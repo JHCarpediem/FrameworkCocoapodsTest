@@ -1,0 +1,6 @@
+framework module TDUIProvider {
+  umbrella header "TDUIProvider-umbrella.h"
+
+  export *
+  module * { export * }
+}

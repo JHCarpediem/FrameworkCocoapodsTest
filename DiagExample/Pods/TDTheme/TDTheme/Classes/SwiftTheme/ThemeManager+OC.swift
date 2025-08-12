@@ -1,0 +1,66 @@
+//
+//  ThemeManager+OC.swift
+//  SwiftTheme
+//
+//  Created by Gesen on 16/9/18.
+//  Copyright © 2016年 Gesen. All rights reserved.
+//
+
+import Foundation
+
+@objc extension ThemeManager {
+    
+    /**
+        extension for Objective-C, Use setTheme(plistName: String, path: ThemePath) in Swift
+     */
+    public class func setThemeWithPlistInMainBundle(_ plistName: String) {
+        setTheme(plistName: plistName, path: .mainBundle)
+    }
+    
+    /**
+        extension for Objective-C, Use setTheme(plistName: String, path: ThemePath) in Swift
+     */
+    public class func setThemeWithPlistInSandbox(_ plistName: String, path: URL) {
+        setTheme(plistName: plistName, path: .sandbox(path))
+    }
+    
+    public class func setThemeWithPlistInBundle(_ plistName: String, bundleName: String) {
+        setTheme(plistName: plistName, path: .bundle(bundleName))
+    }
+    
+    /**
+       extension for Objective-C, Use setTheme(jsonName: String, path: ThemePath) in Swift
+    */
+    public class func setThemeWithJsonInMainBundle(_ jsonName: String) {
+        setTheme(jsonName: jsonName, path: .mainBundle)
+    }
+    
+    /**
+       extension for Objective-C, Use setTheme(jsonName: String, path: ThemePath) in Swift
+    */
+    public class func setThemeWithJsonInSandbox(_ jsonName: String, path: URL) {
+        setTheme(jsonName: jsonName, path: .sandbox(path))
+    }
+    
+    public class func setThemeWithJsonInBundle(_ jsonName: String, bundleName: String) {
+        setTheme(jsonName: jsonName, path: .bundle(bundleName))
+    }
+
+    /**
+        extension for Objective-C, Use setTheme(dict: NSDictionary, path: ThemePath) in Swift
+     */
+    public class func setThemeWithDictInMainBundle(_ dict: NSDictionary) {
+        setTheme(dict: dict, path: .mainBundle)
+    }
+    
+    /**
+        extension for Objective-C, Use setTheme(dict: NSDictionary, path: ThemePath) in Swift
+     */
+    public class func setThemeWithDictInSandbox(_ dict: NSDictionary, path: URL) {
+        setTheme(dict: dict, path: .sandbox(path))
+    }
+    
+    public class func setThemeWithDictInBundle(_ dict: NSDictionary, bundleName: String) {
+        setTheme(dict: dict, path: .bundle(bundleName))
+    }
+}

@@ -1,0 +1,6 @@
+framework module TDWCDB {
+  umbrella header "TDWCDB-umbrella.h"
+
+  export *
+  module * { export * }
+}

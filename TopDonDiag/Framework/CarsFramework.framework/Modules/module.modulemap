@@ -1,0 +1,6 @@
+framework module CarsFramework{
+    umbrella header "CarsFramework.h"
+    
+    export *
+    module * { export *}
+}

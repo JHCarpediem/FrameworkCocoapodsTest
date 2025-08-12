@@ -1,0 +1,59 @@
+
+{
+    "global" : {
+        "isHD" : 0,
+        "statusBarStyle" : 0,
+        "isNeutral": 0,
+        "neutralTopdonReplaceValue": "",
+        "isLogoutPopToRoot": 1,
+        "titleColor" : "#333333",
+        "subTitleColor" : "#999999",
+        "assitTitleColor": "#666666",
+        "mainBackgroundColor" : "#FFFFFF",
+        "tableViewBackgroundColor" : "#F8F8F8",
+        "lineColor" : "#DDDDDD",
+        "themeColor" : "#F22222",
+        "disableBackgroundColor" : "#424D59",
+        "disableTextColor" : "#FFFFFF4D",
+        "errorColor" : "#F22222",
+        "cellBackgroundColor" : "#FFFFFF",
+        "cellSelectBackgroundColor" : "#1C2C3C",
+        "confirmBtnTextColor" : "#FFFFFF",
+        "confirmBtnBackgroundColor" : "#F22222",
+        "confirmBtnDisableBackgroundColor" : "",
+        "confirmBtnDisableTextColor" : "",
+        "textFieldPlaceholder": "#999999"
+    },
+    
+    "alert" : {
+        "buttonStyle" : 0,
+        "conterntCornerRadius" : 5,
+        "backgroundColor" : "#FFFFFF",
+        "titleTextColor" : "#333333",
+        "messageTextColor" : "#999999",
+        "cancelBtnTextColor" : "#FFFFFF",
+        "cancelBtnBackgroundColor" : "#FFFFFF33",
+        "linkTextColor" : "#F22222",
+        "lineHidden" : 0,
+        "messageTextAlignment": "left",
+        "nomoreAlertTextColor": "#999999"
+    },
+    
+    "gradient" : {
+        "mainBackgroundGradientStyle" : "",
+        "mainBackgroundGradient" : "",
+        "confirmBtnGradientStyle" : "",
+        "confirmBtnGradientColors" : "",
+        "alertBackgroundGradientStyle" : "",
+        "alertBackgroundGradient" : "",
+        "pickerViewRowSelectGradientStyle" : "leftToRight",
+        "pickerViewRowSelectGradient" : "",
+        "feedbackBackgroundGradientStyle" : "topToBottom",
+        "feedbackBackgroundGradient" : ""
+    },
+    
+    "navigationBar" : {
+        "backgroundColor" : "",
+        "rightItemTextColor" : "#333333",
+    }
+}

@@ -1,0 +1,6 @@
+framework module vcibattery {
+  umbrella header "vcibattery.h"
+
+  export *
+  module * { export * }
+}

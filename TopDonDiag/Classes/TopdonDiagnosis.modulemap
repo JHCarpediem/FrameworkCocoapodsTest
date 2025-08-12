@@ -1,0 +1,6 @@
+framework module TopdonDiagnosis {
+  umbrella header "TopdonDiagnosis.h"
+
+  export *
+  module * { export * }
+}

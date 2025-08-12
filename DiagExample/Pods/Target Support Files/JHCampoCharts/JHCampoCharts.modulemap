@@ -1,0 +1,6 @@
+framework module JHCampoCharts {
+  umbrella header "JHCampoCharts-umbrella.h"
+
+  export *
+  module * { export * }
+}

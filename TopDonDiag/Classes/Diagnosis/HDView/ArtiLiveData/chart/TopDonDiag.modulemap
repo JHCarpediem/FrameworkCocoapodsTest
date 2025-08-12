@@ -1,0 +1,6 @@
+framework module TopDonDiag{
+    umbrella header "TopDonDiag.h"
+    
+    export *
+    module * { export *}
+}

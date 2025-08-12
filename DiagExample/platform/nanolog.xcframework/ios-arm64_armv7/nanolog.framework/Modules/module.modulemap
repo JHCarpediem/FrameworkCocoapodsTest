@@ -1,0 +1,6 @@
+framework module nanolog {
+  umbrella header "nanolog.h"
+
+  export *
+  module * { export * }
+}

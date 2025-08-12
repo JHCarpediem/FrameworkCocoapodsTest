@@ -1,0 +1,153 @@
+//
+//  PrefixHeader.pch
+//  TDDiag
+//
+//  Created by lk_ios2023002 on 2023/3/16.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#define NSLog(...) NSLog(__VA_ARGS__);
+
+//#define BLELog(...);
+//
+//#define HLog(...);
+
+#define BLELog(fmt, ...) ({\
+@autoreleasepool {\
+if ([TDD_DiagnosisManage sharedManage].enabledBleLog) {\
+[TDD_Tools bleLog:[NSString stringWithFormat:(@"%@",@"" fmt), ##__VA_ARGS__] file:[[NSString stringWithUTF8String:__FILE__] lastPathComponent] func:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] line:__LINE__];\
+}\
+}\
+});
+
+#define HLog(fmt, ...) ({\
+@autoreleasepool {\
+if ([TDD_DiagnosisManage sharedManage].enabledAD200Log) {\
+[TDD_Tools diagLog:[NSString stringWithFormat:(@"%@",@"" fmt), ##__VA_ARGS__] file:[[NSString stringWithUTF8String:__FILE__] lastPathComponent] func:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__] line:__LINE__];\
+}\
+}\
+});
+
+#define useCarsFramework 1
+
+//获取设备的物理宽度
+#define IphoneWidth [UIScreen mainScreen].bounds.size.width
+//获取设备的物理高度
+#define IphoneHeight [UIScreen mainScreen].bounds.size.height
+
+#define H_Height (IphoneWidth/375.f)
+
+#define H_HHeight (IphoneHeight/812.f)
+
+#define HD_Height (IphoneWidth/1024.f)
+
+#define HD_HHeight (IphoneHeight/768.f)
+
+// A4纸的宽度
+#define A4Width 595.f
+// A4纸的高度
+#define A4Height 842.f
+
+//获取状态栏的高度
+#define StatusBarHeight [[UIApplication sharedApplication] statusBarFrame].size.height
+
+//获取导航栏的高度
+#define NavigationBarHeight self.navigationController.navigationBar.frame.size.height
+
+//屏幕顶部 导航栏高度（包含状态栏高度）
+#define NavigationHeight (StatusBarHeight + 44)
+
+// 底部安全区域高度
+#define kSafeBottomHeight [UIDevice vg_safeDistanceBottom]
+
+//是否是IPHONEX以上
+#define IS_iPhoneX \
+({float isPhoneX = 0;\
+if (@available(iOS 11.0, *)) {\
+isPhoneX = [[UIApplication sharedApplication] delegate].window.safeAreaInsets.bottom;\
+}\
+(isPhoneX);})
+
+#define IS_IPad [TDD_DiagnosisTools isIpad]
+
+#define FLT_APP_WINDOW  [[UIApplication sharedApplication] keyWindow]
+
+//底部安全距离
+#define iPhoneX_D (IS_iPhoneX ? IS_iPhoneX : 0.f)
+
+#define kWeakSelf(type)__weak typeof(type)weak##type = type;
+#define kStrongSelf(type)__strong typeof(type)strong##type = weak##type;
+
+#define kWeakObj(o) autoreleasepool{} __weak typeof(o) o##Weak = o;
+#define kStrongObj(o) autoreleasepool{} __strong typeof(o) o = o##Weak;
+
+#define kSystemFont(fontSize) [[UIFont systemFontOfSize:fontSize] tdd_adaptHD]
+#define kBoldSystemFont(fontSize) [[UIFont boldSystemFontOfSize:fontSize] tdd_adaptHD]
+
+#define kImageNamed(image) [TDD_Tools tdd_imageNamed:image]
+
+#define bundleName [[[NSBundle mainBundle] infoDictionary]objectForKey:@"CFBundleDisplayName"]
+
+//颜色
+#define RgbColor(r, g, b, a) [UIColor colorWithRed:(r)/255.0f green:(g)/255.0f blue:(b)/255.0f alpha:(a)]
+
+
+#pragma mark --    多语言
+#define Local(key) [TDD_HLanguage getLanguage:key]
+
+
+#define TDDSelectdVCISerialNum [TDD_DiagnosisTools selectedVCISerialNum]
+#define TDDSelectedTDartsSerialNum [TDD_DiagnosisTools selectedTDartsSerialNum]
+#define isTopVCI (TDD_DiagnosisManage.sharedManage.currentSoftware & TDDSoftwareTopVci)
+#define isTopVCIPRO (TDD_DiagnosisManage.sharedManage.currentSoftware & TDDSoftwareTopVciPro)
+#define isKindOfTopVCI ([TDD_DiagnosisTools softWareIsTopVCI] || [TDD_DiagnosisTools softWareIsCarPalSeries])
+#define isDeepScan (TDD_DiagnosisManage.sharedManage.currentSoftware == TDDSoftwareDeepScan)
+
+#pragma mark -- 链接
+#define kRequestApiSendAlgorithmInformation @"api/v1/user/out/client/sendAlgorithmInformation" //请求及获取算法API
+
+#ifdef __OBJC__
+#import "TDD_HTipManage.h"
+#import "TDD_HLanguage.h"
+#import "Diagnosis_Category.h"
+#import "TDD_DiagnosisTools.h"
+#import "TDD_Statistics.h"
+#import "TDD_DiagnosisManage.h"
+//mod
+#import "TDD_ArtiGlobalModel.h"
+#import "TDD_StdCommModel.h"
+
+//蓝牙
+#import "TDD_HMBLECenterHandle.h"
+#import "TDD_EADSessionController.h"
+
+#import <Firebase/Firebase.h>
+#import <Masonry/Masonry.h>
+#import <YYText/YYText.h>
+#import <YYModel/YYModel.h>
+#import "TDD_VXXScrollButton.h"
+#import "TDD_VXXScrollLabel.h"
+#import "TDD_CustomLabel.h"
+#import "TDD_CustomTextField.h"
+#import <AsyncDisplayKit/AsyncDisplayKit.h>
+
+#ifdef useCarsFramework
+#import <CarsFramework/HStdShowMaco.h>
+#else
+#import "HStdShowMaco.h"
+#endif
+
+#import "Diagnosis_Category.h"
+#import <TopdonDiagnosis/TopdonDiagnosis-Swift.h>
+#import "TDD_Enums.h"
+#import "TDD_Tools.h"
+#import "TDD_UserdefaultManager.h"
+
+#endif
+
+
+#endif /* PrefixHeader_pch */

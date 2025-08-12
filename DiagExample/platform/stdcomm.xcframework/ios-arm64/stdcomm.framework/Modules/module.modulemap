@@ -1,0 +1,6 @@
+framework module stdcomm {
+  umbrella header "stdcomm.h"
+
+  export *
+  module * { export * }
+}
