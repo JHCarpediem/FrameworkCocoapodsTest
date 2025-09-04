@@ -1,0 +1,293 @@
+#include "DemoArtiEcuInfoTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiEcuInfoTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitTitle");		        vctMenuID.push_back(0);
+		uiMenu.AddItem("SetColWidth");			    vctMenuID.push_back(1);
+		uiMenu.AddItem("AddGroup");		            vctMenuID.push_back(2);
+		uiMenu.AddItem("AddItem");		            vctMenuID.push_back(3);
+		//uiMenu.AddItem("测试极限值");	            vctMenuID.push_back(11);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiEcuInfoTest_InitTitle();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiEcuInfoTest_SetColWidth();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiEcuInfoTest_AddGroup();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiEcuInfoTest_AddItem();
+				}
+				else if (11 == vctMenuID[uRetBtn])
+				{
+					ArtiEcuInfoTest_MaxTest();
+				}
+			}
+		}
+	}
+
+
+	void CArtiEcuInfoTest::ArtiEcuInfoTest_InitTitle()
+	{
+		string strTitle;
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000023"));
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = "";
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0200000000");
+			}
+			else
+			{
+				strTitle = TextMulitLineTitle;
+			}
+
+#if __Multi_System_Test__
+			CArtiEcuInfo uiEcuInfo(m_uThread);
+#else
+			CArtiEcuInfo uiEcuInfo;
+#endif
+			uiEcuInfo.InitTitle(strTitle);
+			uiEcuInfo.SetColWidth(50, 50);
+			uiEcuInfo.AddItem(artiGetText("FF0200000003"), artiGetText("FF0200000004"));
+			uiEcuInfo.AddItem(artiGetText("FF0200000005"), artiGetText("FF0200000006"));
+
+			while (1)
+			{
+				uRetBtn = uiEcuInfo.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiEcuInfoTest::ArtiEcuInfoTest_SetColWidth()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0200000007"));
+		uiMenu.AddItem("0,100");
+		uiMenu.AddItem("50,50");
+		uiMenu.AddItem("100,0");
+
+		while (1)
+		{
+#if __Multi_System_Test__
+			CArtiEcuInfo uiEcuInfo(m_uThread);
+#else
+			CArtiEcuInfo uiEcuInfo;
+#endif
+			uiEcuInfo.InitTitle(artiGetText("FF0200000000"));
+
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				uiEcuInfo.SetColWidth(0, 100);
+			}
+			else if (1 == uRetBtn)
+			{
+				uiEcuInfo.SetColWidth(50, 50);
+			}
+			else
+			{
+				uiEcuInfo.SetColWidth(100, 0);
+			}
+			uiEcuInfo.AddItem(artiGetText("FF0200000003"), artiGetText("FF0200000004"));
+			uiEcuInfo.AddItem(artiGetText("FF0200000005"), artiGetText("FF0200000006"));
+
+			while (1)
+			{
+				uRetBtn = uiEcuInfo.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiEcuInfoTest::ArtiEcuInfoTest_AddGroup()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0200000008"));
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		while (1)
+		{
+#if __Multi_System_Test__
+			CArtiEcuInfo uiEcuInfo(m_uThread);
+#else
+			CArtiEcuInfo uiEcuInfo;
+#endif
+			uiEcuInfo.InitTitle(artiGetText("FF0200000000"));
+			uiEcuInfo.SetColWidth(50, 50);
+
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				uiEcuInfo.AddGroup("");
+			}
+			else if (1 == uRetBtn)
+			{
+				uiEcuInfo.AddGroup(artiGetText("FF0200000009"));
+			}
+			else
+			{
+				uiEcuInfo.AddGroup(TextMulitLineTitle);
+			}
+			uiEcuInfo.AddItem(artiGetText("FF0200000003"), artiGetText("FF0200000004"));
+			uiEcuInfo.AddItem(artiGetText("FF0200000005"), artiGetText("FF0200000006"));
+
+			while (1)
+			{
+				uRetBtn = uiEcuInfo.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiEcuInfoTest::ArtiEcuInfoTest_AddItem()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF020000000A"));
+		uiMenu.AddItem(artiGetText("FF020000000B"));
+		uiMenu.AddItem(artiGetText("FF020000000C"));
+
+		while (1)
+		{
+#if __Multi_System_Test__
+			CArtiEcuInfo uiEcuInfo(m_uThread);
+#else
+			CArtiEcuInfo uiEcuInfo;
+#endif
+			uiEcuInfo.InitTitle(artiGetText("FF0200000000"));
+			uiEcuInfo.SetColWidth(50, 50);
+
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiEcuInfo.AddItem("", "");
+				}
+			}
+			else if (1 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiEcuInfo.AddItem(artiGetText("FF0200000000"), artiGetText("FF020000000D"));
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiEcuInfo.AddItem(TextMulitLineTitle, TextMulitLineValue);
+				}
+			}
+
+			while (1)
+			{
+				uRetBtn = uiEcuInfo.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiEcuInfoTest::ArtiEcuInfoTest_MaxTest()
+	{
+		ShowMsgBoxDemo(artiGetText("FF0200000001"), artiGetText("FF0200000002"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+#if __Multi_System_Test__
+		CArtiEcuInfo uiEcuInfo(m_uThread);
+#else
+		CArtiEcuInfo uiEcuInfo;
+#endif
+		uiEcuInfo.InitTitle(artiGetText("FF0200000000"));
+		uiEcuInfo.SetColWidth(50, 50);
+		for (uint32_t i = 0; i < 500; i++)
+		{
+			uiEcuInfo.AddItem(TextMulitLineTitle, TextMulitLineValue);
+		}
+		uiEcuInfo.Show();
+	}
+
+}

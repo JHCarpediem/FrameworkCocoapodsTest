@@ -1,0 +1,18 @@
+#pragma once
+#include "DemoAPITest.h"
+#include <vector>
+
+namespace Topdon_AD900_Demo {
+	class CArtiFreezeTest : public CAPITest
+	{
+	public:
+		void ShowMenu();
+		void ArtiFreezeTest_InitTitle();
+		void ArtiFreezeTest_AddItem();
+		void ArtiFreezeTest_AddItemEx_SetHeads_SetValueType_AddItemEx();
+
+	protected:
+	private:
+	};
+
+}

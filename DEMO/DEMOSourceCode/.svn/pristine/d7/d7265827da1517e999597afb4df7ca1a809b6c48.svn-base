@@ -1,0 +1,64 @@
+#include "DemoHotFunction.h"
+#include "ArtiMenu.h"
+#include "StdShowMaco.h"
+#include "DemoPublicAPI.h"
+#include "ArtiMsgBox.h"
+#include "DataFile.h"
+#include "ArtiGlobal.h"
+#include "DemoMaco.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CHotFunction::ShowMainMenu()
+	{
+		CArtiMenu uiMenu;
+		uiMenu.InitTitle(artiGetText("500000060100"));
+
+		vector<string> vctText;
+
+		uint64_t type = (uint64_t)CArtiGlobal::GetDiagEntryType();
+		char	chvalue[200];
+
+		SPRINTF_S(chvalue, "%lX", type);
+		CEcuInterface::Log(chvalue);
+		for (map<CArtiGlobal::eDiagEntryType, string>::iterator iter = mapeDiagEntryType.begin();
+			iter != mapeDiagEntryType.end(); iter++)
+		{
+			uint64_t typeTemp = (uint64_t)iter->first;
+			if ((typeTemp & type) != 0)
+			{
+				vctText.push_back(iter->second);
+			}
+		}
+
+		if (!vctText.size())
+		{
+ 			artiShowMsgBox(artiGetText("500000200000"), artiGetText("500000200004"), DF_MB_OK, DT_LEFT, -1);
+ 			return;
+		}
+
+		for (string strTemp : vctText)
+		{
+			uiMenu.AddItem(strTemp);
+		}
+				
+		uint32_t uRetMenu = DF_ID_NOKEY;
+		while (1)
+		{
+			uRetMenu = uiMenu.Show();
+			if (uRetMenu == DF_ID_BACK)
+			{
+				break;
+			}
+			else
+			{
+				artiShowMsgBox(artiGetText("500000200000"), artiGetText("Communicating"), DF_MB_NOBUTTON);
+
+				Delay(2000);
+
+				artiShowMsgBox(artiGetText("500000200000"), artiGetText("500000200003"), DF_MB_OK);
+			}
+		}
+	}
+
+}

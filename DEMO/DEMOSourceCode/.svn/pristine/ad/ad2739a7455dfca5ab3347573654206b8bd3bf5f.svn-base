@@ -1,0 +1,149 @@
+/*******************************************************************************
+* Copyright (C), 2020, Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 动作测试
+* 功能描述 : 动作测试举例
+* 创 建 人 : panjun        20210123
+* 审 核 人 : 
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#include "StdShowMaco.h"
+#include "PublicInterface.h"
+#include "ArtiMenu.h"
+#include "ArtiMsgBox.h"
+#include "DemoArtiPictureTest.h"
+#include "ArtiPicture.h"
+
+namespace Topdon_AD900_Demo {
+
+	CArtiPictureTest::CArtiPictureTest()
+	{
+
+	}
+
+	CArtiPictureTest::~CArtiPictureTest()
+	{
+
+	}
+
+	void CArtiPictureTest::TestAritPicture()
+	{
+		CArtiPicture	uiPicture;
+		string			strPath;
+		string			strPicture1Path;
+		string			strPicture2Path;
+		string			strPicture3Path;
+		string			strPicture4Path;
+		string			strPicture5Path;
+		uint32_t		uPicture1Id;
+		uint32_t		uPicture2Id;
+		uint32_t		uPicture3Id;
+		uint32_t		uPicture4Id;
+		uint32_t		uPicture5Id;
+
+		CArtiMenu		uiMenu;
+
+		uiMenu.InitTitle("Test artipicture");
+		uiMenu.AddItem("png");
+		uiMenu.AddItem("bmp");
+		uiMenu.AddItem("jpg");
+		uiMenu.AddItem("svg");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+
+			strPath = CArtiGlobal::GetVehPath();
+
+			strPicture1Path = strPath;
+			strPicture2Path = strPath;
+			strPicture3Path = strPath;
+			strPicture4Path = strPath;
+			strPicture5Path = strPath;
+
+			strPicture1Path += "/picture/";
+			strPicture2Path += "/picture/";
+			strPicture3Path += "/picture/";
+			strPicture4Path += "/picture/";
+			strPicture5Path += "/picture/";
+
+			uiPicture.InitTitle("ArtiPicture");
+			uiPicture.AddButton("OK");
+
+			uRet &= 0xff;
+			if (uRet == 0)
+			{
+				strPicture1Path += "Audi.png";
+				strPicture2Path += "Benz.png";
+				strPicture3Path += "BWM.png";
+				strPicture4Path += "BWM.png";
+
+
+				uPicture1Id = uiPicture.AddPicture(strPicture1Path, "pitcure1");
+				uPicture2Id = uiPicture.AddPicture(strPicture2Path, "pitcure2");
+				uPicture3Id = uiPicture.AddPicture(strPicture3Path, "pitcure3");
+				uPicture4Id = uiPicture.AddPicture(strPicture4Path, "pitcure4");
+
+				uiPicture.AddTopTips(uPicture1Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+				uiPicture.AddTopTips(uPicture2Id, "picture2Info111111111111111111111\n11111111111111", FORT_SIZE_MEDIUM, BOLD_TYPE_NONE);
+				uiPicture.AddTopTips(uPicture3Id, "picture3Info11111111111111111111111", FORT_SIZE_LARGE, BOLD_TYPE_NONE);
+				uiPicture.AddTopTips(uPicture4Id, "picture3Info11111111111111111111111", FORT_SIZE_LARGE, BOLD_TYPE_NONE);
+			}
+			else
+			{
+				if (uRet==1)
+				{
+					strPicture1Path += "bmp.bmp";
+					strPicture2Path += "bmp.bmp";
+					strPicture3Path += "bmp.bmp";
+					strPicture4Path += "bmp.bmp";
+					strPicture5Path += "bmp.bmp";
+				}
+				else if (uRet == 2)
+				{
+					strPicture1Path += "JPG.jpg";
+					strPicture2Path += "JPG.jpg";
+					strPicture3Path += "JPG.jpg";
+					strPicture4Path += "JPG.jpg";
+					strPicture5Path += "JPG.jpg";
+				}
+				else
+				{
+					strPicture1Path += "SVG.svg";
+					strPicture2Path += "SVG.svg";
+					strPicture3Path += "SVG.svg";
+					strPicture4Path += "SVG.svg";
+					strPicture5Path += "SVG.svg";
+				}
+				uPicture1Id = uiPicture.AddPicture(strPicture1Path, "pitcure1");
+				uPicture2Id = uiPicture.AddPicture(strPicture2Path, "pitcure2");
+				uPicture3Id = uiPicture.AddPicture(strPicture3Path, "pitcure3");
+				uPicture4Id = uiPicture.AddPicture(strPicture4Path, "pitcure4");
+				uPicture5Id = uiPicture.AddPicture(strPicture5Path, "pitcure5");
+
+				uiPicture.AddTopTips(uPicture1Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+				uiPicture.AddTopTips(uPicture2Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+				uiPicture.AddTopTips(uPicture3Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+				uiPicture.AddTopTips(uPicture4Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+				uiPicture.AddTopTips(uPicture5Id, "picture1Info111111111111111111111\n11111111111111111", FORT_SIZE_SMALL, BOLD_TYPE_BOLD);
+
+			}
+
+			uiPicture.AddText("Citroen Relay 2006-\nPeugeot Boxer 2006-\nIveco Daily 2007-\n\nkey types:\nMEGAMOS 48");
+			while (1)
+			{
+				uRetBtn = uiPicture.Show();
+				if (DF_ID_BACK == uRetBtn || DF_ID_FREEBTN_0 == uRetBtn)
+				{
+					break;
+				}
+			}
+		}
+	}
+}

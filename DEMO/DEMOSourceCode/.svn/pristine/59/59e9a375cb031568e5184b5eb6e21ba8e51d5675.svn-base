@@ -1,0 +1,116 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := std
+##### 32 Bit So
+#####ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+#####LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso/libStd.so
+#####endif
+
+##### 64 Bit So
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso64/libStd.so
+endif
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := stdshow
+##### 32 Bit So
+#####ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+#####LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso/libstdshow.so
+#####endif
+
+##### 64 Bit So
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso64/libstdshow.so
+endif
+include $(PREBUILT_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_MODULE := stdcomm
+##### 32 Bit So
+#####ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+#####LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso/libstdcomm.so
+#####endif
+
+##### 64 Bit So
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+LOCAL_SRC_FILES := $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Release/Android/libso64/libstdcomm.so
+endif
+include $(PREBUILT_SHARED_LIBRARY)
+
+
+include $(CLEAR_VARS)
+LOCAL_MODULE         := Diag
+#BUILD_SRC_DIR        := $(LOCAL_PATH)/../../Diag
+                     
+LOCAL_SRC_FILES      := $(LOCAL_PATH)/../../../../SourceCode\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoArtiFloatMiniTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/Demomain.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/Demo.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoActive.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoAppLayer.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoEnterSys.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoInfomation.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoLiveData.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoNetCan.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoNetKwp2000.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoNetLayer.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoAPITest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoPublicAPI.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoTroubleCode.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiActiveTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiEcuInfoTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiFileDialogTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiFreezeTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiGlobalTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiInputTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiListTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiLiveDataTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiMenuTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiMsgBoxTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiReportTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiSystemTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiTroubleTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiWebTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoHotFunction.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiPopupTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiMiniMsgBoxTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiCoilReaderTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoArtiFreqWaveTest.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoArtiPictureTest.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoArtiObdReviewTest.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoNetSaeJ1850.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoEcuTest.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoNetTp20.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoNetNormal.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoUnlockGW.cpp\
+						$(LOCAL_PATH)/../../../../SourceCode/DemoVehAutoAuthTest.cpp\
+                        $(LOCAL_PATH)/../../../../SourceCode/DemoImmoTest.cpp
+
+
+                     
+LOCAL_C_INCLUDES     += $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Include\
+                        $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Include/StdInterface\
+                        $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Include/DisplayInterface\
+                        $(LOCAL_PATH)/../../../../../../../PUBLIC/trunk/Include/CommInterface
+
+
+LOCAL_CFLAGS    += -std=c++17
+LOCAL_CFLAGS    += -Wall -Werror -fvisibility=hidden
+
+#LOCAL_CFLAGS    += -mllvm -sub -mllvm -bcf -mllvm -fla -O0
+#启用异常 : LOCAL_CFLAGS += -fexceptions
+#启用RTTI : LOCAL_CFLAGS += -frtti
+
+LOCAL_CFLAGS    += -fno-exceptions
+LOCAL_CFLAGS    += -fno-rtti
+LOCAL_CPPFLAGS  += -Wno-deprecated
+
+
+LOCAL_LDLIBS += -lm -lc -ldl -llog
+LOCAL_SHARED_LIBRARIES := std
+LOCAL_SHARED_LIBRARIES += stdshow
+LOCAL_SHARED_LIBRARIES += stdcomm
+
+include $(BUILD_SHARED_LIBRARY)

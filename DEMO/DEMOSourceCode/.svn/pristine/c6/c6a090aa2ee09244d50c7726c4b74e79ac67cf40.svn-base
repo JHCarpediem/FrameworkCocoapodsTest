@@ -1,0 +1,455 @@
+#include "DemoArtiMiniMsgBoxTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+#include <map>
+#include "ArtiMiniMsgBox.h"
+
+namespace Topdon_AD900_Demo {
+
+	typedef void (CArtiMiniMsgBoxTest::*func)();
+
+	void CArtiMiniMsgBoxTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+		map<uint32_t, func> mapTestFunc;
+
+		CArtiMenu uiMenu;
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitMsgBox");					mapTestFunc.emplace(make_pair(0, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_InitMsgBox));
+		uiMenu.AddItem("SetTitle");						mapTestFunc.emplace(make_pair(1, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetTitle));
+		uiMenu.AddItem("SetContent");					mapTestFunc.emplace(make_pair(2, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetContent));
+		uiMenu.AddItem("AddButton");					mapTestFunc.emplace(make_pair(3, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_AddButton));
+		uiMenu.AddItem("SetButtonType");				mapTestFunc.emplace(make_pair(4, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonType));
+		uiMenu.AddItem("SetButtonStatus");				mapTestFunc.emplace(make_pair(5, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonStatus));
+		uiMenu.AddItem("SetButtonText");				mapTestFunc.emplace(make_pair(6, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonText));
+		uiMenu.AddItem("SetAlignType");					mapTestFunc.emplace(make_pair(7, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetAlignType));
+		uiMenu.AddItem("SetBusyVisible");				mapTestFunc.emplace(make_pair(8, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetBusyVisible));
+		uiMenu.AddItem("SetBusyVisible1");				mapTestFunc.emplace(make_pair(9, &CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetBusyVisible1));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (mapTestFunc.find(uRetBtn & 0xFF) != mapTestFunc.end())
+			{
+				(this->*mapTestFunc[uRetBtn & 0xFF])();
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_InitMsgBox()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("InitMsgBox");
+		uiList.SetColWidth(vctColWidth2);
+
+		uiList.AddItem("uButtonType");
+		uiList.AddItem("uAlignType");
+		uiList.AddButtonEx("Test");
+
+		uint32_t uButtonType = DF_MB_OK;
+		uint32_t uAlignType  = DT_CENTER;
+
+		string strButtonType = "DF_MB_OK";
+		string strAlignType = "DT_CENTER";
+
+		uiList.SetItem(0, 1, strButtonType);
+		uiList.SetItem(1, 1, strAlignType);
+
+		uint32_t uRetBtn = DF_ID_NOKEY;
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiMiniMsgBox uiMsgBox;
+				/*
+				* "测试InitMsgBox接口"
+				* "这是一个测试程序！\n点击[确定]开始测试！"
+				*/
+				uiMsgBox.InitMsgBox(artiGetText("FF0900000002"), artiGetText("FF0900000003"), uButtonType, uAlignType);
+				uiMsgBox.Show();
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uButtonType, strButtonType, mapDFButton);
+					uiList.SetItem(0, 1, strButtonType);
+				}
+				else if (1 == uSelect)
+				{
+					GetParamValue(uAlignType, strAlignType, mapAlignType);
+					uiList.SetItem(1, 1, strAlignType);
+				}
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetTitle()
+	{
+	//	bool bLengText = false;
+		bool bOffSet = false;
+		string strTemp = "";
+
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetTitle接口"
+		*  "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF0900000002"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiMsgBox.SetTitle(artiGetText("FF0900000006") + strTemp);//"SetTitle接口测试\n"
+				}
+				else
+				{
+					uiMsgBox.SetTitle(artiGetText("FF0900000007") + strTemp);//"测试SetTitle接口\n"
+				}
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetContent()
+	{
+	//	bool bLengText = false;
+		bool bOffSet = false;
+		string strTemp = "";
+
+		CArtiMiniMsgBox uiMsgBox;
+
+		/*
+		* "测试SetContent接口"
+		* "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF090000000A"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiMsgBox.SetContent(artiGetText("FF0900000008") + strTemp);//"这是SetContent测试程序！\n点击[确定]开始测试！\n"
+				}
+				else
+				{
+					uiMsgBox.SetContent(artiGetText("FF0900000009") + strTemp);//"这是一个测试程序！\n点击[确定]开始测试！\n"
+				}
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_AddButton()
+	{
+		CArtiMiniMsgBox uiMsgBox;
+
+		/*
+		* "测试AddButton接口"
+		* "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF090000000B"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		bool	bHaveAdd = false;
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				if (!bHaveAdd)
+				{
+					uiMsgBox.AddButton(artiGetText("FF000000000C"));//"测试键"
+					bHaveAdd = true;
+				}
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				break;
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonType()
+	{
+		CArtiMiniMsgBox uiMsgBox1;
+
+		while (1)
+		{
+			//"MsgBox测试界面,点击[OK]调用SetButtonType设置按键类型."
+			uiMsgBox1.InitMsgBox("MsgBox", artiGetText("FF0900000027"), DF_MB_OKCANCEL, DT_LEFT);
+
+			uRetBtn = uiMsgBox1.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_OK)
+			{
+				CArtiList uiList;
+				uiList.InitTitle("ButtonType");
+				uiList.SetColWidth(vctColWidth2);
+				uiList.AddItem("uButtonTyp");
+				uiList.AddButton("Test");
+
+				uint32_t uButtonTyp = DF_MB_OK;
+				string strButtonTyp = "DF_MB_OK";
+
+				uiList.SetItem(0, 1, strButtonTyp);
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_BACK)
+					{
+						break;
+					}
+					else if (DF_ID_FREEBTN_0 == uRetBtn)
+					{
+						if (uButtonTyp == DF_MB_NOBUTTON)
+						{
+							//"测试AddButton接口"	//"您选择了DF_MB_NOBUTTON类型，将返回上级菜单！"
+							ShowMsgBoxDemo("SetButtonType", artiGetText("FF090000000D"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+							continue;
+						}
+						uiMsgBox1.SetButtonType(uButtonTyp);
+
+						//点击任意按键，返回[ButtonType]选择界面
+						uiMsgBox1.SetContent(artiGetText("FF0900000028"));
+
+						uiMsgBox1.Show();
+					}
+					else if (DF_ID_NOKEY != uRetBtn)
+					{
+						uint16_t uSelect = uiList.GetSelectedRow();
+						if (0 == uSelect)
+						{
+							GetParamValue(uButtonTyp, strButtonTyp, mapDFButton);
+							uiList.SetItem(0, 1, strButtonTyp);
+						}
+					}
+				}
+
+				break;
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonStatus()
+	{
+		uint32_t uOffSet = 0;
+
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetButtonStatus接口"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF0900000016"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				uOffSet += 1;
+				if (uOffSet % 2 == 0)
+				{
+					uiMsgBox.SetButtonStatus(uOffSet % 2, DF_ST_BTN_ENABLE);
+				}
+				else if (uOffSet % 2 == 1)
+				{
+					uiMsgBox.SetButtonStatus(uOffSet % 2, DF_ST_BTN_DISABLE);
+				}
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetButtonText()
+	{
+		bool bOffSet = false;
+
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetButtonText接口"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF0900000015"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiMsgBox.SetButtonText(1, "TestBtn_0");
+				}
+				else
+				{
+					uiMsgBox.SetButtonText(1, artiGetText("FF000000000D"));// "测试键0";
+				}
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetAlignType()
+	{
+		uint32_t uOffSet = 0;
+
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetAlignType接口"
+		* "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF090000000E"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+		while (1)
+		{
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				uOffSet += 1;
+				if (uOffSet % 3 == 0)
+				{
+					uiMsgBox.SetAlignType(DT_LEFT);
+				}
+				else if (uOffSet % 3 == 1)
+				{
+					uiMsgBox.SetAlignType(DT_CENTER);
+				}
+				else
+				{
+					uiMsgBox.SetAlignType(DT_RIGHT);
+				}
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetBusyVisible()
+	{
+		bool bOffSet = false;
+
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetBusyVisible接口"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF0900000012"), artiGetText("FF0900000003"), DF_MB_FREE | DF_MB_BLOCK, DT_LEFT);
+		uiMsgBox.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiMsgBox.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiMsgBox.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiMsgBox.SetBusyVisible(true);
+				}
+				else
+				{
+					uiMsgBox.SetBusyVisible(false);
+				}
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiMiniMsgBoxTest::ArtiMiniMsgBoxTest_SetBusyVisible1()
+	{
+		CArtiMiniMsgBox uiMsgBox;
+		/*
+		* "测试SetBusyVisible接口"
+		*/
+		uiMsgBox.InitMsgBox(artiGetText("FF0900000012"), artiGetText("FF0900000003"), DF_MB_NOBUTTON, DT_LEFT);
+		uiMsgBox.SetBusyVisible(true);
+		for (uint16_t i = 10; i != 0 ; i--)
+		{
+			char buff[100] = { 0 };
+			string strText = artiGetText("FF090000002C");//"等待%d秒..."
+			SPRINTF_S(buff, strText.c_str(), i);
+
+			CEcuInterface::Log("SetBusyVisible1 before");
+			uiMsgBox.SetContent(buff);
+			
+			uiMsgBox.Show();
+			CEcuInterface::Log("SetBusyVisible1 arfer");
+			Delay(500);
+		}
+		return;
+	}
+
+}

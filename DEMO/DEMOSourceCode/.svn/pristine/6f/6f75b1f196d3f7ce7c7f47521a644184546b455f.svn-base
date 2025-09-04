@@ -1,0 +1,229 @@
+/*******************************************************************************
+* Copyright (C), 2020, Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 数据流
+* 功能描述 : 数据流举例
+* 创 建 人 : panjun        20210123
+* 审 核 人 : 
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#include "DemoLiveData.h"
+#include "Expression.h"
+#include "DataFile.h"
+#include "ProFile.h"
+#include "Expression.h"
+#include "PublicInterface.h"
+#include "StdInclude.h"
+#include "ArtiLiveData.h"
+#include "StdInclude.h"
+#include "ArtiMsgBox.h"
+#include "DemoEnterSys.h"
+#include "ArtiReport.h"
+#include "DemoPublicAPI.h"
+#include "Demo.h"
+
+namespace Topdon_AD900_Demo {
+
+	CLiveData::CLiveData()
+	{
+
+	}
+
+	CLiveData::~CLiveData()
+	{
+
+	}
+
+	void CLiveData::SetSysEnterPointer(CEnterSys* pSysEnter)
+	{
+		m_pSysEnter = pSysEnter;
+	}
+
+	void CLiveData::DataStream(CBinary binSys)
+	{
+		CArtiLiveData	uiLiveData;
+		CDataFile		datafile;
+		CProFile		profile;
+		string			strTemp;
+		uint32_t		iLiveDataNum;
+		vector<vector<string>> vecvecstrItem;
+		vector<uint16_t> vecint;//当前屏编号集合
+		vector<string>	vecstr;
+		CRecvFrame			cf;
+		uint32_t			uRet;
+		CBinary			binRecv("\x10\x32\x32\x05", 4);
+		const string			strSys = Binary2HexString(binSys);
+
+		if (!datafile.Open("Vehicle.dat"))
+		{
+			artiShowMsgBox("error", "error", DF_MB_OK);
+			return;
+		}
+		strTemp = datafile.GetText(strSys);
+		if (strTemp.empty())
+		{
+			artiShowMsgBox("error", "error", DF_MB_OK);
+			return;
+		}
+		profile.Set(strTemp);
+		uiLiveData.InitTitle(artiGetText("FFFFFFFF0031"));
+		iLiveDataNum = profile.GetHex("LiveData", "LiveDataNum");
+
+		vector<stDsReportItem> vctItem;
+
+		for (uint32_t i = 0; i < iLiveDataNum; i++)
+		{
+			string			strItem = "Item";
+			char			chvalue[100];
+			string			strLiveData;
+			string			strUnit = "50000009";
+			string			strMin = "";
+			string			strMax = "";
+
+			strLiveData = strSys;
+			SPRINTF_S(chvalue, "%d", i + 1);
+			strItem += chvalue;
+			vecstr = profile.GetStringGroup("LiveData", strItem);
+			if (vecstr.size() < 2)
+			{
+				artiShowMsgBox("error", "error", DF_MB_OK);
+				continue;
+			}
+			strLiveData += vecstr[0];
+			if (vecstr.size() > 2)
+			{
+				strUnit += vecstr[2];
+			}
+			strUnit = artiGetText(strUnit);
+			if (vecstr.size()>3)
+			{
+				vector<string>	vecstrMaxMin;
+
+				vecstrMaxMin = SeparateString(vecstr[3], "---");
+				if (vecstrMaxMin.size()>1)
+				{
+					strMin = vecstrMaxMin[0];
+					strMax = vecstrMaxMin[1];
+				}
+			}
+			uiLiveData.AddItem(artiGetText(strLiveData), "", strUnit, strMin, strMax);
+			vecvecstrItem.push_back(vecstr);
+
+			// 设置诊断报告项 [8/10/2022 qunshang.li]
+			stDsReportItem dsReportItem;
+			dsReportItem.strName = artiGetText(strLiveData);
+			dsReportItem.strUnit = strUnit;
+			dsReportItem.strMin = strMin;
+			dsReportItem.strMax = strMax;
+			vctItem.push_back(dsReportItem);
+		}
+		uiLiveData.Show();
+		while (1)
+		{
+			vecint = uiLiveData.GetUpdateItems();
+
+			for (uint32_t i = 0; i<vecint.size(); i++)
+			{
+				string			strExp = strSys;
+				string			strValue;
+				uint8_t			uValue = 0;
+
+				uValue = rand();
+
+				binRecv.SetAt(2, uValue);
+				vecstr = vecvecstrItem[vecint[i]];
+				//cf = m_pSysEnter->SendReceive(HexString2Binary(vecstr[1]));
+				strExp += vecstr[1];
+				strValue = Calc_Script(strExp, binRecv, 2);
+
+				uiLiveData.FlushValue(vecint[i], strValue);
+				//uiLiveData.Show();
+
+				if (vecint[i] < vctItem.size())
+				{
+					vctItem[vecint[i]].strValue = strValue;
+				}
+			}
+			CEnterSys::Delay(500);
+			uRet = uiLiveData.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRet == DF_ID_LIVEDATA_REPORT)
+			{
+#ifndef WIN32
+				vector<stDsReportItem> vctDsp;
+				vector<uint16_t> vctReportItems;
+				vector<uint16_t> vctLimitsItem;
+
+				vctLimitsItem = uiLiveData.GetLimitsModifyItems();
+				for (uint32_t iLimit = 0; iLimit < vctLimitsItem.size(); iLimit++)
+				{
+					string	strChangeMin;
+					string	strChangeMax;
+
+					uiLiveData.GetLimits(vctLimitsItem[iLimit], strChangeMin, strChangeMax);
+					vctItem[vctLimitsItem[iLimit]].strMin = strChangeMin;
+					vctItem[vctLimitsItem[iLimit]].strMax = strChangeMax;
+				}
+
+				vctReportItems = uiLiveData.GetReportItems();
+				for (uint32_t iReport = 0; iReport < vctReportItems.size(); iReport++)
+				{
+					vctDsp.push_back(vctItem[vctReportItems[iReport]]);
+				}
+				SetLiveDataReport(vctDsp);
+#endif // !WIN32
+			}
+		}
+	}
+
+	void CLiveData::SetLiveDataReport(vector<stDsReportItem>& vctItem)
+	{
+		// 判断 APP 的宿主机类型
+		//CArtiGlobal::eHostType uHostType = CArtiGlobal::GetHostType();
+
+		//当前app应用的产品名称
+		//CArtiGlobal::eProductName uProductName = CArtiGlobal::GetAppProductName();
+
+		//当前诊断的入口类型
+		//CArtiGlobal::eDiagEntryType uDiagEntryType = CArtiGlobal::GetDiagEntryType();
+
+		artiShowMsgBox(artiGetText("500000200000"), artiGetText("500000200001"), DF_MB_NOBUTTON);
+
+		Delay(1000);
+
+		//设置系统报告
+		CArtiReport uiReport;
+		uiReport.InitTitle(artiGetText("5100000000E0"));			//诊断报告
+		uiReport.SetReportType(CArtiReport::REPORT_TYPE_DATA_STREAM);
+		uiReport.SetTypeTitle(artiGetText("510000000102"));			//故障诊断报告
+		uiReport.SetDescribeTitle(artiGetText("510000000100"));		//2015-09奥迪
+		uiReport.SetVehInfo("DEMO",CDemo::m_ModelInfo.GetModel(), CDemo::m_ModelInfo.GetYear());			//宝马
+		uiReport.SetEngineInfo(artiGetText("5100000000F6"), "");
+		uiReport.SetVehPath(CDemo::m_ModelInfo.toString());			//
+
+		/*
+		* 概述
+		* 总共扫描出12个系统，其中12个系统故障，故障数量为105个。为了安全驾驶请你仔细阅读分析报告，并修复相关故障信息组件，及时处理排查。
+		*/
+		uiReport.SetSummarize(artiGetText("510000000107"), artiGetText("510000000108"));
+
+		uiReport.AddLiveDataSys("", CDemo::m_ModelInfo.GetSysName());
+		uiReport.AddLiveDataItems(vctItem);
+
+		uint32_t uRetBtn = DF_ID_NOKEY;
+		while (1)
+		{
+			uRetBtn = uiReport.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+		}
+	}
+
+}

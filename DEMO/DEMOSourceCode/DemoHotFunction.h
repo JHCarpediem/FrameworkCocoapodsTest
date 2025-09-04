@@ -1,0 +1,68 @@
+#pragma once
+#include "DemoAPITest.h"
+
+namespace Topdon_AD900_Demo {
+
+	class CHotFunction: public CAPITest
+	{
+	public:
+		void ShowMainMenu();
+		void SpFunMask(string strtile, uint32_t uMak);
+		void OilRest();
+		void ThrottleAdaptation();
+		void EPBRest(string strTile);
+		void ABSBleed(string strTile);
+		void SteeringAngleReset();
+		void DPFReset();
+		void SRSReset();//没有找到协议
+		void BMSReset();
+		void ADASReset();
+		void IMMOMatch(string strTile);
+		void SmartKeyMatch(string strTile);
+		void PasswordReading();//暂不写
+		void InjectorCode(string strTile);
+		void Suspension(string strTile);
+		void TirePressure(string strTile);
+		void TransMatch(string strTile);
+		void GearboxLearning(string strTile);
+		void TransportMode(string strTile);
+		void AFSReset(string strTile);//没有协议
+		void SunroofInit(string strTile);//没有协议
+		void SeatCali(string strTile);//
+		void WindowCali(string strTile);//
+		void StartStop(string strTile);//
+		void EGRTest(string strTile);//
+		void OdometerCali(string strTile);//
+		void SetLanguage(string strTile);//
+		void TireModify(string strTile);//
+		void A_F_Adj(string strTile);//
+		void ElectronicPump(string strTile);
+		void NoxReset(string strTile);//没有协议
+		void AdBlueReset(string strTile);//没有协议
+		void TurbineLearning(string strTile);//
+		void Cylinder(string strTile);//没有协议
+		void Eeprom(string strTile);//没有协议
+		void RFID(string strTile);//没有协议
+		void SpecialFunTest(string strTile);//没有协议
+		void ClutchMatch(string strTile);//
+		void SpeedAndPTO(string strTile);//没有协议
+		void FrmReset(string strTile);//没有协议
+		void WriteVIN(string strTile);//
+		void HV_BATTERY(string strTile);//
+		void ACCReset(string strTile);//
+		void ACLearn(string strTile);//
+		void RainLightSensor(string strTile);//
+		void ControlUnitReset(string strTile);//
+		void CSS_ACC(string strTile);//没有协议 只有大众
+		void RelativeCompression(string strTile);///没有协议 只有大众
+		void HVPoActi(string strTile);///没有协议
+		void ResolverSenCali(string strTile);///没有协议
+		void CoolantChange(string strTile);///没有协议
+		void CamshaftLearn(string strTile);///没有协议
+		void VINODOCheck(string strTile);///没有协议
+
+	protected:
+	private:
+	};
+
+}

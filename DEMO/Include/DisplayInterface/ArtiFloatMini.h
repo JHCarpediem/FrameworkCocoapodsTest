@@ -1,0 +1,119 @@
+/*******************************************************************************
+* Copyright (C), 2020~ , Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 文档类标识
+* 功能描述 : ArtiDiag900悬浮窗控件接口定义
+* 创 建 人 : sujiya 20201210
+* 实 现 人 :
+* 审 核 人 : binchaolin
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#ifndef __ARTI_FLOAT_MINI_H__
+#define __ARTI_FLOAT_MINI_H__
+
+#include "StdInclude.h"
+#include "StdShowMaco.h"
+
+// 非法的悬浮窗ID（句柄）
+#define DF_ID_INVALID_FLOAT_ID  (0xFFFFFFFF)
+
+
+// 悬浮窗相关接口定义，此接口为全局接口
+// 
+// 1、悬浮窗类型可以有多个类型
+// 2、悬浮窗类型默认为FT_TIMER_TYPE，即为倒计时类型（闹钟提醒作用）
+// 2、悬浮窗类没有Show方法，显示和隐藏使用Display和Hidden
+// 3、显示和隐藏接口Display和Hidden，没有Show的按钮返回值效果
+// 4、悬浮窗通常只有一个图标和文字说明
+// 5、如果悬浮窗类型为FT_TIMER_TYPE，App只显示对应的图标，倒计时效果由诊断应用实现
+// 6、同时显示的浮窗最多3个
+//
+class _STD_SHOW_DLL_API_ CArtiFloatMini
+{
+public:
+
+    // 用于指定悬浮窗类型
+    enum class eFloatType :uint32_t
+    {
+        FT_TIMER_TYPE   = 1,        //表示当前悬浮窗是定时器（闹钟效果）类型
+
+        FT_TYPE_INVALID   = 0xFFFFFFFF,
+    };
+
+public:
+    CArtiFloatMini() {}
+    ~CArtiFloatMini() {}
+
+public:
+    /*-----------------------------------------------------------------------------
+      功    能：新建一个悬浮窗
+
+      参数说明：eType  悬浮窗类型，默认是倒计时类型，悬浮窗有一个闹钟图标
+
+      返 回 值：返回悬浮窗编号ID（句柄），例如 0x00000001，表示索引为1的悬浮球
+                DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+
+      说    明：浮窗数量最多3个
+    -----------------------------------------------------------------------------*/
+    static uint32_t NewInstance(eFloatType eType);
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：删除一个悬浮窗
+
+      参数说明：FloatID  悬浮窗ID
+                         FloatID由NewInstance接口返回
+
+      返 回 值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+                DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+
+                如果不存在指定的悬浮窗，返回DF_ID_INVALID_FLOAT_ID
+
+                其它值，暂无意义
+
+      说    明：如果FloatID悬浮窗为显示状态，删除后将消失
+    -----------------------------------------------------------------------------*/
+    static uint32_t DeleteInstance(uint32_t FloatID);
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：设置悬浮窗图标下的文字说明并显示
+
+      参数说明：FloatID       悬浮窗ID，哪一个悬浮窗
+                              FloatID由NewInstance接口返回
+
+                strContent    悬浮窗图标下的文字说明
+
+      返 回 值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+                DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+
+                如果不存在指定的悬浮窗，返回DF_ID_INVALID_FLOAT_ID
+
+                其它值，暂无意义
+
+      说    明：同时显示的浮窗最多3个
+    -----------------------------------------------------------------------------*/
+    static uint32_t Display(uint32_t FloatID, const std::string& strContent);
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：隐藏指定悬浮窗（不显示）
+
+      参数说明：FloatID       悬浮窗ID，哪一个悬浮窗
+                              FloatID由NewInstance接口返回
+
+      返 回 值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+                DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+
+                如果不存在指定的悬浮窗，返回DF_ID_INVALID_FLOAT_ID
+
+                其它值，暂无意义
+
+      说    明：同时显示的浮窗最多3个
+    -----------------------------------------------------------------------------*/
+    static uint32_t Hidden(uint32_t FloatID);
+};
+
+#endif

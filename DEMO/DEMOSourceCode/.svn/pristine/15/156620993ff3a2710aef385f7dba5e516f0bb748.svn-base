@@ -1,0 +1,35 @@
+#pragma once
+#include "DemoAPITest.h"
+#include <vector>
+
+namespace Topdon_AD900_Demo {
+	class CArtiLiveDataTest : public CAPITest
+	{
+	public:
+		void ShowMenu();
+		void ArtiLiveDataTest_InitTitle();
+		void ArtiLiveDataTest_AddItem();
+		void ArtiLiveDataTest_SetNextButtonVisible();
+		void ArtiLiveDataTest_SetNextButtonText();
+		void ArtiLiveDataTest_SetUnit();
+		void ArtiLiveDataTest_SetLimits();
+		void ArtiLiveDataTest_SetReference();
+		void ArtiLiveDataTest_SetHelpText();
+		void ArtiLiveDataTest_SetColWidth();
+		void ArtiLiveDataTest_FlushValue();
+		void ArtiLiveDataTest_GetUpdateItems();
+		void ArtiLiveDataTest_GetItemIsUpdate();
+		void ArtiLiveDataTest_SetPrevButtonVisible();
+		void ArtiLiveDataTest_SetPrevButtonText();
+		void ArtiLiveDataTest_Show();
+		void ArtiLiveDataTest_Show_Type1();
+		void ArtiLiveDataTest_Show_Type2();
+		void ArtiLiveDataTest_SetName_SetVaule();
+		void ArtiLiveDataTest_Tp005ComponentTesting();//小车探  部件测试
+		void ArtiLiveDataTest_GetSearchItems();
+
+	protected:
+	private:
+	};
+
+}

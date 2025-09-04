@@ -1,0 +1,2234 @@
+﻿#ifndef __ECU_INTERFACE_EXPORT_H__
+#define __ECU_INTERFACE_EXPORT_H__
+
+#include "StdCommMaco.h"
+#include "StdInclude.h"
+#include "SendFrame.h"
+
+#include <functional>
+
+class CSendFrame;
+class CRecvFrame;
+class CMultiSendFrame;
+class CMultiRecvFrame;
+
+struct stLinkKeepSet;
+
+#if ENABLE_TOPDON_PUBLIC_STDCOMM_NS
+namespace TopDonPublicStdComm { class CEcuInterfaceImpl; }
+#else
+class CEcuInterfaceImpl;
+#endif
+
+#if defined (_WIN32)
+#pragma warning(push)
+#pragma warning(disable:4251)
+#endif
+
+class _STD_ECU_DLL_API_ CEcuInterface
+{
+
+/************************************     STD 通信层接口   ***************************************/
+/*
+    此接口支持多逻辑链操作，一个CEcuInterface对象即一个逻辑链
+*/
+
+/*
+        调用此接口举例:
+        CEcuInterface ecu;
+        ecu.ClearFilter();
+*/
+
+
+public:
+    /*-----------------------------------------------------------------------------
+      功    能：设置ECU通信协议
+
+      参数说明：ProtocolType     eProtocolType   -- 协议类型
+                BitFormatType    eBitFormat      -- 数据格式
+
+                重复调用SetProtocolType的话（尽管eProtocolType相同），将不会引起SAEJ1962
+                总线PIN脚上的断开和接入（PassThruDisconnect与PassThruConnect）
+                总线上的接入和断开（PassThruConnect与PassThruDisconnect）
+                
+      返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，设置失败
+
+                ERR_NOT_SUPPORTED       不支持，可能原因是逻辑链已超出，或者下位机不支持当前
+                                        引脚的逻辑链，例如：同时跑3路不同引脚的K线
+      
+      说    明：如果需要主动释放接头SAEJ1962总线（例如，释放引脚06和14的CAN_H和CAN_L）
+                eProtocolType实参为CStdCommMaco::__PT_END__，将会释放总线（PassThruDisconnect）
+                条件是已经没有其他逻辑链在跑（即没有CEcuInterface对象占用待释放引脚06和14）
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetProtocolType(CStdCommMaco::ProtocolType eProtocolType,
+                                                CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+
+
+   /*-----------------------------------------------------------------------------
+       功    能：设置通信端口
+       参数说明：
+                 Obd2Pin     IoOutputPin    –  输出引脚，亦可理解为正引脚，如CAN_H;
+                 Obd2Pin     IoInputPin     –  输入引脚，亦可理解为负引脚，如CAN_L;
+                 uint32_t    WorkVoltage    -  工作电压，缺省：K线通信为12V。
+                 uint32_t    PinProperty    –  通信参数 缺省正逻辑输入输出，L线信号与K线同步;
+
+                 重复调用SetIoPin的话（尽管IoOutputPort和IoInputPin相同），将不会引起物理
+                 总线上的接入和断开（PassThruConnect与PassThruDisconnect）
+
+       返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                 其它值，设置失败
+       
+       说    明：1、输入引脚和输出引脚为同一个引脚时，为单线通信，如VPW,不需L辅助线的K线等
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetIoPin(CStdCommMaco::ObdPinType       IoOutputPin,
+                                         CStdCommMaco::ObdPinType       IoInputPin,
+                                         CStdCommMaco::PinVoltageType   WorkVoltage = CStdCommMaco::PinVoltageType::PinVol_12V,
+                                         CStdCommMaco::PinPropertyType  PinProperty = CStdCommMaco::PinPropertyType::PPT_SAME_SIGNAL_K_AND_L_LINE
+                                                                                    | CStdCommMaco::PinPropertyType::PPT_INPUT_POSITIVE_LOGIC
+                                                                                    | CStdCommMaco::PinPropertyType::PPT_OUTPUT_POSITIVE_LOGIC);
+
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：设置通讯波特率
+
+      参数说明： Bps – 波特率, 针对 PT_CANFD 协议，此参数设置仲裁域波特率，即 CAN ID 的波特率
+                 FdBps - 针对 CANFD 协议, FdBps参数设置的是数据域波特率，即 CANFD 波特率
+
+                 例如，CANFD协议，波特率2M，仲裁域500K
+                       SetBaudRate(500000, 2000000);
+      
+      返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，设置失败
+
+      说    明：
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetBaudRate(uint32_t Bps, uint32_t FdBps = 0);
+
+
+
+
+    /*------------------------------------------------------------------------------------------------------
+      功    能：设置/取消链路保持
+      
+      参数说明：uint32_t       KeepTime    -- 链路保持时间间隔(ms)
+                CSendFrame     KeepFrame   -- 链路保持帧
+                KeepLinkMode   KeepType    -- 链路保持方式
+                CRecvFrame     Responesd   -- 链路保持的响应
+                                              在通信库内部处理常用链路保持的响应（适用于常用的链路
+                                              保持）外，追加实参Responesd的排除，如果实参Responesd 值
+                                              为空，则默认只有通信库内部常用链路保持的响应处理
+                bImmediatelyEnable         -- SetLinkKeep调用后，是否立即发送，
+                                              默认为立即发送
+                
+      返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，设置失败
+
+      说    明：如果发送帧内容为空帧(即KeepFrame.IsEmpty()为真)，则取消所有链路保持
+                如果链路保持时间为0，则取消指定帧的链路保持
+
+    ------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetLinkKeep(uint32_t     KeepTimeMs,
+                                            CSendFrame&  KeepFrame,
+                                            CStdCommMaco::LinkKeepType KeepType = CStdCommMaco::LinkKeepType::LKT_INTERVAL);
+
+    CStdCommMaco::ErrorCodeType SetLinkKeep(uint32_t KeepTimeMs,
+                                            CSendFrame& KeepFrame,
+                                            CStdCommMaco::LinkKeepType KeepType,
+                                            const CRecvFrame& Responesd,
+                                            bool bImmediatelyEnable = true);
+
+    /*------------------------------------------------------------------------------------------------------
+      功    能：获取应用已设置的链路保持
+
+      参数说明：vctLinkKpSet   存储已设置的链路保持数组
+
+      返 回 值：获取成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，获取失败
+
+      说    明：无
+
+    ------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType GetLinkKeep(std::vector<stLinkKeepSet> &vctLinkKpSet);
+
+
+    /*------------------------------------------------------------------------------------------------------
+      功    能：设置物理通道保持连接的模式（即断开模式）
+                适用场景：需要与ECU保持常链路保持时，同时需要与其它ECU通信时适用
+
+                默认情况下
+                当EcuInterface进行数据通信时，SendReceive调用后下位机将PassThruConnect，物理总线连接打开
+                当EcuInterface不再进行数据通信时，对象生命周期结束后（对象析构后），物理总线连接不会立即断开
+
+                当新的EcuInterface进行数据通信时，可能会引起其它EcuInterface对应协议的引脚断开，如果调用了
+                此接口SetPhyChlHoldMode设置成PBHT_HOLD_ON_WITH_OBJ_MODE，即使新的EcuInterface进行数据通信，
+                也不会断开对应的物理通道
+
+                当EcuInterface进行数据通信时，如果对应引脚的物理总线已经连接，不做任何操作
+                如果调用了ReleaseAllPhyChannel，将强制断开物理通道的连接（即使设置了PBHT_HOLD_ON_WITH_OBJ_MODE）
+
+
+      参数说明：PhyBusHoldMode HoldMode  物理通道通断开模式
+
+                       PBHT_NORMAL_MODE  默认的处理方式，通信库内部处理断开方式
+
+                       PBHT_HOLD_ON_WITH_OBJ_MODE 保持物理总线常连接
+                       在整个EcuInterface对象生命周期内（除非调用了ReleaseAllPhyChannel），
+                       强制保持物理总线常连接
+
+      返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，设置失败
+
+      说    明：FCA网关算法有此需求，需要对SGW进行常连接
+                如果没有调用此接口，默认值为PBHT_NORMAL_MODE
+    ------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetPhyChlHoldMode(CStdCommMaco::PhyBusHoldMode HoldMode);
+
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：设置通信线电平，拉高多长时间，拉低多长时间，单位为ms
+
+      参数说明：std::vector<uint16_t> vctHihgLow     电平拉高多长时间，拉低多长时间，单位为ms
+
+                举例1：
+                vctHihgLow  有4个元素，分别是，[15, 2500, 15, 3500]
+                表示高电平15毫秒，低电平2.5秒，高电平15毫秒，低电平2.5秒
+
+                举例2：
+                vctHihgLow  有5个元素，分别是，[0, 15, 2500, 15, 3500]
+                表示低电平15毫秒，高电平2.5秒，低电平15毫秒，高电平2.5秒
+
+      返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+                其它值，设置失败
+
+      说    明：此接口为阻塞接口，阻塞时间为 vctHihgLow 的总时间
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCommLineVoltage(const std::vector<uint16_t>& vctHihgLow);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置ECU通信时间参数
+
+    参数说明：uint32_t ReceiveMaxByte2ByteInterval_P1     --  接收帧字节间最大间隔时间
+              uint32_t ReceiveFrameMaxWaitTime_P2         --  接收帧最大等待时间
+              uint32_t SendFrameInterval_P3               --  发送帧时间间隔
+              uint32_t SendByte2Byte_P4                   --  发送帧字节间间隔
+              uint32_t ReceivePacketOverTime              --  接收数据包超时时间;
+
+
+
+            Normal或者KWP2000 on K-Line  对应关系:
+            
+                ReceiveMaxByte2ByteInterval_P1      --  P1_MAX
+                ReceiveFrameMaxWaitTime_P2          --  
+                SendFrameInterval_P3                --  P3_MIN
+                SendByte2Byte_P4                    --  P4_MIN
+                ReceivePacketOverTime               --  
+
+
+
+            Bosch KW1281   对应关系:
+            
+                ReceiveMaxByte2ByteInterval_P1        --  无
+                ReceiveFrameMaxWaitTime_P2            --  
+                SendFrameInterval_P3                  --  UEB_T9_MIN
+                SendByte2Byte_P4                      --  UEB_T7_MIN
+                ReceivePacketOverTime                 --  
+
+
+
+            Chrysler SCI 对应关系:
+            
+                ReceiveMaxByte2ByteInterval_P1        --  T1_MAX  半双工模式下，接收ECU回显超时【0, 100】
+                                                        T4_MAX  半双工或者全双工模式下，ECU响应的字节间隔超时【0, 100/50】
+                                                        
+                                                       
+                ReceiveFrameMaxWaitTime_P2            --  T3_MAX  半双工或者全双工模式下，ECU响应的处理超时【0, 50/5】
+                
+                SendFrameInterval_P3                  --  
+                
+                SendByte2Byte_P4                      --  T2_MIN  半双工模式下，收到回显字节后与发送下一个字节间的最小间隔【0, 5】，默认为0
+                                                        T5_MIN  全双工模式下，发送帧字节间最小间隔【0, 2】，默认为0
+
+                ReceivePacketOverTime                 --  
+
+              
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    说    明：单位：毫秒
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCommTime(uint32_t ReceiveMaxByte2ByteInterval_P1,
+                                            uint32_t ReceiveFrameMaxWaitTime_P2,
+                                            uint32_t SendFrameInterval_P3,
+                                            uint32_t SendByte2Byte_P4,
+                                            uint32_t ReceivePacketOverTime = (uint32_t)-1);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：针对CAN帧的发送，设置开启下位机P3帧间隔使能，此接口只适用于CAN协议
+              这里发送帧间隔指上一帧发送完成开始计时，至下一帧发送的间隔时间，
+              注意不包括续发帧和流控帧的发送（2X和3X）
+
+              如果没有调用过此接口，CanP3MinType默认为CPMT_DISABLE_P3_MINI
+
+    参数说明：CStdCommMaco::CanP3MinType Type
+
+              CPMT_DISABLE_P3_MINI    不开启P3参数，即 SetCommTime 的 P3 无效
+              CPMT_ENABLE_P3_MINI_TX  开启P3参数，即 SetCommTime 的 P3 会在VCI底层实现
+                                      CAN的发送间隔
+
+              应用场景举例：
+              14:01:02:7088 Rx 1 0x41D s 8 FC 1D 3F FF FF FF FF FF
+              14:01:03:0428 Rx 1 0x6EA s 8 02 10 03 55 55 55 55 55
+              14:01:03:0528 Rx 1 0x49D s 8 06 50 03 00 14 00 C8 04
+              14:01:03:0658 Rx 1 0x6EA s 8 02 3E 00 55 55 55 55 55
+              14:01:03:0828 Rx 1 0x49D s 8 02 7E 00 00 14 00 C8 04
+              14:01:03:0908 Rx 1 0x6EA s 8 02 3E 00 55 55 55 55 55    ----  A
+              14:01:03:1018 Rx 1 0x6EA s 8 03 22 F1 21 55 55 55 55    ----  B
+              14:01:03:1128 Rx 1 0x49D s 8 02 7E 00 00 14 00 C8 04
+              14:01:03:7088 Rx 1 0x41D s 8 FC 1D 3F FF FF FF FF FF
+              14:01:04:0908 Rx 1 0x6EA s 8 02 3E 00 55 55 55 55 55
+              14:01:04:0928 Rx 1 0x49D s 8 02 7E 00 00 14 00 C8 04
+              14:01:04:7088 Rx 1 0x41D s 8 FC 1D 3F FF FF FF FF FF
+              这里，B帧在A帧发送完11毫秒后发送，结果是ECU不回22 F1 21
+              如果SetCanP3MinEnable使能了CPMT_ENABLE_P3_MINI_TX，并且P3 = 30毫秒
+              ECU就可以正确回应22 F1 21
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    说    明：大部分情况下，不需要调用此接口
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanP3MinEnable(CStdCommMaco::CanP3MinType Type = CStdCommMaco::CanP3MinType::CPMT_DISABLE_P3_MINI);
+
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：指定OBD引脚(非通信引脚)上输出指定电压或者拉地
+
+    参数说明：CStdCommMaco::ObdPinType  PinNum        --  指定OBD引脚PinNum上输出指定电压，
+                                                         指定OBD引脚，不包含通信引脚，
+                                                         也不包含PD_OBD_04，PD_OBD_05，
+                                                         PD_OBD_16，如已经指定了通信脚为
+                                                         PD_OBD_06与PD_OBD_14，即CAN通信，
+                                                         再调用此接口指定PD_OBD_14上输出
+                                                         12V，则无效
+                                                         
+              uint32_t                 PinVoltageMv  --  指定OBD引脚上输出指定电压，
+                                                         单位为毫伏范围为5000mV至20000mV，
+                                                         如果为0，则指定PinNum脚拉地
+                                                         如果位-1，则恢复原来状态（高阻）
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+
+              PinNum参数实参不正确，返回0x13，即CStdCommMaco::ERR_PIN_INVALID，例如Pin04或者Pin05
+
+              PinNum引脚已经在使用，返回0x0E，即CStdCommMaco::ERR_DEVICE_IN_USE，
+              例如CAN通信设置6和14进行收发数据通讯，然后又设置引脚6输出5伏，将返回引脚已经在使用
+
+    说    明：
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetPinVoltage(CStdCommMaco::ObdPinType PinNum, uint32_t PinVoltageMv);
+                            
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置J1850功能性地址过滤，默认会增加相应地址的过滤器
+              重复调用，以最后一次调用为准
+
+    参数说明：vector<uint8_t>& vctFunctionalAddress    --  功能性地址过滤表
+
+              参考 SAE-J2178-1 "Class B Data Communication Network Messages—Detailed 
+                                    Header Formats and Physical Address Assignments"
+
+              SAE-J1850 PWM消息头格式中，BYTE1 BYTE2 BYTE3 DATA
+                        BYTE1  ----  Header Format
+                        BYTE2  ----  目的地址
+                        BYTE3  ----  源地址
+              
+              BYTE1 格式： 
+                        Bit7 | Bit6 | Bit5 | Bit4 | Bit3 | Bit2 | Bit1 | Bit0
+                          P  |   P  |   P  |   0  |   K  |   Y  |   Z  |   Z
+
+                    PPP: 优先级（0-7）；
+                    K:   是否需要IFR，0，需要IFR；1，不需要IFR；
+                    Y:   地址模式，0，功能性地址；1，物理地址；
+                    ZZ:  指定的消息类型
+
+             对于J1850总线上的数据，如果消息头的Y为0（功能性地址），则需要“功能性地址过滤”；
+
+             通信库默认vctFunctionalAddress为“0x6B”，长度为1；
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    说    明：向量表数组
+              调用此接口，会清除以前的功能地址表，以最后一次调用为准
+
+    附加(下位机收PWM数据流程如下):
+        1、收总线数据放到buffer中；
+        
+        2、判断BYTE1是否是功能地址（相当于广播数据），是则判断BYTE2是否匹配功能地址表，
+           匹配OK跳至4，不匹配丢弃；
+           
+        3、判断BYTE1是否是物理地址，是物理地址则跳至4
+           
+        4、正常过滤器过滤；
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetJ1850FunctionalAddressFilter(std::vector<uint8_t>& vctFunctionalAddress);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置J1850节点地址，默认会增加节点地址的过滤器
+
+    参数说明：uint8_t NodeAddress    --  设置J1850节点地址
+
+            参考 SAE-J2178-1 "Class B Data Communication Network Messages—Detailed
+                                Header Formats and Physical Address Assignments"
+
+            SAE-J1850 PWM消息头格式中，BYTE1 BYTE2 BYTE3 DATA
+                        BYTE1  ----  Header Format
+                        BYTE2  ----  目的地址
+                        BYTE3  ----  源地址
+
+            BYTE1 格式：
+            Bit7 | Bit6 | Bit5 | Bit4 | Bit3 | Bit2 | Bit1 | Bit0
+              P  |   P  |   P  |   0  |   K  |   Y  |   Z  |   Z
+
+                PPP: 优先级（0-7）；
+                K:   是否需要IFR，0，需要IFR；1，不需要IFR；
+                Y:   地址模式，0，功能性地址；1，物理地址；
+                ZZ:  指定的消息类型
+
+        对于J1850总线上的数据，如果消息头的K为0（需要IFR），则需要回复IFR，
+        IFR字节值即为NodeAddress；
+
+            通信库默认NodeAddress为0xF1
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetJ1850NodeAddress(uint8_t NodeAddress);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置J1708发送消息的优先级
+
+    参数说明：uint8_t Priority    --  设置J1708发送消息的优先级
+
+              每条报文都有一个1和8之间的优先级，其中1的优先级最高。
+              Priority只接受1-8之间的值，如果实参Priority为0，此接口修改不起作用
+              如果实参Priority大于8，此接口修改不起作用
+
+              如果从没有调用此接口设置J1708的Priority的话，通信库默认Priority为1
+            
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetJ1708TxMsgPriority(uint8_t Priority);
+
+
+
+    /*-------------------------------------------------------------------------------------
+    功    能：设置CAN扩展地址(CAN ID为5字节ID)
+
+
+    参数说明：const uint8_t     EcuAddress      --  接收帧ID第五个字节，ECU地址
+              const uint8_t     ToolAddress     --  发送帧ID第五个字节，设备地址
+
+
+              CStdCommMaco::CanExtendedAddrType Type
+                                                --  扩展地址类型
+                                                    指定扩展地址是否使用于SendReceive
+                                                    还是SetLinkKeep，还是两者都生效
+
+                                CEAT_EXT_ADDR_NORMAL，如果没有调用此接口设置类型，通信
+                                                    层默认为此值，即SendReceive和链路
+                                                    保持都根据EcuAddress和ToolAddress
+                                                    来进行收发     
+
+                                CEAT_EXT_ADDR_ONLY_SEND_RECV，扩展地址只适用于SendReceive
+                                                    即扩展地址对SetLinkKeep不生效
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanExtendedAddress(const uint8_t EcuAddress, const uint8_t ToolAddress = 0x00);
+    CStdCommMaco::ErrorCodeType SetCanExtendedAddress(const uint8_t EcuAddress, const uint8_t ToolAddress, CStdCommMaco::CanExtendedAddrType Type);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置过滤器ID
+    
+    参数说明：const uint8_t*         FilterMask       --  过滤器掩码
+              const uint8_t*        FilterPattern     --  过滤器模式
+              uint32_t              FilterLength      --  过滤器长度
+
+              CStdCommMaco::FilterType        FilterType        --  过滤器类型，默认为FT_PASS_ENABLE
+              
+    返 回 值：置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFilterId(const uint8_t*  FilterMask,
+                                            const uint8_t*  FilterPattern,
+                                            uint32_t        FilterLength,
+                                            CStdCommMaco::FilterType FilterType = CStdCommMaco::FilterType::FT_PASS_ENABLE);
+
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置过滤器范围
+
+    参数说明：const uint8_t*     FilterBegin     --  过滤器范围起始Id值，包括此值；
+              const uint8_t*     FilterEnd       --  过滤器范围结束Id值，包括此值；
+              uint32_t           FilterLength    --  过滤器长度
+              
+    返 回 值：设设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFilterIdRange(const uint8_t*   FilterBegin,
+                                                 const uint8_t*   FilterEnd,
+                                                 uint32_t         FilterLength);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置PDU数据响应验证， PDU, Protocol Data Unit
+              期望的响应数据类型，通常情况下SID和PID符合以下规则：
+
+                    ReqSID + 0x40 = AnsSID
+                    ReqPID = AnsPID
+
+              例如1：ReqSID = 0x22，AnsSID = 0x62，ReqPID = 0xF190, AnsPID = 0xF190
+              Req:    22 F1 90
+              Ans:    62 F1 90 4C 53 47 55 4C 38 33 4C 39 4C 41 32 32 34 39 32 30
+
+              例如2：ReqSID = 0x82，AnsSID = 0xC2
+              Req: 82
+              Ans: C2
+
+              通信库将利用此规则进行PDU数据过滤，否定应答适用于SID模式
+
+    参数说明：CStdCommMaco::FilterPduType         FilterType             --  数据过滤器类型
+              uint32_t                            FilterPidLength        --  过滤器模式
+
+              FilterType值规则如下：
+                        FPT_PDU_DISABLE         通信层默认此规则，不进行任何过滤校验
+
+                        FPT_SID_ONLY_ENABLE     SID模式
+                                                只校验SID（服务ID）一个字节
+                                                SID校验规则为 ReqSID + 0x40 = AnsSID
+
+                        FPT_SID_PID_ENABLE      PID模式
+                                                在SID校验规则下，校验PID一个字节
+                                                PID校验规则为 ReqPID = AnsPID
+
+                       FPT_SID_PID_MORE_ENABLE  2个字节及2个字节以上的PID模式
+                                                几个字节的PID由参数FilterPidLength指定
+                                                FilterPidLength为2时，即2个字节
+                                                PID校验规则为 ReqPID = AnsPID
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFilterPDU(CStdCommMaco::FilterPduType FilterType, uint32_t FilterPidLength = 2);
+
+
+
+    /*------------------------------------------------------------------------------------------------------------
+    功    能：设置Can数据帧填充字节值
+
+    参数说明：
+        uint8_t*     FramePad     --  Can数据帧填充字节,默认为不填充；
+        bool         PadActive    --  是否使能Can数据帧填充字节，默认为不填充；
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+              
+    注    意：相同的EcuInterface对象，如果第二次单独调用SetCanFramePad修改了PadActive，
+              会存在接收多帧中发送的流控帧（30帧）的填充会没有起到对应修改的问题
+
+              例如原来PadActive为true，即30帧发送是有填充的，现在只调用SetCanFramePad设置为false，对应30帧的
+              填充却还存在
+              
+              解决此问题的方法：
+              需要在调用SetCanFramePad之前重新设置过滤器（ClearFilter后再SetFilterId）才会让30帧的填充起效果
+              即：
+              ClearFilter
+              SetFilterId
+              SetCanFramePad
+    ------------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanFramePad(uint8_t FramePad, bool PadActive = true);
+
+
+
+    
+    /*-----------------------------------------------------------------------------
+    功    能：清除过滤器
+
+    参数说明：无
+              
+    返 回 值：清除成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，清除失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType ClearFilter(void);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置流控制器ID
+
+    参数说明：const uint8_t*  RecvFrameId       --   即接收ID
+              const uint8_t*  FlowCtrlFrameId   --   即流控ID
+
+              uint32_t FrameIdLength            --   接收ID和流控ID的长度
+
+              bool SetFlag  --  真为设置，假为取消，
+                                当取消的时候看，RecvFrameId和FlowCtrlFrameId必须和
+                                设置的保持一致
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFlowControlId(const uint8_t*  RecvFrameId, const uint8_t*  FlowCtrlFrameId, uint32_t FrameIdLength, bool SetFlag);
+
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置流控制帧模式
+
+    参数说明：FlowCtlMode FlowControlMode  ---------  接收多帧时，流控制帧的发送ID模式
+
+                            FLOW_CTL_MODE_NORMAL：  正常模式，即接收ID和流控ID都需要
+                                                    在接口SetFlowControlId()中指定
+    
+
+                            FLOW_CTL_MODE_AUTO:     FLOW_CTL_MODE_AUTO,发送消息
+                                                    id做为流控制id,带扩展地址也
+                                                    一样
+
+                            例如:  请求帧:   00 00 04 53
+                                   首帧:     00 00 04 61
+                                   流控制帧: 00 00 04 53
+                                   续发帧1:  00 00 04 61
+                                   续发帧2:  00 00 04 61
+
+                                                    
+                            FLOW_CTL_MODE_FUNCTION_ADDRESS:当是29位时流控制采用
+                                                    接收到的ID低两字节交换;当是
+                                                    11位时收到的消息接收ID将最
+                                                    低字节最高位变成0来发流控制
+
+                            例如:  请求帧:   00 00 07 DF
+                                   首帧:     00 00 07 E9
+                                   流控制帧: 00 00 07 E1
+                                   续发帧1:  00 00 07 E9
+                                   续发帧2:  00 00 07 E9
+                                                    
+                            FLOW_CTL_MODE_11BIT_EXTID:当11位扩展地址，按接收消息
+                                                    id(5个字节)，最低两字节交换
+                                                    作为流控制
+
+              uint32_t    FlowControlTimes -------- （单位ms），默认为0;
+                                               发送多帧时，续发帧帧发送间隔，指
+                                               定间隔值由接收到的流控制计算得知。
+                                               诊断程序正常情况下无需设置此参数。
+
+                                               接收多帧时，指定值表示为通知ECU的
+                                               续发帧帧发送间隔时间。
+                                               诊断程序正常情况下无需设置此参数。
+
+                          形参FlowControlTimes最高位为0，代表此参数是针对发送多帧时的
+                          时间间隔参数。
+                          通常情况下，诊断程序无需设置此参数，默认为以ECU回复的流控参数
+                          为准，即值为0xFFFF时，是以ECU回复的流控参数为准
+                          例如，需设置续发帧的发送间隔为10ms，则：FlowControlTimes = 10
+                          例如，如果修改此参数后（非0xFFFF），需要还原回为以ECU回复的流控
+                                为准，需要重新设置为0xFFFF
+
+                          形参FlowControlTimes最高位为1，代表此参数是针对接收多帧时的
+                          参数，将会在流控制帧中通知ECU的续发帧帧间隔时间。
+                          例如，需要在流控制帧中设置通知ECU的续发帧帧间隔时间为10ms，
+                          则形参：FlowControlTimes = 10 | (1 << 31)
+
+
+
+              uint32_t    FlowControlBlockSize -------- 默认为0
+                                                发送多帧时，发送完指定帧数的续
+                                                发帧后需再次接收流控制帧，指定
+                                                帧数值由接收到的流控制计算得知。
+                                                诊断程序正常情况下无需设置此参数。
+
+                                                接收多帧时，接收完指定帧数的续
+                                                发帧后需再次发送流控制帧，如果为0，
+                                                则一次性接收完所有续发帧。
+                                                诊断程序正常情况下无需设置此参数。
+
+                           形参FlowControlBlockSize最高位为0，代表此参数是针对发送多
+                           帧时的续发帧帧数参数。
+                           例如，需设置续发帧的帧数为10帧后，需再次等待流控制帧后才
+                           能继续发续发帧，则：FlowControlBlockSize = 10
+                           通常情况下，诊断程序无需设置此参数，默认为以ECU回复的流控参数
+                           为准，即值为0xFFFF时，是以ECU回复的流控参数为准
+                           例如，如果修改此参数后（非0xFFFF），需要还原回为以ECU回复的流控
+                                 为准，需要重新设置为0xFFFF
+
+                           形参FlowControlBlockSize最高位为1，代表此参数是针对接收多帧时的
+                           参数，将会在流控制帧中通知ECU的续发帧帧数。
+                           例如，需要在流控制帧中设置通知ECU的续发帧帧数为10帧为一次流控，
+                           则形参：FlowControlBlockSize = 10 | (1 << 31)
+
+    发送长帧时，如果修改过流控参数，需要还原回以ECU回复的流控为准，需要重新设置为0xFFFF
+    即：SetFlowControlMode(CStdCommMaco::FlowCtrlType::FCT_FUNCTIONAL, 0xFFFF, 0xFFFF);
+    
+              
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFlowControlMode(CStdCommMaco::FlowCtrlType FlowControlMode,
+                                                   uint32_t FlowControlTimes = (1 << 31),
+                                                   uint32_t FlowControlBlockSize = (1 << 31));
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置发送流控制帧延时时间
+   
+    参数说明：uint32_t usDelay     --    发送流控制帧延时时间，单位为us微妙
+
+              在接收长帧时，设备需要发送流控制帧，设置此参数将告诉设备，延时指定的
+              usDelay后，再发送流控制帧
+    
+              
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetFlowControlSendDelay(uint32_t usDelay);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置发送长帧时，第一个续发帧序号值，默认为1
+
+    参数说明：uint32_t SequenceNumber     --    第一个续发帧序号
+
+              在发送长帧时，收完流控制帧后发的第一帧续发帧的帧序号从SequenceNumber开始
+
+
+    相对应的的PDU参数值为：CP_CanFirstConsecutiveFrameValue
+
+                           First consecutive frame number to be transmitted/received
+                           on a multi-segment transfer. Used to override the normal 
+                           first consecutive frame value of 1.
+                           
+    举例1：
+        没有调用此接口情况下，默认第一个续发帧序号值从1开始
+        
+        通信层日志：
+        [12:01:45.408|37EC]    Req:  00 00 07 54 19 06 E1 09 09 FF 01 02 03 04 05 
+        [12:01:45.444|37EC]    Ans:  7F78--> 00 00 07 5C 7F 19 78 
+        [12:01:45.477|37EC]    Ans:  00 00 07 5C 59 06 E1 09 09 AF 01 23 02 25 03 23 04 23 10 7F 41 00 04 00 19 15 77 15 87 15 92 42 00 04 00 19 15 77 15 87 15 88  
+        
+        三叉线采数：
+        12:01:45:4289 Rx 1 0x754 s 8 10 0B 19 06 E1 09 09 FF 
+        12:01:45:4339 Rx 1 0x75C s 8 30 00 00 00 00 00 00 00 
+        12:01:45:4349 Rx 1 0x754 s 8 21 01 02 03 04 05 00 00 
+        12:01:45:4399 Rx 1 0x75C s 8 03 7F 19 78 00 00 00 00 
+        12:01:45:4429 Rx 1 0x75C s 8 10 26 59 06 E1 09 09 AF 
+        12:01:45:4439 Rx 1 0x754 s 8 30 00 00 00 00 00 00 00 
+        12:01:45:4489 Rx 1 0x75C s 8 21 01 23 02 25 03 23 04 
+        12:01:45:4529 Rx 1 0x75C s 8 22 23 10 7F 41 00 04 00 
+        12:01:45:4559 Rx 1 0x75C s 8 23 19 15 77 15 87 15 92 
+        12:01:45:4599 Rx 1 0x75C s 8 24 42 00 04 00 19 15 77 
+        12:01:45:4639 Rx 1 0x75C s 8 25 15 87 15 88 00 00 00 
+        
+    举例2：
+        调用此接口，设置第一个续发帧序号值从0开始，即SetCanFirstConsecutiveFrameValue(0)
+        
+        通信层日志：
+        [12:08:53.880|3C04]    Req:  00 00 07 54 19 06 E1 09 09 FF 01 02 03 04 05 
+        [12:08:53.916|3C04]    Ans:  7F78--> 00 00 07 5C 7F 19 78 
+        [12:08:53.949|3C04]    Ans:  00 00 07 5C 59 06 E1 09 09 AF 01 23 02 25 03 23 04 23 10 7F 41 00 04 00 19 15 77 15 87 15 92 42 00 04 00 19 15 77 15 87 15 88 
+        
+        三叉线采数：
+        12:08:53:9031 Rx 1 0x754 s 8 10 0B 19 06 E1 09 09 FF
+        12:08:53:9081 Rx 1 0x75C s 8 30 00 00 00 00 00 00 00
+        12:08:53:9091 Rx 1 0x754 s 8 20 01 02 03 04 05 00 00
+        12:08:53:9131 Rx 1 0x75C s 8 03 7F 19 78 00 00 00 00
+        12:08:53:9171 Rx 1 0x75C s 8 10 26 59 06 E1 09 09 AF
+        12:08:53:9171 Rx 1 0x754 s 8 30 00 00 00 00 00 00 00
+        12:08:53:9231 Rx 1 0x75C s 8 20 01 23 02 25 03 23 04
+        12:08:53:9261 Rx 1 0x75C s 8 21 23 10 7F 41 00 04 00
+        12:08:53:9301 Rx 1 0x75C s 8 22 19 15 77 15 87 15 92
+        12:08:53:9331 Rx 1 0x75C s 8 23 42 00 04 00 19 15 77
+        12:08:53:9361 Rx 1 0x75C s 8 24 15 87 15 88 00 00 00
+        
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanFirstConsecutiveFrameValue(uint32_t SequenceNumber = 1);
+
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：  设置（增加/删除）单报文CAN格式的发送ID与接收ID(非ISO15765格式，也称为非标准CAN格式)
+                即原始CAN的发送与接收
+
+    参数说明：   RxCanId          ---    单报文接收帧的CAN ID
+                 TxCanId          ---    单报文发送帧的CAN ID
+                 SetFlag          ---    是清除还是设置, true 为设置（增加）， false 为清除（删除）
+
+
+                单报文CAN发送与接收举例:
+                    发送:   00 00 06 E0 FC 01 02 03 04 05 06 07
+                    接收:   00 00 07 E8 FD 01 02 03 04 05 06 07
+
+                此时: 需要设置，RxCanId = 0x000007E8, TxCanId = 0x000006E0
+
+
+                如果没有这样设置过:
+                
+                    发送00 00 06 E0 FC 01 02 03 04 05 06 07将按标准CAN格式发送:
+                    
+                        00 00 06 E0 10 08 FC 01 02 03 04 05 
+                        00 00 XX XX 30 00 00 55 55 55 55 55
+                        00 00 06 E0 21 06 07 55 55 55 55 55
+
+                    接收00 00 07 E8 FD 01 02 03 04 05 06 07，则收不到数据
+
+
+     注意:    SetSingleMsgCanFormatId会默认设置接收RxCanId过滤器，
+              诊断程序不需要重复设置此RxCanId过滤器
+
+          例如:
+              如果SetSingleMsgCanFormatId的RxCanId(例如0x078b)，与SetFilterId中的
+              FilterPattern: 0x078B 一样的话，SetFilterId是不需要设置0x078b这个过
+              滤器的
+                    
+
+              
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetSingleMsgCanFormatId(uint32_t RxCanId, uint32_t TxCanId = 0, bool SetFlag = true);
+
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：  设置CAN格式类型
+
+    参数说明：  Type, CAN格式类型，仅适用于ISO15765_2协议，即协议ID为 "PT_CAN"
+
+                CFT_FORMAT_NORAML   
+                                通信层默认的处理方式，ISO15765_2格式
+                                除SetSingleMsgCanFormatId指定的ID外，都以ISO15765_2格式处理
+
+                CFT_FORMAT_RX_RAW
+                                优先以原始CAN的方式收取，发送默认为ISO15765_2格式
+                                即使SetSingleMsgCanFormatId没有调用，也优先以原始CAN的方式收取
+
+                CFT_FORMAT_TX_RX_RAW
+                                优先以原始CAN的方式收取和发送
+                                即使SetSingleMsgCanFormatId没有调用，也优先以原始CAN的方式发送和收取
+
+                CFT_FORMAT_TX_RAW
+                                以原始CAN的方式发送，接收默认为ISO15765_2格式优先
+                                即使SetSingleMsgCanFormatId没有调用，强制以原始CAN的方式发送数据帧
+
+    注   意:  
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    ------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanDataFormat(CStdCommMaco::CanFormatType Type);
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：  设置CANFD的发送帧长度格式大小
+
+    参数说明：  cfDlc, CANFD，每帧（单帧）最长发送字节，默认是8字节
+
+                举例：
+                cfDlc = CanFdDlcType::TX_DL_12
+                ITEM: 8C 14 DA 60 F1 10 C8 36 01 02 03 04 05 06 07 08 09   50MS  FD 17:35:27.274
+                ITEM: 88 14 DA F1 60 30 00 00 00 00 00 00 00               1MS      17:35:27.274
+                ITEM: 8C 14 DA 60 F1 21 0A 0B 0C 0D 0E 0F 10 11 12 13 14   1MS  FD 17:35:27.274
+                ITEM: 8C 14 DA 60 F1 22 15 16 17 18 19 1A 1B 1C 1D 1E 1F   0MS  FD 17:35:27.274
+                ITEM: 8C 14 DA 60 F1 23 20 21 22 23 24 25 26 27 28 29 2A   0MS  FD 17:35:27.274
+                ITEM: 8C 14 DA 60 F1 24 2B 2C 2D 2E 2F 30 31 32 33 34 35   1MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 25 36 37 38 39 3A 3B 3C 3D 3E 3F 40   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 26 41 42 43 44 45 46 47 48 49 4A 4B   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 27 4C 4D 4E 4F 50 51 52 53 54 55 56   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 28 57 58 59 5A 5B 5C 5D 5E 5F 60 61   1MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 29 62 63 64 65 66 67 68 69 6A 6B 6C   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2A 6D 6E 6F 70 71 72 73 74 75 76 77   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2B 78 79 7A 7B 7C 7D 7E 7F 80 81 82   1MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2C 83 84 85 86 87 88 89 8A 8B 8C 8D   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2D 8E 8F 90 91 92 93 94 95 96 97 98   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2E 99 9A 9B 9C 9D 9E 9F A0 A1 A2 A3   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 2F A4 A5 A6 A7 A8 A9 AA AB AC AD AE   1MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 20 AF B0 B1 B2 B3 B4 B5 B6 B7 B8 B9   0MS  FD 17:35:27.282
+                ITEM: 8C 14 DA 60 F1 21 BA BB BC BD BE BF C0 C1 C2 C3 C4   0MS  FD 17:35:27.282
+                ITEM: 88 14 DA 60 F1 22 C5 C6 C7 55 55 55 55               1MS  FD 17:35:27.282
+                ITEM: 88 14 DA F1 60 02 76 00 00 00 00 00 00               1MS  FD 17:35:27.282
+
+                cfDlc = CanFdDlcType::TX_DL_24
+                ITEM: 98 14 DA 60 F1 10 C8 36 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15   20MS  FD 17:55:01.063
+                ITEM: 88 14 DA F1 60 30 00 00 00 00 00 00 00  1MS   17:55:01.064
+                ITEM: 98 14 DA 60 F1 21 16 17 18 19 1A 1B 1C 1D 1E 1F 20 21 22 23 24 25 26 27 28 29 2A 2B 2C   0MS  FD 17:55:01.066
+                ITEM: 98 14 DA 60 F1 22 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C 3D 3E 3F 40 41 42 43   0MS  FD 17:55:01.066
+                ITEM: 98 14 DA 60 F1 23 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A   1MS  FD 17:55:01.068
+                ITEM: 98 14 DA 60 F1 24 5B 5C 5D 5E 5F 60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71   0MS  FD 17:55:01.068
+                ITEM: 98 14 DA 60 F1 25 72 73 74 75 76 77 78 79 7A 7B 7C 7D 7E 7F 80 81 82 83 84 85 86 87 88   0MS  FD 17:55:01.068
+                ITEM: 98 14 DA 60 F1 26 89 8A 8B 8C 8D 8E 8F 90 91 92 93 94 95 96 97 98 99 9A 9B 9C 9D 9E 9F   1MS  FD 17:55:01.068
+                ITEM: 98 14 DA 60 F1 27 A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 AA AB AC AD AE AF B0 B1 B2 B3 B4 B5 B6   0MS  FD 17:55:01.069
+                ITEM: 94 14 DA 60 F1 28 B7 B8 B9 BA BB BC BD BE BF C0 C1 C2 C3 C4 C5 C6 C7 55 55   0MS  FD 17:55:01.069
+                ITEM: 88 14 DA F1 60 02 76 00 00 00 00 00 00  1MS  FD 17:55:01.069
+
+                cfDlc = CanFdDlcType::TX_DL_32
+                21:13:53:2102 Rx 0x14DA60F1   10 C8 36 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F 10 11 12 13 14 15 16 17 18 19 1A 1B 1C 1D
+                21:13:53:2892 Rx 0x14DAF160   30 00 00 00 00 00 00 00
+                21:13:53:2902 Rx 0x14DA60F1   21 1E 1F 20 21 22 23 24 25 26 27 28 29 2A 2B 2C 2D 2E 2F 30 31 32 33 34 35 36 37 38 39 3A 3B 3C
+                21:13:53:2902 Rx 0x14DA60F1   22 3D 3E 3F 40 41 42 43 44 45 46 47 48 49 4A 4B 4C 4D 4E 4F 50 51 52 53 54 55 56 57 58 59 5A 5B
+                21:13:53:2902 Rx 0x14DA60F1   23 5C 5D 5E 5F 60 61 62 63 64 65 66 67 68 69 6A 6B 6C 6D 6E 6F 70 71 72 73 74 75 76 77 78 79 7A
+                21:13:53:2912 Rx 0x14DA60F1   24 7B 7C 7D 7E 7F 80 81 82 83 84 85 86 87 88 89 8A 8B 8C 8D 8E 8F 90 91 92 93 94 95 96 97 98 99
+                21:13:53:2912 Rx 0x14DA60F1   25 9A 9B 9C 9D 9E 9F A0 A1 A2 A3 A4 A5 A6 A7 A8 A9 AA AB AC AD AE AF B0 B1 B2 B3 B4 B5 B6 B7 B8
+                21:13:53:2912 Rx 0x14DA60F1   26 B9 BA BB BC BD BE BF C0 C1 C2 C3 C4 C5 C6 C7
+                21:13:53:2922 Rx 0x14DAF160   02 76 00 00 00 00 00 00
+
+                cfDlc = CanFdDlcType::TX_DL_64
+                Tx: 14 DA 40 F1 10 45 31 01 02 00 02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 51 20 45 ED 94 53 F5 39 39 69 28 98 56 64 B5 62 E2 94 B9 1B 71 F8 86 43 1A 86 C8 07 B3 A6 ED 72 AE D4 0D 54 16 AC 23 BC 5E A1   23MS  FD 14:41:17.035
+                Rx: 14 2A F1 40 30 00 00 55 55 55 55 55  1MS  FD 14:41:17.038
+                Tx: 14 DA 40 F1 21 FF 82 A3 DC B6 1A C9  0MS  FD 14:41:17.038
+                Rx: 14 2A F1 40 05 71 01 02 00 00 55 55  9MS  FD 14:41:17.050
+
+
+    注   意:  如果没有调用此接口，CANFD默认为8字节
+              对于FCT_VEHICLE_VW流控模式（即大众CANFD协议），默认64字节
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    ------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetCanFdDLC(CStdCommMaco::CanFdDlcType cfDlc);
+
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：默认值为0x0E00
+   
+    参数说明：
+              
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    ----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetDoipClientAddress(uint16_t ClientAddress);
+
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：设置DOIP头版本号，默认值为0x02
+
+              DOIP头版本号是指DOIP头结构体的第一个字节
+
+    参数说明：ProtocolVersion
+              Protocol version, Identifies the protocol version of DoIP packets.
+              例如，00          保留值，设置无效
+
+                    01          ISO/DIS 13400-2:2010
+                    02          ISO 13400-2:2012
+                    03          ISO 13400-2:2019
+
+                    04 到 FE    暂无定义，设置无效
+                    FF          车辆ID请求消息值
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+              仅针对发送打包的DOIP头有效，接收的DOIP头版本号比较不受此参数影响
+    ----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetDoipHeadVersion(uint8_t ProtocolVersion = 2);
+
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：设置DOIP静态IP地址功能（VCI本身的IP，注意不是车的IP）
+
+              日产DOIP的ECU需要静态IP地址才能通讯，否则ECU不会响应，即
+              VCI的IP地址是 "192.168.11.10"，      车辆ECU的IP地址是"192.168.11.4"
+              VCI的MAC地址是"AA:BB:CC:DD:00:0A"，  车辆ECU的IP地址是"AA:BB:CC:DD:00:04"
+
+    参数说明：strIP      需要修改的IP地址，例如"192.168.11.10"
+              strMAC     需要修改的MAC地址，例如"AA:BB:CC:DD:00:0A"
+                         如果strMAC不为空，则设置为指定的MAC地址
+                         如果strMAC为空，则不修改MAC地址，保持原有的MAC地址
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    注   意： 此设置在VCI断电后会丢失（VCI重新上电后，默认的IP为192.168.1.1）
+              如果需要禁用VCI的DHCP功能，必须在ActiveDoipPin之前调用此接口
+              如果需要设置VCI的静态IP地址，必须在TcpEnter或GetDoipModule之前调用此接口
+              如果需要设置VCI的MAC地址，必须在TcpEnter或GetDoipModule之前调用此接口
+    ----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetDoipFixedIP(const std::string& strIP = "192.168.11.10", const std::string strMAC = "AA:BB:CC:DD:00:0A");
+
+
+
+    /*-------------------------------------------------------------------------------------------------
+    功    能：修改VCI的DHCP功能，默认为开启
+
+              沃尔沃DOIP会用到VCI不开启DHCP的功能，让车辆ECU能够自己给自己分配IP地址（169.254开头）
+
+    参数说明：DhcpConfig      0 -- 关闭DHCP
+                              1 -- 开启DHCP
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+
+    注   意： 此设置在VCI断电后会丢失（VCI重新上电后，默认开启DHCP）
+              如果需要禁用VCI的DHCP功能，必须在ActiveDoipPin之前调用此接口
+              如果需要设置VCI的静态IP地址，必须在TcpEnter或GetDoipModule之前调用此接口
+              如果需要设置VCI的MAC地址，必须在TcpEnter或GetDoipModule之前调用此接口
+    -------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetDoipVciDhcp(uint32_t Dhcp);
+
+
+
+
+    /*-----------------------------------------------------------------------------------------------------------
+    功    能：建立TCP连接和发送 Routing Activation 路由激活
+
+              TCP连接建立和DOIP路由激活是2个步骤，通常情况下要求这2个步骤之间尽可能短，如果参数使能了EnterMode
+              下位机VCI会在TCP连接建立后立马发送路由激活
+              
+              如果设备连接方式是有线通信时（例如USB连接X7的ENET模式，USB传输时延可忽略），可在TcpEnter中不使能路由
+              激活，路由激活消息由诊断应用通过 SendReceive 完成也是可以的
+              
+              如果设备连接方式是无线通信时（例如蓝牙连接，这时蓝牙传输时延不可忽略），必须使能EnterMode，TCP连接建立
+              和DOIP路由激活这两个步骤都在VCI中连续完成（即2步骤中间没有上下位机交互）
+   
+    参数说明：strIpDst       指定需要建立TCP连接的IP地址，例如 169.254.118.51
+                             
+              ReceiveFrame   路由激活的响应消息，不包含DOIP头，Routing activation responses 
+                             例如，Ans:  [0E 80 10 10 10 00 00 00 00]
+                             
+              TcpPortDst     指定需要建立TCP连接的目的端口
+              
+              EnterMode      TCP连接模式，默认情况下，在TcpEnter接口中，TCP建立连接后，立马发routing activation request
+                             TEM_ENABLE_ROUTING_ACT，在TcpEnter接口中，TCP建立连接后，不发送routing activation request
+                             TEM_DISABLE_ROUTING_ACT，TCP建立连接后，立马发routing activation request并接收响应
+                             
+              ClientAddress  测试设备地址（诊断设备地址），例如, 0x0E80
+              
+              ActiveType     激活类型，例如，默认0x00，0xE0表示Central security
+              
+    日志举例说明：
+    [17:00:53.138|148c] [00000001] TcpEnter: strIpDst = 169.254.118.51, TcpPortDst = 13400, EnterMode = ENABLE_ROUTING_ACT, ClientAddress = 0x0E80, ActiveType = 0x00
+    [17:00:53.140|148c] [TcpCliet] tcp write_some(169.254.118.51), 02FD00050000000B0E80000000000000000000
+    [17:00:53.625|1c9c] [TcpCliet] tcp async_read_some(169.254.118.51), 02FD0006000000090E8010101000000000
+    [17:00:53.626|0a10] [00000001] Routing activation response (0x0006), Logical address of external tester: 0x0E80, Source Address: 0x1010, Routing successfully activated. (0x10)
+    [17:00:53.626|148c] [00000001] Ans:  [0E 80 10 10 10 00 00 00 00]
+
+
+    注   意:  如果在TCP连接已建立情况下，重复调用TcpEnter，并且IP地址和端口都一样，就会断开之前的连接，重新建立TCP连接请求
+              如果在TCP连接已建立情况下，重复调用TcpEnter，并且IP地址或端口不一样，不会断开之前的连接，新建另外一个TCP连接
+              
+    返 回 值：TCP建立连接成功并且路由激活成功，返回0，      CStdCommMaco::STATUS_NOERROR
+              如果没有使能路由激活，TCP建立连接成功，返回0，CStdCommMaco::STATUS_NOERROR
+              如果使能了路由激活，TCP建立连接成功，但是路由激活失败，将不返回CStdCommMaco::STATUS_NOERROR
+    -----------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType TcpEnter(const std::string& strIpDst, CRecvFrame& ReceiveFrame, 
+                                         uint16_t TcpPortDst = 13400, 
+                                         CStdCommMaco::TcpEnterMode EnterMode = CStdCommMaco::TcpEnterMode::TEM_ENABLE_ROUTING_ACT,
+                                         uint16_t ClientAddress = 0x0E80,
+                                         uint8_t ActiveType = 0x00);
+
+
+
+    /*----------------------------------------------------------------------------------------
+    功    能：  监听查看CAN总线的数据波特率，以不干扰CAN总线方式（静默模式）去监听
+                设置的波特率即是总线上波特率
+
+    参数说明：  TimeOutMs, 监听CAN数据的超时时间，默认为200毫秒
+           
+                例如：
+
+                CEcuInterface ecu;
+                ecu.SetProtocolType(CStdCommMaco::ProtocolType::PT_RAW_CAN);
+                ecu.SetIoPin(IoOutputPin, IoInputPin);
+                ecu.SetBaudRate(500 * 1000);
+                if (ecu.MonitorCanBaudrate(300) == CStdCommMaco::STATUS_NOERROR)
+                {
+                    // 监测到波特率为500K
+                }
+
+
+    注   意：   如果指定引脚CAN总线上没有广播数据，将监听失败
+                SetProtocolType设置协议为 PT_RAW_CAN
+
+    返 回 值：  监听波特率成功，返回0，    CStdCommMaco::STATUS_NOERROR
+
+                其它返回值，监听失败
+                设置的协议ID错误，返回1，  CStdCommMaco::ERR_NOT_SUPPORTED
+                监听波特率失败，返回9，    CStdCommMaco::ERR_TIMEOUT
+                VCI没有连接，返回8，       CStdCommMaco::ERR_DEVICE_NOT_CONNECTED
+    ------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType MonitorCanBaudrate(uint32_t TimeOutMs);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：  强制使能分帧发送CAN数据帧，适用于CAN帧数据长度为6（扩展地址或混合地
+                址）或者7（正常寻址）的CAN帧发送场景
+
+    参数说明：  Enable       ---   使能参数，默认情况下为0，如果没有调用，默认情形与
+                                   Enable为0一致，此接口在切换协议或者引脚（包括波特
+                                   率共3个接口，SetProtocolType,SetIoPin,SetBaudRate
+                                   ）后恢复为默认情况
+
+                             值为0时，正常情况发送，如果数据长度大于7时，ISO15765分
+                                      帧发送CAN帧，数据长度小于等于7，单帧发送CAN帧
+
+                             值为1时，非正常发送CAN帧，如果数据长度大于等于7时，
+                                      ISO15765分帧发送CAN帧，数据数据长度小于7，单帧
+                                      发送CAN帧
+
+    举例1：
+            CAN数据长度为7，正常寻址，CAN帧为：00000791    2E 01 02 03 04 05 06
+
+            通常情况下数据帧会按如下发送（Enable = 0）：
+                    Req:    08 07 91 07 2E 01 02 03 04 05 06
+                    Ans:    08 07 7A 03 6E 01 02 00 00 00 00
+
+            如果Enable = 1，则按分帧发送
+                    Req:    08 07 91 10 07 2E 01 02 03 04 05
+                    Ans:MN  08 07 99 30 00 00 00 00 00 00 00
+                    Req:    08 07 91 21 06 00 00 00 00 00 00
+                    Ans:    08 07 99 03 6E 01 02 00 00 00 00
+
+            
+    举例2： EcuAddress = 0x72, ToolAddress = 0xF1
+            PDU数据为：19 06 80 0F 2E FF
+
+        两种情况：
+            Enable = 0
+                        Req:    08 06 F1 72 06 19 06 80 0F 2E FF
+                        Ans: MN 08 06 72 F1 10 0C 59 06 80 0F 2E
+                        Req:    04 06 F1 72 30 00 00
+                        Ans: 1N 08 06 72 F1 21 2E 01 00 02 01 03
+                        Ans:    03 06 72 F1 22 00
+
+            Enable = 1
+                        Req:    08 06 F1 72 10 06 19 06 80 0F 2E
+                        Ans: MN 04 06 72 F1 30 00 00
+                        Req:    03 06 F1 72 21 FF
+                        Ans: MN 08 06 72 F1 10 0C 59 06 80 0F 2E
+                        Req:    04 06 F1 72 30 00 00
+                        Ans: 1N 08 06 72 F1 21 2E 01 00 02 01 03
+                        Ans:    03 06 72 F1 22 00
+                    
+
+    返 回 值：设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+              其它值，设置失败
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType EnableSegmentedSendSingleCanFrame(uint32_t Enable = 0);
+
+
+
+/*                   
+                                     ISO9141-2 5bps Address Code Send  Example: Address = 0x33 
+  ___________________________________________________________________________________________________________________________________________________________________________  
+||                            |                                             |                              |                                                                 ||
+|| W0                         |                                          W1 |                       W2, W3 |W4                          |                                    ||
+|| WaitTimeBeforSendAddress   |                        SyncByte0x55OverTime |            ReceiveKwOverTime |Kw2ReverseWaitTime          |      ReceiveReverseAddressOverTime ||
+||                            |                                             |                              |                            |                                    ||
+||~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~||
+||                            |        Address          |  Synchronization  |   Key Word 1  |  Key Word 2  |                      ~KW2  |           ~Address                 ||
+||____________________________|_________________________|___________________|_______________|______________|____________________________|____________________________________||
+||                            |                         |                   |               |              |                            |                                    ||
+||                            |        0x33             |      0x55         |      0x08     |      0x08    |         0xF7               |             0xCC                   ||
+||                            |        0x33             |      0x55         |      0x94     |      0x94    |         0x6B               |             0xCC                   ||
+||____________________________|_________________________|___________________|_______________|______________|____________________________|____________________________________||
+*/
+
+    /*-----------------------------------------------------------------------------
+    功    能：  地址码进入系统
+
+    参数说明：  AddressCode         --  地址码
+                ReceiveFrame        --  接收到的数据帧
+                AddSendBps          --  发送地址码的波特率，默认为5bps
+                EnterType           --  进入参数（如协议、波特率全自动识别，KW2取反，
+                                        KW1取反，地址码取反，接收关键字个数，接收一
+                                        帧数据，接收多帧数据等等一些参数信息）
+
+                                        
+                WaitTimeBeforSendAddress        --  发送地址码前高电平等待时间（单位ms）
+                SyncByte0x55OverTime            --  接收0x55的最大等待时间（单位ms）
+                ReceiveKwOverTime               --  接收关键字的最大等待时间（单位ms）
+                Kw2ReverseWaitTime              --  关键字KW2取反发回的最小时间（单位ms）
+                ReceiveReverseAddressOverTime   --  接收地址码取反的最大等待时间（单位ms）
+
+
+            Normal或者KWP2000 on K-Line  对应关系:
+            
+                WaitTimeBeforSendAddress        --  W0,W5
+                SyncByte0x55OverTime            --  W1
+                ReceiveKwOverTime               --  W2,W3
+                Kw2ReverseWaitTime              --  W4
+                ReceiveReverseAddressOverTime   --  下位机固定1000
+
+
+            Bosch KW1281   对应关系:
+                WaitTimeBeforSendAddress        --  UEB_T0_MIN
+                SyncByte0x55OverTime            --  UEB_T1_MAX
+                ReceiveKwOverTime               --  UEB_T2_MAX,UEB_T3_MAX
+                Kw2ReverseWaitTime              --  UEB_T4_MIN
+                ReceiveReverseAddressOverTime   --  下位机固定1000
+            
+  
+              
+    返 回 值：错误代码
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType AddressCodeEnter(uint8_t          AddressCode,
+                                                 CRecvFrame&      ReceiveFrame,
+                                                 uint32_t         AddSendBps = 5,
+                                                 CStdCommMaco::AddressEnterParaType EnterType = CStdCommMaco::AddressEnterParaType::AEPT_AUTO_BAUDRATE,
+                                                 uint32_t         WaitTimeBeforSendAddress = 400,
+                                                 uint32_t         SyncByte0x55OverTime = 300,
+                                                 uint32_t         ReceiveKwOverTime = 20,
+                                                 uint32_t         Kw2ReverseWaitTime = 25,
+                                                 uint32_t         ReceiveReverseAddressOverTime = 1000);
+
+
+
+
+    /*-----------------------------------------------------------------------------------------
+    功    能：  快速进入系统
+
+    参数说明：  SendFrame               初始化进入命令
+                ReceiveFrame            接收到的数据帧
+                WaitTime                电瓶拉低前的稳定时间（单位ms）
+                LowVoltageTime          电平拉低时间（单位ms）
+                HighVoltageTime         电平拉高时间（单位ms）
+
+    说  明：    只发送不接收
+                如果SendFrame的接收参数为SF_RECEIVE_NONE，即表示快速进入不需要接收数据，发送完
+                后立即返回
+              
+    返 回 值：错误代码
+    -----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType QuickEnter(const CSendFrame&   SendFrame,
+                                           CRecvFrame&         ReceiveFrame,
+                                           uint32_t            WaitTime = 300,
+                                           uint32_t            LowVoltageTime = 25,
+                                           uint32_t            HighVoltageTime = 25);
+
+
+    /*-----------------------------------------------------------------------------------------
+    功    能：  设置快速进入系统的参数，快速进入参数类型，大部分情况下不需要调用此接口
+
+    参数说明：  EnterType    参数类型     
+
+                             QEPT_NOMAL 正常模式，如果从没有调用此接口设置，默认为此值
+
+                             QEPT_RECV_FRAMES_IF_FAILED
+                             即使拉高拉低快速进入失败以后，也继续尝试接收P2时间的响应
+                             丰田车有此需求
+
+    说  明：    如果从没有调用此接口设置，默认为QEPT_NOMAL
+
+    返 回 值：错误代码
+    -----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetQuickEnterPara(CStdCommMaco::QuickEnterParaType EnterType = CStdCommMaco::QuickEnterParaType::QEPT_NOMAL);
+
+
+
+    /*-----------------------------------------------------------------------------------------
+    功    能：  用于TP20协议进入使用，目前支持TP20同时跑的逻辑链为4条，TP20和TP16不能同时跑
+
+    参数说明：  TpTargetAddress         目标地址
+                ReceiveFrame            接收到的数据帧
+                AppLayerID              应用层协议ID
+
+
+                TpTargetAddress     CPM_VWTP_DestAddr，值范围为[0, 0xFF]
+                                    ECU的TP通道逻辑地址，通常在车辆中是固定的
+                                    例如：0x01是发动机，0x02是变速箱，0x05是气囊，0x1F为CAN Gateway
+                
+                AppLayerID          CPM_VWTP_ApplicationType 值范围为：[0x01, 0x21]
+                                    通常为4类，默认值为0x01
+                                        0x01 = SD Diagnostics
+                                        0x10 = Infotainment Communication
+                                        0x20 = Application Protocol
+                                        0x21 = WFS/WIF
+
+                                    如果需要跑多通道（J2534-2中定义TP20支持同时跑4条通道）
+                                    定义两个ECU对象即可
+
+
+                03:20:56:7767 Rx 1 0x200 s 7 26 C0 00 10 00 03 01
+                03:20:56:7846 Rx 1 0x226 s 7 00 D0 00 03 18 03 01
+                03:20:56:7858 Rx 1 0x318 s 6 A0 0F 8A FF 32 FF
+                03:20:56:7944 Rx 1 0x300 s 6 A1 0F 8A FF 14 FF
+                03:20:56:8163 Rx 1 0x318 s 5 10 00 02 27 01
+                03:20:56:8243 Rx 1 0x300 s 1 B1
+                03:20:56:8358 Rx 1 0x300 s 8 20 00 06 67 01 82 1C 2A
+                03:20:56:8440 Rx 1 0x300 s 2 11 20
+                03:20:56:8445 Rx 1 0x318 s 1 B2
+                03:20:56:8541 Rx 1 0x318 s 8 21 00 06 27 02 79 D1 FF
+                03:20:56:8560 Rx 1 0x318 s 2 12 B7
+                03:20:56:8647 Rx 1 0x300 s 1 B3
+                03:20:56:8744 Rx 1 0x300 s 6 12 00 03 67 02 34
+                03:20:56:8749 Rx 1 0x318 s 1 B3
+              
+    返 回 值：错误代码
+    -----------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType TP20Enter(uint8_t      TpTargetAddress,
+                                          CRecvFrame&  ReceiveFrame,
+                                          uint8_t      AppLayerID  = 0x01);
+
+    // 与接口TP20Enter一致，不同点：增加通道建立请求发送ID可设置，正常数据响应ID可设置
+    /*
+        SetupReqId   通道建立请求发送ID， 例如 0x202
+        ConnRespId   正常数据响应ID，例如 0x3CA
+
+        00000202  03 C0 00 10 CA 03 01
+        00000203  02 D0 CA 03 CC 03 01
+        000003CC  A0 0F 8A FF 32 FF
+        000003CA  A1 0F 8A FF 4A FF
+        000003CC  10 00 02 1A 9B
+        000003CA  B1
+        000003CA  10 80 03 7F 1A 78
+        000003CC  B1
+
+        这里，第一帧，00000202  03 C0 00 10 CA 03 01
+        SetupReqId = 0x0202, ConnRespId = 0x03CA
+    */
+    CStdCommMaco::ErrorCodeType TP20EnterEx(uint8_t      TpTargetAddress,
+                                            CRecvFrame&  ReceiveFrame,
+                                            uint8_t      AppLayerID,
+                                            uint32_t     SetupReqId, 
+                                            uint32_t     ConnRespId);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：  用于TP16协议进入时使用，目前支持TP16同时跑的逻辑链为4条，TP20和TP16不能同时跑
+
+    参数说明：  EnterSysId              CPM_VWTP_PhysReqIdSetup, TP通道建立请求的CAN ID，值范围为：[0, 0xFFFFFFFF]
+                EnterFilterId           CPM_VWTP_PhysRespIdSetup, TP通道建立响应的CAN ID，值范围为：[0, 0xFFFFFFFF]
+                TargetAddr              CPM_VWTP_PhysReqIdCon, TP通道建立后的请求CAN ID，值范围为：[0, 0xFFFFFFFF]
+                EnterAddressCode        CP_5BaudAddressPhys, 5波特率地址, 值范围为：[0, 0xFF]
+                SystemId                CPM_VWTP_DestAddr, TP16目标地址，例如0x11位Acc/Start Authentication, 值范围为：[0, 0xFF]
+                ReceiveFrame            接收到的数据帧
+
+                通常情况下举例1：
+                16:18:52:4371 Rx 1 0x2D0 s 3 11 C0 11
+                16:18:52:4391 Rx 1 0x2F1 s 3 F0 D0 31
+                16:18:52:4401 Rx 1 0x311 s 6 A0 0F 8A FF 32 FF
+                16:18:52:4531 Rx 1 0x331 s 6 A1 03 94 54 00 D9
+                16:18:52:5041 Rx 1 0x311 s 2 30 25
+                16:18:52:5221 Rx 1 0x331 s 4 10 55 6B 8F
+                16:18:52:5221 Rx 1 0x311 s 1 B1
+                16:18:52:5241 Rx 1 0x311 s 2 30 70
+                16:18:52:5521 Rx 1 0x331 s 2 10 DA
+                16:18:52:5521 Rx 1 0x311 s 1 B1
+
+                EnterSysId = 0x2D0，EnterFilterId = 0x2F1，TargetAddr= 0x311， EnterAddressCode = 0x25, SystemId = 0x11
+
+                0x2D0     11 C0 11
+                  |        |     |___________________  TargetAddr & 0xFF, 即 CPM_VWTP_PhysReqIdCon & 0xFF，通道建立后的请求ID低8位
+                  |        |_________________________  SystemId, 即CPM_VWTP_DestAddr, TP16目标地址
+                  |__________________________________  EnterSysId, 即CPM_VWTP_PhysReqIdSetup, TP通道建立时的请求CAN ID, 下位机发送
+
+
+                0x2F1     F0 D0 31
+                  |        |     |___________________  CPM_VWTP_PhysRespIdCon & 0xFF，通道建立后的响应ID低8位
+                  |        |_________________________  CPM_VWTP_TesterAddr，TP16通道的Tester地址
+                  |__________________________________  EnterFilterId, 即CPM_VWTP_PhysRespIdSetup, TP通道建立时的响应CAN ID, ECU发送
+
+
+                0x311     A0 0F 8A FF 32 FF
+                   |          |  |  |  |  |__________  CPM_VWTP_T4, Tester发送给ECU的参数，一般为0xFF，表示永不超时
+                   |          |  |  |  |_____________  CPM_VWTP_T3, Tester发送给ECU的参数，告诉ECU发送续发帧（0x2X）的间隔，0x32表示为50 * 100us = 5ms
+                   |          |  |  |________________  CPM_VWTP_T2, Tester发送给ECU的参数，一般为0xFF，表示永不超时
+                   |          |  |___________________  CPM_VWTP_T1, Tester发送给ECU的参数，告诉ECU接收Tester的数据或者ACK的超时，0x82表示为2 * 10ms = 20ms
+                   |          |______________________  CPM_VWTP_BlockSize, Tester发送给ECU的参数，告诉ECU发送续发帧的块大小
+                   |
+                   |_________________________________  CPM_VWTP_PhysReqIdCon, 通道建立后的请求ID, 下位机发送
+
+
+                0x331     A1 03 94 54 00 D9
+                   |          |  |  |  |  |__________ T4, ECU发送给Tester的参数，下位机一般忽略此参数
+                   |          |  |  |  |_____________ T3, ECU发送给Tester的参数，告诉下位机发送续发帧（0x2X）的间隔，0x00表示为立即发送
+                   |          |  |  |________________ T2, ECU发送给Tester的参数，下位机一般忽略此参数
+                   |          |  |___________________ T1, ECU发送给Tester的参数，告诉下位机接收ECU的数据或者ACK的超时，0x94表示为20 * 10ms = 200ms
+                   |          |______________________ BlockSize, ECU发送给Tester的参数，告诉下位机发送续发帧的块大小
+                   |
+                   |_________________________________ CPM_VWTP_PhysRespIdCon, 通道建立后的响应ID, ECU发送
+
+
+                0x311     30 25
+                   |       |  |______________________ EnterAddressCode 即CP_5BaudAddressPhys, ISO9141-2的5波特率地址码
+                   |       |_________________________ The control byte (TPCI)，表示结束帧，不需要ACK确认
+                   |
+                   |_________________________________ CPM_VWTP_PhysReqIdCon, 通道建立后的请求ID, 下位机发送
+
+
+                0x331     10 55 6B 8F
+                  |        |  |  |  |________________ 关键字2，即ISO9141-2的 Key Word 2
+                  |        |  |  |___________________ 关键字1，即ISO9141-2的 Key Word 1
+                  |        |  |______________________ 同步字节，即ISO9141-2的Synchronization
+                  |        |_________________________ The control byte (TPCI)，表示结束帧，需要ACK确认
+                  |
+                  |__________________________________ CPM_VWTP_PhysRespIdCon, 通道建立后的响应ID, ECU发送
+
+
+                0x311     B1
+                   |      |__________________________ ACK 确认
+                   |
+                   |_________________________________ CPM_VWTP_PhysReqIdCon, 通道建立后的请求ID, 下位机发送
+
+
+                0x311     30 70
+                   |       |  |______________________ 关键字2的取反发回，即ISO9141-2的~KW2
+                   |       |_________________________ The control byte (TPCI)，表示结束帧，不需要ACK确认
+                   |
+                   |_________________________________ CPM_VWTP_PhysReqIdCon, 通道建立后的请求ID, 下位机发送
+
+
+                0x331     10 DA
+                   |       |  |______________________ 地址码的取反发回，即ISO9141-2的~Address
+                   |       |_________________________ The control byte (TPCI)，表示结束帧，需要ACK确认
+                   |
+                   |_________________________________ CPM_VWTP_PhysRespIdCon, 通道建立后的响应ID, ECU发送
+
+
+
+    返 回 值：错误代码
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType TP16Enter(uint32_t    EnterSysId,
+                                          uint32_t    EnterFilterId, 
+                                          uint32_t    TargetAddr, 
+                                          uint8_t     EnterAddressCode, 
+                                          uint8_t     SystemId, 
+                                          CRecvFrame& ReceiveFrame);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：  用于TP20协议广播数据的发送
+
+
+    参数说明：  
+                SendFrame                   广播发送帧
+                ReceiveFrame                如果指定需要接收，接收到的响应将返回，目
+                                            前未实现接收功能
+                TimeIntervalMs              广播帧间隔时间，单位毫秒，默认20毫秒
+                SendTimes                   广播帧发送次数，默认5次
+                TimeIntervalOfReTriggerMs   广播帧重触发（Re-trigger）发送的间隔，单
+                                            位毫秒，默认0毫秒，如果为0，将取消重触
+                                            发发送
+
+    广播消息帧格式定义：
+                    Identifier  Byte1     Byte2  Byte3   Byte4  Byte5  Byte6  Byte7
+                    CAN ID      目的地址  类型   服务ID  参数1  参数2  KEY    KEY
+
+    Byte1   对于非广播数据帧，需要接收响应，目的地址，小于0xFx，例如0x01，发动机
+            对于广播数据帧，不需要接收响应，目的地址，范围为0xF0值0xFF，例如0xFE
+
+    Byte2   为0x23和0x24，分别代表是请求帧和响应帧
+    
+    Byte3   服务ID，SID
+
+    Byte4   PID1，SID的参数1
+    Byte5   PID2，SID的参数2
+
+    Byte6/Byte7     对于非广播数据帧，KEY为0
+                    对于广播数据帧，KEY为0x55和0xAA交替
+
+    举例1：
+        CRecvFrame ReceiveResponedFrame;
+        CBinary binBroadcast((const uint8_t *)"\x00\x00\x02\x00\xFE\x23\x3B\x00\x00\x55\x55", 11)
+        CSendFrame csfBroadcast(binBroadcast, 1);
+        TP20Broadcast(csfBroadcast, ReceiveResponedFrame);
+
+        广播数据帧为：00 00 02 00 FE 23 3B 00 00 55 55
+        Can ID为0x200，目的地址为0xFE，0x23为请求帧类型，SID=0x3B（运输模式），PID=0x0000
+
+        发送如下：
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 39989686 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 20234 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 20230 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 20234 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 20230 us
+
+    举例2：
+        CRecvFrame ReceiveResponedFrame;
+        CBinary binBroadcast((const uint8_t *)"\x00\x00\x02\x00\xFE\x23\x3B\x00\x00\x55\x55", 11)
+        CSendFrame csfBroadcast(binBroadcast, 1);
+        TP20Broadcast(csfBroadcast, ReceiveResponedFrame, 20, 5, 1000);
+
+        广播数据帧为：00 00 02 00 FE 23 3B 00 00 55 55，重触发间隔为1秒
+        Can ID为0x200，目的地址为0xFE，0x23为请求帧类型，SID=0x3B（运输模式），PID=0x0000
+
+        发送如下：
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 110146293 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 20002 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 19996 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 20002 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 19999 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 999999 us  --------重触发开始
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 999995 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 999998 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 999996 us
+                07 02 00 FE 23 3B 00 00 AA AA ;Times: 1000000 us
+                07 02 00 FE 23 3B 00 00 55 55 ;Times: 999992 us
+
+                重触发的广播帧会一直以间隔TimeIntervalOfReTriggerMs发送，直到再次调用此接
+                口，并且参数TimeIntervalOfReTriggerMs为-1，将停止发送重触发广播帧
+
+    返 回 值： 错误代码
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType TP20Broadcast(const CSendFrame&   SendFrame,
+                                              CRecvFrame&         ReceiveFrame,
+                                              uint32_t            TimeIntervalMs = 20,
+                                              uint32_t            SendTimes = 5,
+                                              uint32_t            IntervalOfReTriggerMs = 0);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 用于 $NRC21 $NRC23 $NRC78 的处理 设置对应的处理方式，默认通信库处理
+
+    参数说明： 
+              Mode             表示当前是对哪种模式的处理设置
+                               参数枚举值有三种：
+                               RHM_MODE_NRC21 ，表示当前设置的是 7F XX 21 的处理
+                               RHM_MODE_NRC23 ，表示当前设置的是 7F XX 23 的处理
+                               RHM_MODE_NRC78 ，表示当前设置的是 7F XX 78 的处理
+
+
+              Type             通信库对相应负响应的处理方式， 默认为 RHT_UNTIL_TIMEOUT，即直到超时
+
+                               参数枚举值有三种：
+                               RHT_DISABLE ， 通信库不处理，由诊断应用自己处理，由诊断应用自己处理
+
+                               RHT_UNTIL_TIMEOUT，通信库连续处理，直到超时时间到 RCXXCompletionTimeout
+                               时间，通信层默认RcxxHandlingType为此值，应用如果没有设置 
+                               RCXXCompletionTimeout 时间， 针对78，RCXXCompletionTimeout 默认为15秒
+
+                               RHT_UNLIMITED_LOOP ， 通信库无限制的处理，直到应用程序重新设置
+                               为 RHT_DISABLE 不处理，或者车辆返回正响应
+
+                               如果相应的RCXX模式，没有调用过此接口设置，默认Type值为 RHT_UNTIL_TIMEOUT
+
+
+              CompletionTimeoutMs   RCXX的处理超时时间（总超时，从收到第一个7F开始计时），此参数只对参
+                                    数 Type 为 RHT_UNTIL_TIMEOUT 时才有效
+
+                                    RC21CompletionTimeoutMs 默认为 5000， 即5秒
+                                    RC23CompletionTimeoutMs 默认为 5000， 即5秒
+                                    RC78CompletionTimeoutMs 默认为 15000，即15秒
+
+                                    例如：  [15:51:53.476|4ab0] Req:  [00 00 07 E0 10 89]
+                                            [15:51:53.489|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:54.284|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:55.082|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:55.885|34cc] Ans:  [00 00 07 E8 50 89]
+                                    请求 10 89 与 响应 50 89 之间为2.4秒，如果设置CompletionTimeoutMs
+                                    为2000毫秒，将超时返回（收不到[00 00 07 E8 50 89]）
+
+
+              WaitNext7FXXTimeMs   当 Mode = RHM_MODE_NRC78 时，WaitNext7FXXTimeMs是一个超时间
+
+                                   针对7F78的一个超时间隔，即从收到一个7F78开始，等待下一个7F78的超时时间
+                                   通信库默认此值为 3000，即3秒
+
+                                   例如： [15:51:53.476|4ab0] Req:  [00 00 07 E0 10 89]
+                                            [15:51:53.489|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:54.284|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:55.082|34cc] Ans:  7F78--> [00 00 07 E8 7F 10 78]
+                                            [15:51:55.885|34cc] Ans:  [00 00 07 E8 50 89]
+                                   第一个 7F78 与第二个7F78的间隔为800毫秒，如果 设置 WaitNext7FXXTimeMs 
+                                   为500毫秒，将超时返回（收不到[00 00 07 E8 50 89]）
+
+
+
+                                   当 Mode = RHM_MODE_NRC21 或者 RHM_MODE_NRC23 时，WaitNext7FXXTimeMs
+                                   是一个最小间隔，即间隔多久重发请求帧
+
+                                   针对收收到7F21，重新发送帧最小间隔，即从收到一个7F21开始，等待指定间隔重
+                                   发请求帧，通信库默认为 100毫秒，如果在 SetCommTime 中设置的 P3 大于
+                                   WaitNext7FXXTimeMs指，将使用 P3， 即实际的重发间隔为 Max(P3, WaitNext7FXXTimeMs)
+
+                         
+    返 回 值： 设置成功，返回0，    CStdCommMaco::STATUS_NOERROR
+               其它值，设置失败
+
+
+    说    明：
+            1、0x7F 0xXX 0x21/0x23 通常的处理方式，重复发送请求
+            
+                Type = RHT_DISABLE      通信库不做处理，直接返回
+                例如：
+                    [15:20:21.581|2268] [00000001] Req:  [00 00 07 E0 33 02] 01
+                    [15:20:21.611|2268] [00000001] Ans:  [00 00 07 E8 7F 33 21]
+
+
+
+                Type = RHT_UNTIL_TIMEOUT      通信库间隔 “发送间隔”（P3和WaitNext7FXXTimeMs较大者）
+                                              时间后，重复发送请求帧，直到正响应或者 CompletionTimeoutMs 超时
+                                              RC21和RC23的CompletionTimeoutMs默认值为5秒
+                例如：
+                    设置参数：
+                        // P3 = 50, CompletionTimeoutMs = 30000, WaitNext7FXXTimeMs = 300
+                        // 即总超时30秒，发送间隔 Max(50, 300) = 300 毫秒
+                        ecu.SetCommTime(0, 500, 50, 0);
+                        ecu.SetRCXXHandling(CStdCommMaco::RcxxHandlingMode::RHM_MODE_NRC21, CStdCommMaco::RcxxHandlingType::RHT_UNTIL_TIMEOUT, 30 * 1000, 300);
+
+                    [15:25:34.295|287c] [00000002] Req:  [00 00 07 E0 33 02] 01
+                    [15:25:34.298|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    [15:25:34.329|42c8] [00000002] Ans:  7F21--> [00 00 07 E8 7F 33 21]
+                    [15:25:34.635|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    [15:25:34.653|42c8] [00000002] Ans:  7F21--> [00 00 07 E8 7F 33 21]
+                    [15:25:34.958|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    [15:25:34.972|42c8] [00000002] Ans:  7F21--> [00 00 07 E8 7F 33 21]
+                    [15:25:35.277|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    ......
+                    ......
+                    ......
+                    [15:25:44.777|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    [15:25:44.803|42c8] [00000002] Ans:  7F21--> [00 00 07 E8 7F 33 21]
+                    [15:25:45.107|42c8] [00000002] TX_MSG_TYPE = [00 00 07 E0]
+                    [15:25:45.139|42c8] [00000002] START_OF_MESSAGE = [00 00 07 E8] [length = 55]
+                    [15:25:45.213|287c] [00000002] Ans:  [00 00 07 E8 73 02 01 01 08 01 13 01 18 01 21 01 22 01 35 01 41 02 21 02 23 02 30 04 43 10 00 12 60 14 5C 14 60 15 49 20 08 21 10 21 11 21 21 21 22 21 26 21 27 D9 00]
+
+
+                Type = RHT_UNLIMITED_LOOP     通信库间隔 “发送间隔”（P3和WaitNext7FXXTimeMs较大者）时间后
+                                              重复发送请求帧，直到正响应或者P2超时
+
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetRCXXHandling(CStdCommMaco::RcxxHandlingMode Mode,
+                                                CStdCommMaco::RcxxHandlingType Type,
+                                                uint32_t CompletionTimeoutMs = 15 * 1000,
+                                                uint32_t WaitNext7FXXTimeMs = 3 * 1000);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置清除缓存的规则
+
+    参数说明： Mode          清除Buffer的模式，默认不清除任何 Buffer
+
+                             应用没有调用SetClearBuffer 情况下，EcuInterface 默认为 CBM_CLEAR_DISABLE
+                             每个CEcuInterface有自己的接收缓存（std::queue），通常情况下，EcuInterface
+                             必须保证不丢弃任何数据（链路保持的响应数据和7F负响应，除外），除非应用调用
+                             了此接口
+            
+               当 Mode = CBM_CLEAR_DISABLE
+               不做任何清除缓存处理，EcuInterface默认为此值
+
+               当 Mode = CBM_CLEAR_COMM_RX_QUEUE
+               数据发送到总线后，立即清除EcuInterface的接收缓存，即EcuInterface的接收queue
+               即PassThruWriteMsgs后立即清除EcuInterface的接收queue
+
+               当 Mode = CBM_CLEAR_VCI_RX_BUFFER
+               此模式在CBM_CLEAR_COMM_RX_QUEUE模式基础上增加清除下位机的通信缓存数据
+               即：PassThruIoctl(CLEAR_RX_BUFFER)调用后，才PassThruWriteMsgs()
+               然后，清除EcuInterface的接收queue
+
+               数据发送到总线前，清除VCI的接收缓存，即PASSTHRU的接收缓存（PassThruConnect的channel缓存）
+               注意，多线程诊断下，不建议设置此值，否则会把其它CEcuInterface对象的数据给清除了
+               此设置清除了VCI的channel缓存，如果应用同时跑多ECU，此时会造成数据丢失
+               CBM_CLEAR_VCI_RX_BUFFER模式只针对CAN协议生效
+               
+
+    返 回 值：错误代码
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetClearBuffer(CStdCommMaco::ClearBufferMode Mode = CStdCommMaco::ClearBufferMode::CBM_CLEAR_DISABLE);
+
+
+    
+    /*-------------------------------------------------------------------------------------------------
+    功    能：发一帧（0帧）收一帧或多帧（0帧）
+    
+    参数说明：CSendFrame SendFrame                   – 发送帧
+              CRecvFrame ReceiveFrame                - 接收帧
+              
+              CStdCommMaco::DoipMsgType MsgType      - 指定需要发送的DOIP消息类型（PT_DOIP有效）
+                                                       此参数对非DOIP协议不起作用
+              
+              MsgType，举例，MsgType = DMT_VEH_ID_REQ时，即 Vehicle identification request
+              
+    日志举例说明：
+              [17:00:53.653|148c] [00000001] SetLinkKeep: Frame Length = 6, KeepTimeMs = 1000, KeepType = LKT_INTERVAL, Immediately = true, Tx: [0E 80 10 10 3E 80]
+              [17:00:53.653|148c] [TcpCliet] tcp write_some(169.254.118.51), 02FD8001000000060E8010103E80
+              [17:00:53.654|148c] [00000001] 
+              [17:00:53.654|148c] [00000001] Diagnostic message(8001)
+              [17:00:53.654|1c9c] [TcpCliet] tcp async_read_some(169.254.118.51), 02FD80020000000510100E8000
+              [17:00:53.655|148c] [00000001] Req:  [0E 80 10 10 3E 00] 01
+              [17:00:53.655|0a10] [00000001] Diagnostic message positive acknowledgment (0x8002), Source Address: 0x1010, Target Address: 0x0E80, ACK code: ACK (0x00)
+              [17:00:53.655|148c] [TcpCliet] tcp write_some(169.254.118.51), 02FD8001000000060E8010103E00
+              [17:00:53.656|1c9c] [TcpCliet] tcp async_read_some(169.254.118.51), 02FD80020000000510100E8000
+              [17:00:53.656|0a10] [00000001] Diagnostic message positive acknowledgment (0x8002), Source Address: 0x1010, Target Address: 0x0E80, ACK code: ACK (0x00)
+              [17:00:53.729|1c9c] [TcpCliet] tcp async_read_some(169.254.118.51), 02FD80010000000610100E807E00
+              [17:00:53.730|0a10] [00000001] Push: [02 FD 80 01 00 00 00 06 10 10 0E 80 7E 00 00 00]
+              [17:00:53.730|148c] [00000001] Ans:  [10 10 0E 80 7E 00]
+              
+    返 回 值：错误代码
+    
+              ReceiveFrame
+    
+    说    明：
+            1、只发送不接收(无P2等待时间)，SendFrame.SetRecvFrameNums(0)，
+               设置接收帧数量为0；
+               
+            2、只接收不发送，即发空帧实现，SendFrame.Clear();
+    -------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SendReceive(const CSendFrame& SendFrame, CRecvFrame& ReceiveFrame);
+    CStdCommMaco::ErrorCodeType SendReceive(const CSendFrame& SendFrame, CRecvFrame& ReceiveFrame, CStdCommMaco::DoipMsgType MsgType);
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：无限收，如果过滤器设置了接收所有ID，此接口将实现采数功能
+
+    参数说明：CSendFrame SendFrame – 当协议ID为PT_CAN(不是PT_RAW_CAN)发送帧，用于设置监听的过滤器，
+                                      默认情况下收数据帧为0表示监听所有
+                                      即 CSendFrame Tx(0);   即监听所有ID
+
+                                      当协议ID为PT_RAW_CAN(不是PT_CAN)发送帧无意义
+
+                                      当协议ID为PT_ISO时，CSendFrame的发送帧为只有一个字节且为1时，表示
+                                      现在是采集电平宽度
+
+              收到的数据，将在回调函数 fCallBack 中返回
+
+              回调函数声明
+                        void RxCallBack(const CRecvFrame& rf, uint32_t ts);
+
+              回调函数参数
+                            rf      接收到的数据帧
+
+                            ts      接收到的数据帧的时间戳（硬件控制器的时间戳），单位为位时间
+                                    位时间，就是CAN发送每位数据的时间，也就是波特率
+                                    比如CAN配置的波特率1Mbps,那么位时间就是1us
+                                    比如CAN配置的波特率500K,那么位时间就是0.5us
+
+
+    说    明：
+            1、针对监听功能，增加此接口
+
+            由于回调函数 fCallBack 是函数调用者的代码空间，函数调用者应尽量不要在回调函
+            数 fCallBack 中进行太多的逻辑处理，以免累计太多监听数据在通信库中
+
+            建议，例如在 fCallBack 中只保存 CRecvFrame 的数据，处理逻辑应放到其它代码中
+
+
+    举   例：
+            // 采集6和14引脚CAN总线上所有11位标准CAN的数据10分钟并打印出来
+            ErrorCode_t CTest::Monitor_CAN11_0614_10Minutes()
+            {
+                auto PrintRf = [](const CRecvFrame& rf, uint32_t ts)
+                {
+                    uint32_t n = rf.GetSize();
+                    for (uint32_t i = 0; i < n; i++)
+                    {
+                        printf("%08d.%03d    ", (ts / 2000), ((ts / 2) % 1000)); // 时间戳精确到微秒
+                        CBinary b = rf.GetAt(i); uint32_t nb = b.GetSize();
+                        for (uint32_t j = 0; j < nb; j++)    printf("%02X ", b[j]);
+                        printf("\r\n");
+                    }
+                };
+
+                CEcuInterface ecu;
+                ecu.SetProtocolType(CStdCommMaco::ProtocolType::PT_CAN);
+                ecu.SetIoPin(CStdCommMaco::ObdPinType::PIN_OBD_06, CStdCommMaco::ObdPinType::PIN_OBD_14);
+                ecu.SetBaudRate(500 * 1000);
+
+                CSendFrame Tx(0);
+                ecu.SendReceive(Tx, PrintRf);
+                std::this_thread::sleep_for(std::chrono::minutes(10));
+                return ErrorCodeType::STATUS_NOERROR;
+            }
+
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SendReceive(const CSendFrame& SendFrame, std::function<void(const CRecvFrame&, uint32_t)> fCallBack);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：发多帧（0帧）收多帧（0帧）
+    
+    参数说明：CMultiSendFrame MultiSendFrame – 发送帧
+    
+    返 回 值：错误代码
+
+              MultiRecvFrame
+    
+    说    明：
+            
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SendReceive(const CMultiSendFrame& MultiSendFrame, CMultiRecvFrame& MultiRecvFrame);
+
+
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：取得某引脚状态
+
+    参数说明：
+            CStdCommMaco::ObdPinType       IoPort –    引脚号
+            CStdCommMaco::PinStatusType    StatusWay    取值类型，缺省为ST_VOLTAGE_VALUE, 即电压值
+
+            PST_LEVEL       -- 取得电平高低，返回值0表示低电平，非0表示高电平
+            PST_VALTAGE     -- 取得电压值，返回值单位: 0.1V（即100毫伏）
+
+    返 回 值：电平或电压值
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    uint32_t GetPinStatus(CStdCommMaco::ObdPinType    IoPort,
+                          CStdCommMaco::PinStatusType StatusWay = CStdCommMaco::PinStatusType::PST_VALTAGE);
+
+
+
+    /*-------------------------------------------------------------------------------------------------------------------------
+    功    能：设置失活DOIP引脚的模式
+
+              默认情况下，是 DAO_DISABLE_DOIP_PIN_NORMAL，激活DOIP引脚（调用ActiveDoipPin使能8脚上拉）后，在EcuInterface对象的
+              析构函数中，会失活DOIP引脚（取消8脚上拉）
+
+
+    参数说明： CStdCommMaco::DeActiveDoipMode Mode   --  设置为 DAO_DISABLE_DOIP_PIN_NORMAL，正常模式，默认值
+                                                         如果应用没有调用过SetDeActiveDoipMode接口，即为此值
+                                                         此模式下，在EcuInterface对象的析构函数中会失活DOIP引脚（取消8脚上拉）
+
+                                                         如果设置为 DAO_CANCLE_DOIP_PIN_DISABLE，Cancle模式，在EcuInterface对象
+                                                         的析构函数中，将不会失活DOIP引脚（即不会取消8脚上拉）
+
+
+    返 回 值：STATUS_NOERROR，设置成功
+
+    说    明：如果诊断应用没有调用过此接口，默认为 DAO_DISABLE_DOIP_PIN_NORMAL 模式
+    -------------------------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetDeActiveDoipMode(const CStdCommMaco::DeActiveDoipMode Mode = CStdCommMaco::DeActiveDoipMode::DAO_DISABLE_DOIP_PIN_NORMAL);
+
+
+
+    /*-------------------------------------------------------------------------------------------------------------------------
+    功    能：使能或者禁能DOIP指定引脚的上拉功能，用于激活车辆DOIP的物理诊断功能（网卡），通常情况下为8号引脚
+
+
+    参数说明： CStdCommMaco::Obd2Pin  PinNum       --  指定OBD引脚PinNum，使能上拉功能呢（上拉510欧姆电阻）
+                                                       指定OBD引脚，不包含PD_OBD_04，PD_OBD_05，PD_OBD_16
+                                                       PD_OBD_08，其余引脚脚均不起作用
+
+               uint32_t ActiveEnable               --  非零为使能，零为禁能（即失活）
+
+
+               调用举例1：
+               ecu.ActiveDoipPin(); // 使能DOIP的8脚，即激活DOIP
+
+               调用举例2：
+               ecu.ActiveDoipPin(CStdCommMaco::ObdPinType::PIN_OBD_08, 0); // 禁能DOIP的8脚上拉，即失活DOIP
+
+    返 回 值：STATUS_NOERROR，激活或者禁能成功
+
+    说    明：调用此接口激活后，如果没有修改过SetDeActiveDoipMode失活模式（默认为DAO_DISABLE_DOIP_PIN_NORMAL），或者设置
+              失活DOIP引脚的模式为DAO_DISABLE_DOIP_PIN_NORMAL，这样，在Ecu对象析构时会自动还原为未激活状态（失活状态）
+    -------------------------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType ActiveDoipPin(const CStdCommMaco::ObdPinType PinNum = CStdCommMaco::ObdPinType::PIN_OBD_08 , const uint32_t ActiveEnable = 1);
+
+
+
+    /*-------------------------------------------------------------------------------------------------------------------------
+    功    能：选择DOIP通信引脚，DOIP有两组通信引脚，分别为(PIN03,PIN11,PIN12,PIN13)、(PIN01,PIN09,PIN12,PIN13)
+              没有设置此接口的下，默认为选项1
+
+    参数说明： PinOption -- 值1为选项1，值2为选项2，值为0没有任何选项，其它值无效
+
+                            没有选项: DOIP没有任何引脚连接
+                            选项1： PIN03,PIN11,PIN12,PIN13
+                            选项2： PIN01,PIN09,PIN12,PIN13
+
+                            宝马DOIP、JLR、BENZ、VW等都是选项1
+
+    返 回 值：STATUS_NOERROR 获取成功
+
+    说    明：无
+    -------------------------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SelectDoipOption(const uint32_t PinOption = 1);
+
+
+    /*-------------------------------------------------------------------------------------------------------------------------
+    功    能：获取当前可用的DOIP的实例，即执行一次Vehicle identification request来获取有多少个DOIP实例
+
+    参数说明： vctModule -- 返回值数组，获取到的DOIP实例数组
+               TimeOutMs -- 超时时间，单位为毫秒ms
+               RecvNums  -- 接收个数，类似 CSendFrame 的 RECV_FRAME_NUM
+                            RecvNums = SF_RECEIVE_AUTO，表示自动接收获取，TimeOutMs时间到才返回 
+                            RecvNums = N, 表示获取指定个数的DOIP实例，获取到N个后如果TimeOutMs时间没到也立即返回
+               
+               CStdCommMaco::DOIPMODULE结构体定义
+                typedef struct tagDoipModule
+                {
+                    std::string  IP;                 // 字符串 IPv4地址或者是IPv6地址，IPv4地址例如"169.254.16.223"
+                                                     // IPv6地址例如"FC00:0000:130F:0000:0000:09C0:876A:130B"，如果无IPv6，则空
+                    std::string  EntityID;           // 例如 "02:26:55:12:34:56"
+                    std::string  GroupeID;           // 例如 "02:26:55:12:34:56"
+
+                    uint16_t  LogicalAddress;        // 2字节  实体的逻辑地址，通常情况下即网关的逻辑地址，例如 0x1716
+                    uint8_t   FurtherAction;         // Further Action Required
+                    uint8_t   SyncStatus;            // VIN/GID SyncStatus
+
+                    std::vector<uint8_t> VIN;        // 数组  车辆车架号
+                }DOIPMODULE, PDOIPMODULE;
+                
+                
+    日志举例说明：
+              [20:35:23.704|42d0] [00000001] GetDoipModule: TimeOutMs = 300, RecvNums = 0xFF
+              [20:35:23.727|42d0] [TcpCliet] udp send_to(172.16.36.200), 02FD000100000000
+              [20:35:24.033|42d0] [TcpCliet] udp send_to(169.254.246.243), 02FD000100000000
+              [20:35:24.338|42d0] [TcpCliet] udp recv_from(169.254.16.89) = 00000028, 02FD00040000002057314B3647354B42584D4130313038383210593CCE150000033CCE1500000500
+              [20:35:24.338|42d0] [TcpCliet] udp recv_from(169.254.17.91) = 00000028, 02FD0004000000200000000000000000000000000000000000115B3CCE150000063CCE1500000500
+              [20:35:24.338|42d0] [TcpCliet] udp recv_from(169.254.17.72) = 00000028, 02FD0004000000204C4534414734434258504C32373331313511483CCE150000053CCE1500000500
+              [20:35:24.340|42d0] [TcpCliet] udp send_to(192.168.10.1), 02FD000100000000
+              [20:35:24.646|42d0] [TcpCliet] udp send_to(192.168.164.1), 02FD000100000000
+              [20:35:25.261|42d0] [00000001] RecvDoipModule, TimeOut = 308ms.
+              [20:35:25.261|42d0] [00000001] Ans: LA = 0x1059, IP = 169.254.16.89, VIN = W1K6G5KBXMA010882, EID = 3C:CE:15:00:00:03, GID = 3C:CE:15:00:00:03, FAR = 0x00
+              [20:35:25.261|42d0] [00000001] Ans: LA = 0x115B, IP = 169.254.17.91, VIN = , EID = 3C:CE:15:00:00:06, GID = 3C:CE:15:00:00:06, FAR = 0x00
+              [20:35:25.262|42d0] [00000001] Ans: LA = 0x1148, IP = 169.254.17.72, VIN = LE4AG4CBXPL273115, EID = 3C:CE:15:00:00:05, GID = 3C:CE:15:00:00:05, FAR = 0x00
+
+    返 回 值：STATUS_NOERROR 获取成功
+
+    说    明：无
+    -------------------------------------------------------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType GetDoipModule(std::vector<CStdCommMaco::DOIPMODULE> &vctModule, uint32_t TimeOutMs, uint8_t RecvNums = CSendFrame::RECV_FRAME_NUM::SF_RECEIVE_AUTO);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：设置 VCI 断开与连接 事件的回调函数
+              当VCI连接上，通信层将调用fnEventCb通知应用
+              当VCI断开，  通信层将调用fnEventCb通知应用
+
+    参数说明：
+            fnEventCbe       断开与连接的回调函数
+            
+
+            回调函数声明
+                        void EventCallBack(unsigned long Status, unsigned long BatteryMv);
+
+            回调函数参数
+                            Status          0，未连接； 1，已连接； 其他值，保留
+                            BatteryMv       电池电压，单位毫伏
+
+    返 回 值：STATUS_NOERROR
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    CStdCommMaco::ErrorCodeType SetVciConnectEvent(std::function<void (unsigned long, unsigned long)> fnEventCb);
+
+
+// 静态成员函数
+//////////////////////////////////////////////////////////////////////////////////////
+public:
+
+    /*-----------------------------------------------------------------------------
+    功    能：向通信库日志文件中写入日志, 与C的printf功能类似，会自动补上"\r\n"
+              注意Log的最大buffer为64K字节，超过65565的长度将会造成崩溃
+
+    参数说明：format为格式化字符串，与C的printf功能类似
+
+    返 回 值：返回LOGI字串，即打印到文件的字串
+
+    说    明：会自动补上"\r\n"
+    -----------------------------------------------------------------------------*/
+    static const std::string Log(const char* format, ...);
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：获取版本号
+
+      参数说明：无
+
+      返 回 值：32位 整型 0xHHLLYYXX
+
+      说    明：Coding of version numbers
+                HH 为 最高字节, Bit 31 ~ Bit 24   主版本号（正式发行），0...255
+                LL 为 次高字节, Bit 23 ~ Bit 16   次版本号（正式发行），0...255
+                YY 为 次低字节, Bit 15 ~ Bit 8    最低版本号（测试使用），0...255
+                XX 为 最低字节, Bit 7 ~  Bit 0    保留
+
+                例如 0x02010300, 表示 V2.01.003
+                例如 0x020B0000, 表示 V2.11
+    -----------------------------------------------------------------------------*/
+    static uint32_t GetVersion();
+
+    
+    /*-----------------------------------------------------------------------------
+      功    能：获取当前VCI是否支持指定的功能
+
+      参数说明：SupportType   表示当前VCI是否支持的功能类型
+
+                VST_SUPPORT_DOIP        硬件是否支持DOIP
+                VST_SUPPORT_4_CAN       硬件是否支持4路CAN同时跑
+                VST_SUPPORT_ELM327      硬件是否支持ELM327
+
+      返 回 值：true, 支持； false, 不支持
+
+      说    明：如果当前没有连接VCI，返回false
+    -----------------------------------------------------------------------------*/
+    static bool GetSupported(CStdCommMaco::VciSupportType SupportType);
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取VCI类型名称
+
+        参数说明： 无
+
+        返 回 值：返回VCI的类型名称，例如"AD900VCI"指AD900平板蓝牙小接头
+                  如果VCI没有连接上，返回空串
+
+        说    明： VCI类型名称
+                    "AD900TOOL"    -->  AD900 Tool诊断工装盒子
+                    "AD900VCI"     -->  AD900 VCI 小接头，只能平板蓝牙连接
+                    "EasyVCI"      -->  TOPKEY EasyVCI 小接头
+                    "PG1000VCI"    -->  PG1000 VCI 远程诊断VCI
+                    "TP005VCI"     -->  国内版TOPVCI， 小车探，CarPal
+                    "AD500VCI"     -->  AD500VCI
+                    "RLinkMiniVCI" -->  DOI006 VCI
+                    "TesterBench"  -->  新陪测板工装
+                    "AD800VCI"     -->  AD800BT-2VCI
+    -----------------------------------------------------------------------------*/
+    static const std::string GetVciTypeName();
+
+
+    /*-----------------------------------------------------------------------------------------------
+        功    能： 获取当前VCI的设备固件类型
+
+        参数说明： 无
+
+        返 回 值：返回VCI的类型名称，例如"AD900VCI"指AD900平板蓝牙小接头
+                  如果VCI没有连接上，返回空串
+
+        说    明： VCI类型名称                      GetVciFwType         固件文件头
+                                                     uint32_t            固件标识             VCI名称
+         AD900 Tool 的设备类型是：                  0x41443900         "AD900Relay207"       "AD900TOOL"
+         AD900 VCI（小接头）的设备类型是：          0x4E333247         "AD900VCIN32G455"     "AD900VCI"
+         TOPKEY EasyVCI（小接头）的设备类型是：     0x45564349         "EasyVCIGD32F305"     "EasyVCI"
+         PG1000的设备类型是：                       0x31303634         "PG1000VCIRT1064"     "PG1000"
+         RLinkMiniVCI的设备类型是：                 0x47443332         "RLMiniGD32F427"      "RLinkMiniVCI"
+         AD500VCI的设备类型是：                     0x41443553         "AD500VCIN32G455"     "AD500VCI"
+         国内版TOPVCI的设备类型是：                 0x50443031         "PD001N32G455"        "TP005VCI"
+         新陪测板工装设备类型是：                   0x47445442         "TesterGD32F427"      "TesterBench"
+         AD800BT-2VCI的设备类型是：                 0x41443800         "AD800VCIN32H487"     "AD800VCI"
+         TopScanProV2.0（OBD1000）设备类型是：      0x48343837         "TSP2VCIN32H487"      "TopScanPro2VCI"
+         DeepScan设备类型是：                       0x44534E54         "DEEPSCANN32H487"     "DeepScanVCI"
+         CarPal（H487 + OBD1000）设备类型是：       0x43415250         "CARPALN32H487"       "TP005VCI"
+         DOIP（H487 + OBD1000 + MT7628）设备类型是：0x444F4950         "TSMVCIN32H487"       "TopScanMasterVCI"
+    -----------------------------------------------------------------------------------------------*/
+    static const uint32_t GetVciFwType();
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取VCI的序列号
+
+        参数说明： 无
+
+        返 回 值：返回VCI的序列号, 例如：“JV0013BA100044”
+    -----------------------------------------------------------------------------*/
+    static const std::string GetVciSN();
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取VCI的6字节校验码
+
+        参数说明： 无
+
+        返 回 值：返回VCI的校验码, 例如：“123456”
+    -----------------------------------------------------------------------------*/
+    static const std::string GetVciKey();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取VCI的MCU的ID
+               当前MCU的唯一ID，即UID(Unique device ID)
+               此MCU的唯一ID来自MCU芯片厂商，可参考对应的MCU芯片参考手册
+
+               通常情况下，VCI的McuUID的长度，等于12个字节，即96位的字节
+
+    参数说明： 无
+
+    返 回 值：返回VCI MCU的ID, 例如：[27 00 34 00 03 51 38 32 30 34 35 32]
+    -----------------------------------------------------------------------------*/
+    static const std::vector<uint8_t> GetVciMcuId();
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取VCI是否已经连接
+
+        参数说明： 无
+
+        返 回 值： true, 已连接； false, 没有连接
+    -----------------------------------------------------------------------------*/
+    static bool IsVciConnected();
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取当前连接的VCI的连接方式
+
+        参数说明： 无
+
+        返 回 值： 
+                   "not connected"       VCI没有连接
+                   "usb"                 当前是USB连接方式
+                   "system bluetooth"    当前是平板蓝牙连接方式
+                   "serial"              当前连接方式是串口
+                   "ch343 serial"        当前连接方式是USB串口(CH343)
+    -----------------------------------------------------------------------------*/
+    static const std::string GetCommType();
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前连接VCI的固件版本
+
+    参数说明： 无
+
+    返 回 值：例如："AD900 ToolV4 Jul  8 2022 V1.19"
+    -----------------------------------------------------------------------------*/
+    static const std::string GetVciVersion();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前连接VCI的CANFD芯片
+
+    参数说明： 无
+
+    返 回 值：
+               "not connected"       VCI没有连接
+               "PIC18F27Q84"         当前是PIC18F27Q84
+               "MCP2518"             当前是MCP2518
+               "GD32C103"            当前是GD32C103
+               "NOCANFD"             当前没有贴CANFD芯片，例如keyNOW
+               "ERROR"               硬件错误
+    -----------------------------------------------------------------------------*/
+    static const std::string GetCanFdType();
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前连接VCI的CANFD芯片版本信息
+
+    参数说明： 无
+
+    返 回 值：
+               V1.01
+    -----------------------------------------------------------------------------*/
+    static const std::string GetCanFdVersion();
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 复位下位机VCI
+
+        参数说明： 无
+
+        返 回 值：STATUS_NOERROR 成功
+
+        说    明：无
+    -----------------------------------------------------------------------------*/
+    static CStdCommMaco::ErrorCodeType VciReset(void);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 下位机VCI通信灯开关
+
+    参数说明： OnOff
+                    1, 灯亮
+                    0, 灯灭
+
+    返 回 值：STATUS_NOERROR 成功
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    static CStdCommMaco::ErrorCodeType VciVehicleLedOn(uint32_t OnOff);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 下位机蜂鸣器响
+
+    参数说明： 无
+
+    返 回 值：STATUS_NOERROR 成功
+
+    说    明：无
+    -----------------------------------------------------------------------------*/
+    static CStdCommMaco::ErrorCodeType VciBuzzOn(uint32_t OnOff);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：释放所有已建立的协议引脚，即断开所有已连接的PasshtruConnect通道（物理通道）
+
+    参数说明：无
+
+    返 回 值：STATUS_NOERROR
+
+    说    明：读所有引脚电压前，为了确保CAN引脚的准确性（XJ549芯片读电压存在问题）
+    -----------------------------------------------------------------------------*/
+    static CStdCommMaco::ErrorCodeType ReleaseAllPhyChannel();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能：强制DOIP的TCP和UDP数据包，走本地主机（App/Apk）所在的以太网网络环境
+
+    参数说明：Enable     -- 1,     强制走本地主机的网络环境
+                                   例如，VCI是TopScanMaster，此时VCI是蓝牙连接的，
+                                   如果此时主机（手机或者平板）连上了TopScanMaster
+                                   的热点，DOIP数据包将通过WiFi直接与车辆通信，
+                                   DOIP的数据包将不会通过蓝牙发送到VCI
+                                   
+                         -- 0,     不强制走本地主机的网络环境，根据实际连接的VCI定，
+                                   例如，VCI是TopScanMaster，此时VCI是蓝牙连接的，
+                                   DOIP数据包通过蓝牙发送到VCI，再到MT7628，最后
+                                   通到车辆
+
+    返 回 值：STATUS_NOERROR
+
+    说    明：没有调用此接口情况下，默认为0
+              即不强制走本地主机的网络环境，即DOIP数据包按VCI连接方式转发
+    -----------------------------------------------------------------------------*/
+    static CStdCommMaco::ErrorCodeType SetLocalDoipForce(uint32_t Enable);
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+public:
+    CEcuInterface();
+
+    virtual ~CEcuInterface();
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+private:
+#if ENABLE_TOPDON_PUBLIC_STDCOMM_NS
+    const std::unique_ptr<TopDonPublicStdComm::CEcuInterfaceImpl> m_upEcuImpl;
+#else
+    const std::unique_ptr<CEcuInterfaceImpl> m_upEcuImpl;
+#endif
+};
+
+#if defined (_WIN32)
+#pragma warning(pop)
+#endif
+
+#endif  // __ECU_INTERFACE_EXPORT_H__

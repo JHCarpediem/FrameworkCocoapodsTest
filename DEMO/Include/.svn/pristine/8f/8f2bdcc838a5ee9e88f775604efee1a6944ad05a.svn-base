@@ -1,0 +1,339 @@
+/*******************************************************************************
+* Copyright (C), 2020~ , Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 文档类标识
+* 功能描述 : ArtiDiag900数据流控件接口定义
+* 创 建 人 : sujiya 20201216
+* 实 现 人 :
+* 审 核 人 : binchaolin
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#ifndef _ARTILIVEDATA_H_
+#define _ARTILIVEDATA_H_
+#include "StdInclude.h"
+
+class _STD_SHOW_DLL_API_ CArtiLiveData
+{
+public:
+    CArtiLiveData();
+#ifdef MULTI_SYSTEM
+    CArtiLiveData(uint32_t thId);
+#endif // MULTI_SYSTEM
+    ~CArtiLiveData();
+
+    /**********************************************************
+    *    功  能：初始化数据流控件，同时设置标题文本
+    *    参  数：strTitle 标题文本
+    *    返回值：true 初始化成功 false 初始化失败
+    **********************************************************/
+    bool InitTitle(const string& strTitle);
+
+
+    /*******************************************************************
+    *    功  能：设置部件测试类型，此接口只针对小车探（国内版TOPVCI）
+    * 
+    *    参  数：uType 部件测试类型
+    * 
+    *            DF_TYPE_THROTTLE_CARBON      节气门积碳检测
+    *            DF_TYPE_FULE_CORRECTION      燃油修正控制系统检测
+    *            DF_TYPE_MAF_TEST             空气流量传感器检测
+    *            DF_TYPE_INTAKE_PRESSURE      进气压力传感器检测
+    *            DF_TYPE_OXYGEN_SENSOR        氧传感器检测
+    * 
+    *    返回值：无
+    *******************************************************************/
+    void SetComponentType(uint32_t uType);
+
+
+    /*******************************************************************
+    *    功  能：设置部件测试结果值，此接口只针对小车探（国内版TOPVCI）
+    * 
+    *    参  数：uResult 结果类型
+    * 
+    *    当部件测试类型为 DF_TYPE_THROTTLE_CARBON 节气门积碳检测
+    *    uResult的值可为：
+    *        DF_RESULT_THROTTLE_NORMAL        1  发动机节气门运作正常
+    *        DF_RESULT_THROTTLE_LIGHT_CARBON  2  节气门疑似有轻微积碳
+    *        DF_RESULT_THROTTLE_SERIOUSLY     3  节气门积碳严重
+    *  
+    *    当部件测试类型为 DF_TYPE_FULE_CORRECTION 燃油修正控制系统检测
+    *    uResult的值可为：
+    *        DF_RESULT_FULE_NORMAL      1 燃油修正正常
+    *        DF_RESULT_FULE_HIGH        2 燃油修正偏浓
+    *        DF_RESULT_FULE_LOW         3 燃油修正偏稀
+    *        DF_RESULT_FULE_ABNORMAL    4 燃油修正异常
+    * 
+    *    当部件测试类型为 DF_TYPE_MAF_TEST 空气流量传感器检测
+    *    uResult的值可为：
+    *        DF_RESULT_MAF_NORMAL   1  进气量正常
+    *        DF_RESULT_MAF_HIGH     2  进气量偏大
+    *        DF_RESULT_MAF_LOW      3  进气量偏小
+    * 
+    *    当部件测试类型为 DF_TYPE_INTAKE_PRESSURE 进气压力传感器检测
+    *    uResult的值可为：
+    *        DF_RESULT_INTAKE_PRESSURE_NORMAL  1  进气压力正常
+    *        DF_RESULT_INTAKE_PRESSURE_HIGH    2  进气压力偏高
+    * 
+    *    当部件测试类型为 DF_TYPE_OXYGEN_SENSOR 氧传感器检测
+    *    uResult的值可为：
+    *         DF_RESULT_OXYGEN_NORMAL  1  氧传感器正常
+    *         DF_RESULT_OXYGEN_ERROR   2  氧传感器出现故障
+    * 
+    * 
+    *    返回值：无
+    **********************************************************/
+    void SetComponentResult(uint32_t uResult);
+
+
+
+    /**********************************************************
+    *    功  能：添加数据流项
+    *    参  数：strName 数据流名称
+    *            strValue 数据流值
+    *            strUnit 数据流单位
+    *            strMin 数据流最小参考值
+    *            strMax 数据流最大参考值
+    *            strReference 数据流枚举型的参考值
+    *    返回值：无
+    *     说明：  
+    *     通常情况下，4列，名称-值-参考值-单位
+    *    范围由最小参考值和最大参考值构成
+    **********************************************************/
+    void AddItem(const string& strName,
+        const string& strValue,
+        const string& strUnit = "",
+        const string& strMin = "",
+        const string& strMax = "",
+        const string& strReference = "");
+
+
+
+    /**********************************************************
+    *    功  能：设置Next按钮是否显示，控件默认不显示（Benz车系需求，默认文本Next）
+    * 
+    *    参  数：bIsVisible = true  显示Next按钮
+    *            bIsVisible = false 隐藏Next按钮
+    * 
+    *    返回值：无
+    * 
+    *     说明： 此按钮返回值 DF_ID_LIVEDATA_NEXT 在Show中返回
+    **********************************************************/
+    void SetNextButtonVisible(bool bIsVisible = true);
+
+
+
+    /**********************************************************
+    *    功  能：修改Next按钮的文本
+    * 
+    *    参  数：strButtonText  修改按钮显示的文本
+    * 
+    *    返回值：无
+    **********************************************************/
+    void SetNextButtonText(const string& strButtonText);
+
+
+
+    /**********************************************************
+    *    功  能：设置Prev按钮是否显示，控件默认不显示
+    *           （大众通道数据流需求，默认文本Next）
+    *
+    *    参  数：bIsVisible = true  显示Prev按钮
+    *            bIsVisible = false 隐藏Prev按钮
+    *
+    *    返回值：无
+    *
+    *     说明： 此按钮返回值 DF_ID_LIVEDATA_PREV 在Show中返回
+    **********************************************************/
+    void SetPrevButtonVisible(bool bIsVisible = true);
+
+
+
+    /**********************************************************
+    *    功  能：修改Prev按钮的文本
+    *
+    *    参  数：strButtonText  修改按钮显示的文本
+    *
+    *    返回值：无
+    **********************************************************/
+    void SetPrevButtonText(const string& strButtonText);
+
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的名称，即第0列值
+    *
+    *    参  数：uIndex  指定的数据流行号
+    *            strName 需要设置的数据流名称
+    *
+    *    返回值：无
+    **********************************************************/
+    void SetName(uint16_t uIndex, const string& strName);
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的值，即第1列值
+    *
+    *    参  数：uIndex  指定的数据流行号
+    *            strValue 需要设置的数据流值
+    *
+    *    返回值：无
+    **********************************************************/
+    void SetVaule(uint16_t uIndex, const string& strValue);
+
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的单位
+    * 
+    *    参  数：uIndex 指定的数据流
+    *            strUnit 需要设置的单位文本
+    * 
+    *    返回值：无
+    **********************************************************/
+    void SetUnit(uint16_t uIndex, const string& strUnit);
+
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的范围
+    * 
+    *    参  数：uIndex 指定的数据流
+    *            strMin 需要设置的最小值参考值
+    *            strMax 需要设置的最大值参考值
+    * 
+    *    返回值：无
+    **********************************************************/
+    void SetLimits(uint16_t uIndex,
+        const string& strMin,
+        const string& strMax);
+
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的枚举型参考值
+    *    参  数：uIndex 指定的数据流
+    *           strReference 需要设置的枚举型参考值
+    *    返回值：无
+    **********************************************************/
+    void SetReference(uint16_t uIndex, const string& strReference);
+
+
+
+    /**********************************************************
+    *    功  能：设置某条数据流的帮助信息
+    *    参  数：uIndex 指定的数据流
+    *            strHelp 需要设置的帮助文本
+    *    返回值：无
+    **********************************************************/
+    void SetHelpText(uint16_t uIndex, const string& strHelpText);
+
+
+
+    /**********************************************************
+    *    功  能：设置各列表列宽比，如果列宽百分比为0，则隐藏该列
+    *            4列列宽比加起来为100
+    * 
+    *    参  数： widthName     "名称"   列宽占比
+    *             widthValue    "值"     列宽占比
+    *             widthUnit     "单位"   列宽占比
+    *             widthRef      "参考值" 列宽占比
+    * 
+    *    返回值：无
+    *
+    *     说  明：4列列宽比加起来为100
+    **********************************************************/
+    void SetColWidth(int32_t widthName, int32_t widthValue, int32_t widthUnit, int32_t widthRef);
+
+
+    /**********************************************************
+    *    功  能：刷新某条数据流的值
+    *    参  数：uIndex 指定的数据流
+    *            strValue 需要设置的数据流值
+    *    返回值：无
+    **********************************************************/
+    void FlushValue(uint16_t uIndex, const string& strValue);
+
+
+
+    /**********************************************************
+    *    功  能：获取当前显示屏的更新项的下标集合
+    *    参  数：无
+    *    返回值：更新项的下标集合
+    **********************************************************/
+    vector<uint16_t> GetUpdateItems();
+
+
+
+    /**********************************************************
+    *    功  能：获取某条数据流是否需要更新
+    *    参  数：无
+    *    返回值：true 需要更新，false 不需要更新
+    **********************************************************/
+    bool GetItemIsUpdate(uint16_t uIndex);
+
+
+
+    /**********************************************************
+    *    功  能：获取搜索后的数据流下标集合
+    * 
+    *    参  数：无
+    * 
+    *    返回值：搜索后的数据流下标集合
+    **********************************************************/
+    std::vector<uint16_t> GetSearchItems();
+
+
+
+    /***********************************************************************************
+    *    功  能：获取被用户修改参考值后的数据流下标集合
+    * 
+    *            如果用户没有修改过，返回数组为空
+    *
+    *    参  数：无
+    *
+    *    返回值：被用户修改参考值后的数据流下标集合
+    *            如果用户没有修改过，返回数组为空
+    *************************************************************************************/
+    std::vector<uint16_t> GetLimitsModifyItems();
+
+
+
+    /***********************************************************************************
+    *    功  能：获取某条数据流的范围
+    *
+    *    参  数：uIndex 指定的数据流
+    *            strMin 需要获取的最小值参考值
+    *            strMax 需要获取的最大值参考值
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    * 
+    *            获取到返回0
+    *            uIndex不存在指定数据流，返回-1
+    *            其它值，暂无意义
+    *
+    *************************************************************************************/
+    uint32_t GetLimits(uint16_t uIndex, std::string& strMin, std::string& strMax);
+
+
+
+    /**********************************************************
+    *    功  能：显示数据流控件
+    *    参  数：无
+    *    返回值：uint32_t 组件界面按键返回值
+    * 
+    *           DF_ID_LIVEDATA_BACK     点击了返回
+    *           DF_ID_LIVEDATA_NEXT     点击了NEXT按钮
+    *           DF_ID_LIVEDATA_PREV     点击了PREV按钮
+    *           DF_ID_LIVEDATA_REPORT   点击了报告按钮
+    **********************************************************/
+    uint32_t Show();
+
+private:
+    void*        m_pData;
+};
+
+
+#endif

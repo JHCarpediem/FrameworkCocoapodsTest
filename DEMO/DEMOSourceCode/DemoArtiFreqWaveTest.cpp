@@ -1,0 +1,339 @@
+#include "DemoArtiFreqWaveTest.h"
+#include "DemoMaco.h"
+#include "ArtiFreqWave.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiFreqWaveTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+		CArtiMenu uiMenu;
+
+		uiMenu.InitTitle("ArtiFreqWaveTest");
+		uiMenu.AddItem("InitTitle");		        vctMenuID.push_back(0);
+		uiMenu.AddItem("SetModeFrequency");			vctMenuID.push_back(1);
+		uiMenu.AddItem("TriggerCrest");				vctMenuID.push_back(2);
+		uiMenu.AddItem("SetLeftLayoutPicture");		vctMenuID.push_back(3);
+	//	uiMenu.AddItem("Show");						vctMenuID.push_back(4);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiFreqWaveTest_InitTitle();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiFreqWaveTest_SetModeFrequency();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiFreqWaveTest_TriggerCrest();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiFreqWaveTest_SetLeftLayoutPicture();
+				}
+				else if (4 == vctMenuID[uRetBtn])
+				{
+					ArtiFreqWaveTest_Show();
+				}
+			}
+		}
+	}
+
+	void CArtiFreqWaveTest::ArtiFreqWaveTest_InitTitle()
+	{
+		string strTitle;
+		CArtiMenu uiMenu;
+
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF1300000001"));	//"标题文本为空"
+		uiMenu.AddItem(artiGetText("FF1300000002"));	//"标题文本为单行"
+		uiMenu.AddItem(artiGetText("FF1300000003"));	//"标题文本为多行"
+		uiMenu.AddItem(artiGetText("FF1300000004"));	//"标题文本英文长度达到阈值"
+		uiMenu.AddItem(artiGetText("FF1300000005"));	//"标题文本中文长度达到阈值"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = "";
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0100000002");
+			}
+			else if (2 == uRetBtn)
+			{
+				strTitle = TextMulitLine;
+			}
+			else if (3 == uRetBtn)
+			{
+				strTitle = artiGetText("FF1100000004");
+			}
+			else if (4 == uRetBtn)
+			{
+				strTitle = artiGetText("FF1200000004");
+			}
+
+			CArtiFreqWave uiFreqWave;
+			uiFreqWave.InitTitle(strTitle);
+			uiFreqWave.SetModeFrequency("ASK","868.75MHz", "-32dbm");
+
+			while (1)
+			{
+				uRetBtn = uiFreqWave.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+				uiFreqWave.TriggerCrest(CArtiFreqWave::eCrestType::TRIGGER_ONE_CREST);
+				Delay(1000);
+			}
+		}
+	}
+
+	void CArtiFreqWaveTest::ArtiFreqWaveTest_SetModeFrequency()
+	{
+		// 1.配置接口参数初始值
+		map<string, string> mapModeValue;
+		map<string, string> mapFreqValue;
+		map<string, string> mapIntensity;
+
+		mapModeValue.emplace("ASK", "ASK");
+		mapModeValue.emplace("FSK", "FSK");
+
+		mapFreqValue.emplace("868.75MHz", "868.75MHz");
+		mapFreqValue.emplace("600.00MHz", "600.00MHz");
+
+		mapIntensity.emplace("-32dbm", "-32dbm");
+		mapIntensity.emplace("32dbm", "32dbm");
+
+		string strModeValue = mapModeValue["ASK"];
+		string strFreqValue = mapFreqValue["868.75MHz"];
+		string strIntensity = mapIntensity["-32dbm"];
+
+		// 2.显示参数列表
+		CArtiList uiList;
+		uiList.InitTitle("SetCoilSignal");
+		uiList.SetColWidth(vector<int32_t>{50, 50});
+		uiList.SetHeads(vector<string>{"Name", "Value"});
+
+		uiList.AddItem("mapModeValue");
+		uiList.SetItem(0, 1, strModeValue);
+
+		uiList.AddItem("strFreqValue");
+		uiList.SetItem(1, 1, strFreqValue);
+
+		uiList.AddItem("strIntensity");
+		uiList.SetItem(2, 1, strIntensity);
+
+		uiList.AddButtonEx("Test");
+		//uiList.AddButtonEx("Help");
+
+		// 3.配置和测试接口
+		uint32_t uRetBtn = DF_ID_NOKEY;
+		while (true)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiFreqWave uiFreqWave;
+				uiFreqWave.InitTitle("SetModeFrequency");
+				uiFreqWave.SetModeFrequency(strModeValue, strFreqValue, strIntensity);
+
+				while (1)
+				{
+					uRetBtn = uiFreqWave.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					uiFreqWave.TriggerCrest(CArtiFreqWave::eCrestType::TRIGGER_ONE_CREST);
+					Delay(1000);
+				}
+			}		
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(strModeValue, strModeValue, mapModeValue);
+					uiList.SetItem(0, 1, strModeValue);
+				}
+				else if (1 == uSelect)
+				{
+					GetParamValue(strFreqValue, strFreqValue, mapModeValue);
+					uiList.SetItem(1, 1, strFreqValue);
+				}
+				else if (2 == uSelect)
+				{
+					GetParamValue(strIntensity, strIntensity, mapModeValue);
+					uiList.SetItem(2, 1, strIntensity);
+				}
+			}
+		}
+	}
+
+	void CArtiFreqWaveTest::ArtiFreqWaveTest_TriggerCrest()
+	{
+		// 1.配置接口参数初始值
+		map<CArtiFreqWave::eCrestType, string> mapeCrestType;
+
+		mapeCrestType.emplace(CArtiFreqWave::eCrestType::TRIGGER_ONE_CREST, "TRIGGER_ONE_CREST");
+		mapeCrestType.emplace(CArtiFreqWave::eCrestType::TRIGGER_TWO_CREST, "TRIGGER_TWO_CREST");
+		
+		string strCrestType = "TRIGGER_ONE_CREST";
+		CArtiFreqWave::eCrestType enumCrestType = CArtiFreqWave::TRIGGER_ONE_CREST;
+
+		// 2.显示参数列表
+		CArtiList uiList;
+		uiList.InitTitle("TriggerCrest");
+		uiList.SetColWidth(vector<int32_t>{50, 50});
+		uiList.SetHeads(vector<string>{"Name", "Value"});
+
+		uiList.AddItem("eCrestType");
+		uiList.SetItem(0, 1, strCrestType);
+		
+		uiList.AddButtonEx("Test");
+		//uiList.AddButtonEx("Help");
+
+		// 3.配置和测试接口
+		uint32_t uRetBtn = DF_ID_NOKEY;
+		while (true)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiFreqWave uiFreqWave;
+				uiFreqWave.InitTitle("TriggerCrest");
+				uiFreqWave.SetModeFrequency("ASK", "868.75MHz", "-32dbm");
+
+				while (1)
+				{
+					uRetBtn = uiFreqWave.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					uiFreqWave.TriggerCrest(enumCrestType);
+					Delay(1000);
+				}
+			}
+			else if (DF_ID_FREEBTN_1 == uRetBtn)
+			{
+
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(enumCrestType, strCrestType, mapeCrestType);
+					uiList.SetItem(0, 1, strCrestType);
+				}
+			}
+		}
+	}
+
+	void CArtiFreqWaveTest::ArtiFreqWaveTest_SetLeftLayoutPicture()
+	{
+		// 1.配置接口参数初始值
+		map<uint16_t, string> mapAlignType;
+
+		mapAlignType.emplace(DT_LEFT_TOP, "DT_LEFT_TOP");
+		mapAlignType.emplace(DT_RIGHT_TOP, "DT_RIGHT_TOP");
+		mapAlignType.emplace(DT_LEFT_BOTTOM, "DT_LEFT_BOTTOM");
+		mapAlignType.emplace(DT_RIGHT_BOTTOM, "DT_RIGHT_BOTTOM");
+
+		string strAlignType = "DT_LEFT_TOP";
+		uint16_t uAlignType = DT_LEFT_TOP;
+
+		string strPathBenz = CArtiGlobal::GetVehPath() + "/Logo/Benz.png";
+
+		// 2.显示参数列表
+		CArtiList uiList;
+		uiList.InitTitle("SetLeftLayoutPicture");
+		uiList.SetColWidth(vector<int32_t>{50, 50});
+		uiList.SetHeads(vector<string>{"Name", "Value"});
+
+		uiList.AddItem("uAlignType");
+		uiList.SetItem(0, 1, strAlignType);
+
+		uiList.AddButtonEx("Test");
+		//uiList.AddButtonEx("Help");
+
+		// 3.配置和测试接口
+		uint32_t uRetBtn = DF_ID_NOKEY;
+		while (true)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiFreqWave uiFreqWave;
+				uiFreqWave.InitTitle("TriggerCrest");
+				uiFreqWave.SetModeFrequency("ASK", "868.75MHz", "-32dbm");
+
+				uiFreqWave.SetLeftLayoutPicture(strPathBenz, "/Logo/Benz.png", uAlignType);
+
+				while (1)
+				{
+					uRetBtn = uiFreqWave.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					uiFreqWave.TriggerCrest(CArtiFreqWave::eCrestType::TRIGGER_ONE_CREST);
+					Delay(1000);
+				}
+			}
+			else if (DF_ID_FREEBTN_1 == uRetBtn)
+			{
+
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uAlignType, strAlignType, mapAlignType);
+					uiList.SetItem(0, 1, strAlignType);
+				}
+			}
+		}
+	}
+
+	void CArtiFreqWaveTest::ArtiFreqWaveTest_Show()
+	{
+
+	}
+
+}

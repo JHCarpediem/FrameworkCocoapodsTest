@@ -1,0 +1,178 @@
+#pragma once
+#include <string>
+#include "StdInclude.h"
+#include "Binary.h"
+
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+
+namespace Topdon_AD900_Demo {
+
+	string Binary2ASCIIString(const CBinary& binData);
+
+	uint32_t String2UInt(const string strSrc, uint16_t uFormat = 16);
+
+	/**********************************************************
+	*    函数名：ToDouble
+	*    参  数：string &
+	*    返回值：double
+	#    说  明：字符串转双精度浮点数
+	**********************************************************/
+	double ToDouble(string& str);
+
+	/**********************************************************
+	*    函数名：ToDouble
+	*    参  数：char *
+	*    返回值：double
+	#    说  明：字符串转双精度浮点数
+	**********************************************************/
+	double ToDouble(const char* str);
+
+	/**********************************************************
+	*    函数名：ToFolat
+	*    参  数：string &
+	*    返回值：float
+	#    说  明：字符串转单精度浮点数
+	**********************************************************/
+	float ToFolat(string& str);
+
+	/**********************************************************
+	*    函数名：ToFolat
+	*    参  数：char *
+	*    返回值：float
+	#    说  明：字符串转单精度浮点数
+	**********************************************************/
+	float ToFolat(const char* str);
+
+	/**********************************************************
+	*    函数名：ToInt8
+	*    参  数：string &, int32_t
+	*    返回值：int8_t
+	#    说  明：字符串转有符号8位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	int8_t ToInt8(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToUint8
+	*    参  数：string &, int32_t
+	*    返回值：uint8_t
+	#    说  明：字符串转无符号8位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	uint8_t ToUint8(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToInt16
+	*    参  数：string &, int32_t
+	*    返回值：int16_t
+	#    说  明：字符串转有符号16位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	int16_t ToInt16(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToUint16
+	*    参  数：string &, int32_t
+	*    返回值：uint16_t
+	#    说  明：字符串转无符号16位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	uint16_t ToUint16(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToInt32
+	*    参  数：string &, int32_t
+	*    返回值：int32_t
+	#    说  明：字符串转有符号32位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	int32_t ToInt32(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToInt32
+	*    参  数：string &, int32_t
+	*    返回值：uint32_t
+	#    说  明：字符串转无符号32位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	uint32_t ToUint32(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToInt64
+	*    参  数：string &, int32_t
+	*    返回值：int64_t
+	#    说  明：字符串转有符号64位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	int64_t ToInt64(string& str, int32_t radix = 10);
+
+	/**********************************************************
+	*    函数名：ToUint64
+	*    参  数：string &, int32_t
+	*    返回值：uint64_t
+	#    说  明：字符串转无符号64位整数
+	#    描  述：第二个参数代表转换的进制
+	**********************************************************/
+	uint64_t ToUint64(string& str, int32_t radix = 10);
+
+	string uint8ToString(uint8_t value, bool decimal = true);
+
+	string int8ToString(int8_t value, bool decimal = true);
+
+	string uint8ToBinaryString(uint8_t value);
+
+	string uint16ToString(uint16_t value, bool decimal = true);
+
+	string int16ToString(int16_t value, bool decimal = true);
+
+	string uint32ToString(uint32_t value, bool decimal = true);
+
+	string int32ToString(int32_t value, bool decimal = true);
+
+	string uint64ToString(uint64_t value, bool decimal = true);
+
+	string int64ToString(int64_t value, bool decimal = true);
+
+	int BinFindByte(CBinary binValue, CBinary binFind);
+
+	void Split(const string& s, const string& c, vector<string>& v);
+
+	void SortCBinary(CBinary& bin);
+
+	bool isVctStrHasOneStr(vector<string>& vctStr, string& str);
+
+	string Binary2ASCIIStringForVIN(const CBinary& binData);
+
+	uint32_t CountOneItemRepeatPosMap(map<uint32_t, uint32_t>& RepeatPosMap, uint32_t iBytePos);
+
+	int32_t ComplementCode(CBinary buf);
+
+	string DecString2HexString(string str);
+
+	string HexString2UintDecString(string str);
+
+	string HexString2IntDecString(string str);
+
+	CBinary getBinFromDecString(string strReturn, uint32_t iBinSize);
+
+	void Delay(int msec);
+
+	char* strcat_lk(char* destStr, char const* srcStr);
+
+	void Android_log(string strLog);
+
+	string GetInputExpressBySize(uint32_t uSize);
+
+	string substring(string value, uint32_t numericIndex, uint32_t numericCount);
+
+	string trim(string value);
+
+	void printLog(string t);
+
+	void printLog(initializer_list<string> ls);
+
+	int64_t GetSysTime();
+
+}

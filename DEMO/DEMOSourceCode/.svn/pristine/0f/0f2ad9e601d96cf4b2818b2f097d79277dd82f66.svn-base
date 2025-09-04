@@ -1,0 +1,221 @@
+#include "DemoArtiFreezeTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiFreezeTest::ShowMenu()
+	{
+
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitTitle");	     vctMenuID.push_back(0);
+		uiMenu.AddItem("AddItem");			 vctMenuID.push_back(1);
+		uiMenu.AddItem("AddItemEx_SetHeads_SetValueType_AddItemEx");			 vctMenuID.push_back(2);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiFreezeTest_InitTitle();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiFreezeTest_AddItem();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiFreezeTest_AddItemEx_SetHeads_SetValueType_AddItemEx();
+				}
+			}
+		}
+	}
+
+	void CArtiFreezeTest::ArtiFreezeTest_InitTitle()
+	{
+		string strTitle;
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0300000002"));
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = "";
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0300000001");
+			}
+			else
+			{
+				strTitle = TextMulitLineTitle;
+			}
+
+#if __Multi_System_Test__
+			CArtiFreeze uiFreeze(m_uThread);
+#else
+			CArtiFreeze uiFreeze;
+#endif
+			uiFreeze.InitTitle(strTitle);
+			uiFreeze.AddItem(artiGetText("FF0300000003"), artiGetText("FF0300000004"), artiGetText("FF0300000005"), artiGetText("FF0300000006"));
+			uiFreeze.AddItem(artiGetText("FF0300000007"), artiGetText("FF0300000008"), artiGetText("FF0300000009"), artiGetText("FF030000000A"));
+
+			while (1)
+			{
+				uRetBtn = uiFreeze.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiFreezeTest::ArtiFreezeTest_AddItem()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF030000000B"));
+		uiMenu.AddItem(artiGetText("FF030000000C"));
+		uiMenu.AddItem(artiGetText("FF030000000D"));
+		uiMenu.AddItem(artiGetText("FF030000000E"));
+
+		while (1)
+		{
+#if __Multi_System_Test__
+			CArtiFreeze uiFreeze(m_uThread);
+#else
+			CArtiFreeze uiFreeze;
+#endif
+
+			uiFreeze.InitTitle(artiGetText("FF0300000000"));
+
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItem("", "", "", "");
+				}
+			}
+			else if (1 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItem(artiGetText("FF0300000003"), artiGetText("FF0300000004"), artiGetText("FF0300000005"), artiGetText("FF0300000006"));
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItem(TextMulitLineTitle, TextMulitLineValue, TextMulitLineUnit, TextMulitLineHelp);
+				}
+			}
+
+			while (1)
+			{
+				uRetBtn = uiFreeze.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiFreezeTest::ArtiFreezeTest_AddItemEx_SetHeads_SetValueType_AddItemEx()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF030000000B"));
+		uiMenu.AddItem(artiGetText("FF030000000C"));
+		uiMenu.AddItem(artiGetText("FF030000000D"));
+		uiMenu.AddItem(artiGetText("FF030000000E"));
+
+		while (1)
+		{
+#if __Multi_System_Test__
+			CArtiFreeze uiFreeze(m_uThread);
+#else
+			CArtiFreeze uiFreeze;
+#endif
+
+			uiFreeze.InitTitle(artiGetText("FF0300000000"));
+			uiFreeze.SetValueType(VALUE_2_COLUMN);
+			uiFreeze.SetHeads(vector<string>({ "Name","Value3","Value4","Unit","Help" }));
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItemEx("", "", "", "","");
+				}
+			}
+			else if (1 == uRetBtn)
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItemEx(artiGetText("FF0300000003"), artiGetText("FF0300000004"), artiGetText("FF0300000004"), artiGetText("FF0300000005"), artiGetText("FF0300000006"));
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					uiFreeze.AddItemEx(TextMulitLineTitle, TextMulitLineValue, TextMulitLineUnit, TextMulitLineHelp, TextMulitLineHelp);
+				}
+			}
+
+			while (1)
+			{
+				uRetBtn = uiFreeze.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+}

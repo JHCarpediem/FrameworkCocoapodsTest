@@ -1,0 +1,225 @@
+#include "DemoArtiWebTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiWebTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitTitle");		        vctMenuID.push_back(0);
+		uiMenu.AddItem("LoadHtmlFile");			    vctMenuID.push_back(1);
+		uiMenu.AddItem("LoadHtmlContent");			vctMenuID.push_back(2);
+		uiMenu.AddItem("AddButton");				vctMenuID.push_back(3);
+		uiMenu.AddItem("SetButtonVisible");				vctMenuID.push_back(4);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiWebTest_InitTitle();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiWebTest_LoadHtmlFile();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiWebTest_LoadHtmlContent();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiWebTest_AddButton();
+				}
+				else if (4 == vctMenuID[uRetBtn])
+				{
+					ArtiWebTest_SetButtonVisible();
+				}
+			}
+		}
+	}
+
+	void CArtiWebTest::ArtiWebTest_InitTitle()
+	{
+		string strTitle;
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = "";
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0D00000008");	//"Baidu";
+			}
+			else
+			{
+				strTitle = TextMulitLineTitle;
+			}
+
+			string strHtml = artiGetText("FF0D00000004");	//"./html/Baidu.htm"
+			strHtml = CArtiGlobal::GetVehPath() + strHtml;
+
+#if __Multi_System_Test__
+			CArtiWeb uiArtiWeb(m_uThread);
+#else
+			CArtiWeb uiArtiWeb;
+#endif
+			uiArtiWeb.InitTitle(strTitle);
+			if (uiArtiWeb.LoadHtmlFile(strHtml))
+			{
+				uiArtiWeb.Show();
+			}
+		}
+	}
+
+	void CArtiWebTest::ArtiWebTest_LoadHtmlFile()
+	{
+		string strTitle;
+		string strHtml;
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0D00000001"));	//"选择网址"
+		uiMenu.AddItem(artiGetText("FF0D00000002"));	//"百度一下，你就知道"
+		uiMenu.AddItem(artiGetText("FF0D00000003"));	//"Google 翻译"
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0D00000002");	//"Baidu"
+				strHtml = artiGetText("FF0D00000004");	//"./html/Baidu.htm"
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = artiGetText("FF0D00000003");	//"Google"
+				strHtml = artiGetText("FF0D00000005");	//"./html/Google.htm"
+			}
+
+#if __Multi_System_Test__
+			CArtiWeb uiArtiWeb(m_uThread);
+#else
+			CArtiWeb uiArtiWeb;
+#endif
+			uiArtiWeb.InitTitle(strTitle);
+
+			strHtml = CArtiGlobal::GetVehPath() + strHtml;
+			//strHtml = "E:\\10_DOC\\钉钉接收文件\\vaudes_document_0800452180b90ab0.html";
+			if (uiArtiWeb.LoadHtmlFile(strHtml))
+			{
+				uiArtiWeb.Show();
+			}
+		}
+	}
+
+	void CArtiWebTest::ArtiWebTest_LoadHtmlContent()
+	{
+		ShowMsgBoxDemo("LoadHtmlContent", artiGetText("FF0D00000006"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+#if __Multi_System_Test__
+		CArtiWeb uiArtiWeb(m_uThread);
+#else
+		CArtiWeb uiArtiWeb;
+#endif
+		uiArtiWeb.InitTitle(artiGetText("FF0D00000002"));
+		uiArtiWeb.LoadHtmlContent(artiGetText("FF0D00000007"));
+		uiArtiWeb.Show();
+	}
+
+	void CArtiWebTest::ArtiWebTest_AddButton()
+	{
+#if __Multi_System_Test__
+		CArtiWeb uiArtiWeb(m_uThread);
+#else
+		CArtiWeb uiArtiWeb;
+#endif
+		uiArtiWeb.InitTitle("Add three button");
+		uiArtiWeb.LoadHtmlContent(artiGetText("FF0D00000007"));
+		uiArtiWeb.AddButton("Test1");
+		uiArtiWeb.AddButton("Test2");
+		uiArtiWeb.AddButton("Test3");
+		
+
+		while (1)
+		{
+			uint32_t uRet = uiArtiWeb.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRet == DF_ID_FREEBTN_0)
+			{
+				artiShowMsgBox("Test1", "Test1");
+			}
+			else if (uRet == DF_ID_FREEBTN_1)
+			{
+				artiShowMsgBox("Test2", "Test2");
+			}
+			else if (uRet == DF_ID_FREEBTN_2)
+			{
+				artiShowMsgBox("Test3", "Test3");
+			}
+		}
+	}
+
+	void CArtiWebTest::ArtiWebTest_SetButtonVisible()
+	{
+#if __Multi_System_Test__
+		CArtiWeb uiArtiWeb(m_uThread);
+#else
+		CArtiWeb uiArtiWeb;
+#endif
+		uiArtiWeb.InitTitle("SetButtonVisible");
+		uiArtiWeb.LoadHtmlContent(artiGetText("FF0D00000007"));
+		uiArtiWeb.AddButton("Test1");
+		uiArtiWeb.SetButtonVisible(true);
+
+		while (1)
+		{
+			uint32_t uRet = uiArtiWeb.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRet == DF_ID_FREEBTN_0)
+			{
+				uiArtiWeb.SetButtonVisible(false);
+			}
+		}
+	}
+
+}

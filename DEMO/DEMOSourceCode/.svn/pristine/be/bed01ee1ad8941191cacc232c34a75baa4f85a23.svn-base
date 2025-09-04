@@ -1,0 +1,1028 @@
+#include "DemoArtiGlobalTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+#include "VehAutoAuth.h"
+
+#if ((defined (WIN32)) | (defined (WIN64)))
+#else
+#include "dlfcn.h"
+#endif
+
+namespace Topdon_AD900_Demo {
+
+	uint8_t CArtiGlobalTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("GetVersion");				vctMenuID.push_back(0);
+		uiMenu.AddItem("GetAppVersion");			vctMenuID.push_back(1);
+		uiMenu.AddItem("GetLanguage");				vctMenuID.push_back(2);
+		uiMenu.AddItem("GetVehPath");				vctMenuID.push_back(3);
+		uiMenu.AddItem("GetVehName");				vctMenuID.push_back(4);
+		uiMenu.AddItem("GetVIN");					vctMenuID.push_back(5);
+		uiMenu.AddItem("SetVIN");					vctMenuID.push_back(6);
+		uiMenu.AddItem("SetVehInfo");				vctMenuID.push_back(7);
+		uiMenu.AddItem("SetSysName");				vctMenuID.push_back(8);
+		//uiMenu.AddItem("SetThreadVehiInfo");		vctMenuID.push_back(9);
+		uiMenu.AddItem("Copy2RunPath");				vctMenuID.push_back(10);
+		uiMenu.AddItem("GetTabletSN");				vctMenuID.push_back(11);
+		uiMenu.AddItem("GetTabletKey");				vctMenuID.push_back(12);
+		uiMenu.AddItem("IsNetworkAvailable");		vctMenuID.push_back(13);
+		uiMenu.AddItem("RpcSendRecv");				vctMenuID.push_back(14);
+		uiMenu.AddItem("GetVehUserDataPath");		vctMenuID.push_back(15);
+		uiMenu.AddItem("Copy2RunPathEx");				vctMenuID.push_back(16);
+		uiMenu.AddItem("GetVehPathEx");				vctMenuID.push_back(17);
+		uiMenu.AddItem("GetDiagEntryType");				vctMenuID.push_back(18);
+		uiMenu.AddItem("GetDiagMenuMask");				vctMenuID.push_back(19);
+		uiMenu.AddItem("FcaAuthDiagInit");				vctMenuID.push_back(20);
+		uiMenu.AddItem("FcaAuthDiagRequest");				vctMenuID.push_back(21);
+		uiMenu.AddItem("SetCurVehNotSupport");				vctMenuID.push_back(22);
+		uiMenu.AddItem("SetEventTracking");				vctMenuID.push_back(23);
+		uiMenu.AddItem("GetCurUnitMode");				vctMenuID.push_back(24);
+		uiMenu.AddItem("FcaGetLoginRegion");				vctMenuID.push_back(25);
+		uiMenu.AddItem("GetAutoVinEntryType");				vctMenuID.push_back(26);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVersion();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetAppVersion();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetLanguage();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVehPath();
+				}
+				else if (4 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVehName();
+				}
+				else if (5 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVIN();
+				}
+				else if (6 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_SetVIN();
+				}
+				else if (7 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_SetVehInfo();
+				}
+				else if (8 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_SetSysName();
+				}
+				else if (9 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_SetThreadVehiInfo();
+				}
+				else if (10 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_Copy2RunPath();
+				}
+				else if (11 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetTabletSN();
+				}
+				else if (12 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetTabletKey();
+				}
+				else if (13 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_IsNetworkAvailable();
+				}
+				else if (14 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_RpcSendRecv();
+				}
+				else if (15 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVehUserDataPath();
+				}
+				else if (16 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_Copy2RunPathEX();
+				}
+				else if (17 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetVehPathEx();
+				}
+				else if (18 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetDiagEntryType();
+				}
+				else if (19 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetDiagMenuMask();
+				}
+				else if (20 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_FcaAuthDiagInit();
+				}
+				else if (21 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_FcaAuthDiagRequest();
+				}
+				else if (22 == vctMenuID[uRetBtn])
+				{
+					if (0 == ArtiGlobalTest_SetCurVehNotSupport())
+					{
+						return 0;
+					}
+				}
+				else if (23 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_SetEventTracking();
+				}
+				else if (24 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetCurUnitMode();
+				}
+				else if (25 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_FcaGetLoginRegion();
+				}
+				else if (26 == vctMenuID[uRetBtn])
+				{
+					ArtiGlobalTest_GetAutoVinEntryType();
+				}
+			}
+		}
+		return 1;
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVersion()
+	{
+		uint32_t uVersion = CArtiGlobal::GetVersion();
+		memset(buff, 0, sizeof(buff));
+		SPRINTF_S(buff, "%d", uVersion);
+
+		ShowMsgBoxDemo(artiGetText("FF0400000002"), buff, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetAppVersion()
+	{
+		uint32_t uVersion = CArtiGlobal::GetAppVersion();
+		memset(buff, 0, sizeof(buff));
+		SPRINTF_S(buff, "%d", uVersion);
+
+		ShowMsgBoxDemo(artiGetText("FF0400000003"), buff, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetLanguage()
+	{
+		string strLanguage = CArtiGlobal::GetLanguage();
+
+		ShowMsgBoxDemo(artiGetText("FF0400000004"), strLanguage, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVehPath()
+	{
+		string strVehPath = CArtiGlobal::GetVehPath();
+
+
+		ShowMsgBoxDemo(artiGetText("FF0400000005"), strVehPath, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVehPathEx()
+	{
+		CArtiMenu	uiMenu;
+		string strVehPath;
+
+#if ((defined ___IS_IOS___))
+		artiShowMsgBox("Information", "iOS do not need this interface");
+		return;
+#else
+		uiMenu.InitTitle("Vehicle");
+		uiMenu.AddItem("BENZ");
+		uiMenu.AddItem("GM");
+		uiMenu.AddItem("NISSAN");
+		uiMenu.AddItem("AUTOVIN");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet==DF_ID_BACK)
+			{
+				break;
+			}
+			if (uRet==3)
+			{
+				strVehPath = CArtiGlobal::GetVehPathEx("Diagnosis", "Public", "AUTOVIN");
+			}
+			else if (uRet == 2)
+			{
+				strVehPath = CArtiGlobal::GetVehPathEx("Diagnosis", "Asia", "NISSAN");
+			}
+			else if (uRet == 1)
+			{
+				strVehPath = CArtiGlobal::GetVehPathEx("Diagnosis", "America", "GM");
+			}
+			else if (uRet == 0)
+			{
+				strVehPath = CArtiGlobal::GetVehPathEx("Diagnosis", "Europe", "BENZ");
+			}
+			artiShowMsgBox("Path", strVehPath);
+		}
+#endif
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVehUserDataPath()
+	{
+		string strVehUserDataPath = CArtiGlobal::GetVehUserDataPath();
+
+		ShowMsgBoxDemo(artiGetText("FF0400000001"), strVehUserDataPath, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVehName()
+	{
+		string strVehName = CArtiGlobal::GetVehName();
+
+		ShowMsgBoxDemo(artiGetText("FF0400000006"), strVehName, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetVIN()
+	{
+		string strVIN = CArtiGlobal::GetVIN();
+
+		ShowMsgBoxDemo(artiGetText("FF0400000007"), strVIN, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_SetVIN()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0400000008"));
+		uiMenu.AddItem(artiGetText("FF0400000009"));
+		uiMenu.AddItem(artiGetText("FF040000000A"));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == 0)
+			{
+				CArtiGlobal::SetVIN(artiGetText("FF0400000009"));
+			}
+			else
+			{
+				CArtiGlobal::SetVIN(artiGetText("FF040000000A"));
+			}
+		}
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_SetVehInfo()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF040000000B"));
+		uiMenu.AddItem(artiGetText("FF040000000C"));
+		uiMenu.AddItem(artiGetText("FF040000000D"));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == 0)
+			{
+				CArtiGlobal::SetVehInfo(artiGetText("FF040000000C"));
+			}
+			else
+			{
+				CArtiGlobal::SetVehInfo(artiGetText("FF040000000D"));
+			}
+		}
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_SetSysName()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF040000000E"));
+		uiMenu.AddItem(artiGetText("FF040000000F"));
+		uiMenu.AddItem(artiGetText("FF0400000010"));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == 0)
+			{
+				CArtiGlobal::SetSysName(artiGetText("FF040000000F"));
+			}
+			else
+			{
+				CArtiGlobal::SetSysName(artiGetText("FF0400000010"));
+			}
+		}
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_SetThreadVehiInfo()
+	{
+		/*uint8_t uThread = 1;
+		pVehicleInfo;
+		CArtiGlobal::SetThreadVehiInfo(uThread, &pVehicleInfo);
+		uint32_t data = *pVehicleInfo;
+		ShowMsgBoxDemo(artiGetText("FF0400000014"), pVehicleInfo, DF_MB_OK, DT_LEFT);*/
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_Copy2RunPath()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0400000011"));
+		uiMenu.AddItem(artiGetText("FF0400000012"));
+		uiMenu.AddItem(artiGetText("FF0400000013"));
+
+		string strSoName;
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == 0)
+			{
+				strSoName = CArtiGlobal::Copy2RunPath(artiGetText("FF0400000012"));
+			}
+			else
+			{
+				strSoName = CArtiGlobal::Copy2RunPath(artiGetText("FF0400000013"));
+			}
+			ShowMsgBoxDemo(artiGetText("FF0400000014"), strSoName, DF_MB_OK, DT_LEFT, -1, m_uThread);
+		}
+
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_Copy2RunPathEX()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+#if (defined (WIN32) | defined (WIN64) | (defined ___IS_IOS___))
+		artiShowMsgBox("Information", "iOS do not need this interface");
+#else
+		uiMenu.InitTitle(artiGetText("FF0400000011"));
+		uiMenu.AddItem("copy autovin's so to run directory and change name");
+
+		string strDestPath;
+		string strSrcPath;
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			strDestPath = CArtiGlobal::Copy2RunPathEx("Diagnosis", "Public", "AUTOVIN", "libDiag.so", "libDiag_AUTOVIN.so");
+			artiShowMsgBox("Path", strDestPath);
+			string strVehPath = CArtiGlobal::GetVehPathEx("Diagnosis", "Public", "AUTOVIN");
+			CDataFile::SetVehPath(strDestPath);
+			void* handle = dlopen("libDiag_AUTOVIN.so", RTLD_LAZY);
+			strDestPath += "/libDiag_AUTOVIN.so";
+			handle = dlopen(strDestPath.c_str(), RTLD_LAZY);
+
+			if (handle == nullptr)
+			{
+				artiShowMsgBox("load failed1", "load failed1");
+				return;
+			}
+			typedef int32_t(*AUTOVIN)(const string&, const string strVehPath,vector<string>&);
+
+			AUTOVIN vin =  (AUTOVIN)dlsym(handle, "AutoVINVehicle");
+			if (vin==nullptr)
+			{
+				artiShowMsgBox("load faild3", "load faild3");
+				return;
+			}
+
+			string	strVin = "VF111111111111111";
+			vector<string>	vecstr;
+
+			(*vin)(strVin, strVehPath, vecstr);
+			artiShowMsgBox("Information", "Already Enter AutoVIN's so and the VIN is VF111111111111111");
+			for (uint32_t i=0; i<vecstr.size(); i++)
+			{
+				artiShowMsgBox("vechilce", vecstr[i]);
+			}
+			if (handle!=nullptr)
+			{
+				dlclose(handle);
+			}
+			CDataFile::SetVehPath(CArtiGlobal::GetVehPath());
+		}
+#endif
+	}
+
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetTabletSN()
+	{
+		string strTabletSN = CArtiGlobal::GetTabletSN();
+		ShowMsgBoxDemo(artiGetText("FF0400000015"), strTabletSN, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetTabletKey()
+	{
+		string strTabletKey = CArtiGlobal::GetTabletKey();
+		ShowMsgBoxDemo(artiGetText("FF0400000016"), strTabletKey, DF_MB_OK, DT_LEFT, -1, m_uThread);
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_IsNetworkAvailable()
+	{
+		bool IsNetwork = CArtiGlobal::IsNetworkAvailable();
+		if (IsNetwork)
+		{
+			ShowMsgBoxDemo(artiGetText("FF0400000017"), artiGetText("FF0400000018"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+		}
+		else
+		{
+			ShowMsgBoxDemo(artiGetText("FF0400000017"), artiGetText("FF0400000019"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+		}
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_RpcSendRecv()
+	{
+		CAlgorithmData *data2 = new CAlgorithmData();
+
+		CArtiMenu	uiMenu;
+
+		uiMenu.InitTitle("RpcSendRecv");
+
+		uiMenu.AddItem("code 0 or other");
+		uiMenu.AddItem("code -1");
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet==DF_ID_BACK)
+			{
+				break;
+			}
+			uRet &= 0xff;
+			if (uRet==0)
+			{
+				data2->SetId(0x0206);
+				data2->SetSeed(CBinary("\x12\x34\x56\x78", 4));
+				data2->SetSeedType(CAlgorithmData::SEED_TYPE_LOCAL);
+
+				uint32_t ret = CArtiGlobal::RpcSendRecv(data2);
+				if (ret == -1)
+				{
+					ShowMsgBoxDemo(artiGetText("FF040000001A"), artiGetText("FF040000001C"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+				}
+				else
+				{
+					string data_len = to_string(ret);
+					ShowMsgBoxDemo(artiGetText("FF040000001A"), artiGetText("FF040000001B") + data_len, DF_MB_OK, DT_LEFT, -1, m_uThread);
+				}
+			}
+			else
+			{
+				uint32_t ret = CArtiGlobal::RpcSendRecv(nullptr);
+				string data_len = to_string(ret);
+				ShowMsgBoxDemo(artiGetText("FF040000001A"), artiGetText("FF040000001B") + data_len, DF_MB_OK, DT_LEFT, -1, m_uThread);
+			}
+		}
+
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetDiagEntryType()
+	{
+		uint64_t	uType = (uint64_t)CArtiGlobal::GetDiagEntryType();
+		string	strType = uint64ToString(uType, false);
+		
+		artiShowMsgBox("DiagEntryType", strType);
+
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetDiagMenuMask()
+	{
+		uint64_t	uType = (uint64_t)CArtiGlobal::GetDiagMenuMask();
+		string	strType = uint64ToString(uType, false);
+
+		artiShowMsgBox("DiagMenuMask", strType);
+
+	}
+
+	int32_t CArtiGlobalTest::ArtiGlobalTest_FcaAuthDiagInit()
+	{
+		uint32_t iKey = artiShowSpecial(eSpecialShowType::SST_FUNC_FCA_AUTH); //显示登录界面
+		if (iKey == DF_ID_BACK)
+		{
+			return -1;
+		}
+
+		artiShowMsgBox("FCA INIT", "Data Loading...", DF_MB_NOBUTTON);
+
+		stFcaAdInitReq stFcaReq;
+		stFcaReq.strVin = "ZFAEFAA40PX186434"; //5A 46 41 45 46 41 41 34 30 50 58 31 38 36 34 33 34
+		stFcaReq.strSgwSN = "TD857208304W700"; //54 44 38 35 37 32 30 38 33 30 34 57 37 30 30
+		stFcaReq.strSgwUUID = "E91A0A20799411EAB469FC9A85041315";
+
+		stFcaAdInitAns stFcaAns;
+
+		uint32_t iRetCode = CArtiGlobal::FcaAuthDiagInit(stFcaReq, stFcaAns);
+		if (iRetCode == 0)//调用成功
+		{
+			if (stFcaAns.strCode == "2000")
+			{
+				artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Success!", DF_MB_OK);
+			}
+			else
+			{
+				artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Fialed!  ErrorCode:" + stFcaAns.strCode + "  ErrorMsg:" + stFcaAns.strMsg, DF_MB_OK);
+				return -1;
+			}
+		}
+		else
+		{
+			artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Fialed!  ErrorCode:" + stFcaAns.strCode + "  ErrorMsg:" + stFcaAns.strMsg, DF_MB_OK);
+			return -1;
+		}
+		return 0;
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_FcaAuthDiagRequest()
+	{
+		while (1)
+		{
+			uint32_t iKey = artiShowSpecial(eSpecialShowType::SST_FUNC_FCA_AUTH); //显示登录界面
+			if (iKey == DF_ID_BACK)
+			{
+				return;
+			}
+
+			artiShowMsgBox("FCA INIT", "Data Loading...", DF_MB_NOBUTTON);
+
+			stFcaAdInitReq stFcaReq;
+			stFcaReq.strVin = "ZFAEFAA40PX186434"; //5A 46 41 45 46 41 41 34 30 50 58 31 38 36 34 33 34
+			stFcaReq.strSgwSN = "TD857208304W700"; //54 44 38 35 37 32 30 38 33 30 34 57 37 30 30
+			stFcaReq.strSgwUUID = "E91A0A20799411EAB469FC9A85041315";
+
+			stFcaAdInitAns stFcaAns;
+
+			uint32_t iRetCode = CArtiGlobal::FcaAuthDiagInit(stFcaReq, stFcaAns);
+			if (iRetCode == 0)//调用成功
+			{
+				if (stFcaAns.strCode == "2000")
+				{
+					artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Success!", DF_MB_OK);
+				}
+				else
+				{
+					artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Fialed!  ErrorCode:" + stFcaAns.strCode + "  ErrorMsg:" + stFcaAns.strMsg, DF_MB_OK);
+					return;
+				}
+			}
+			else
+			{
+				artiShowMsgBox("FCA INIT", "FcaAuthDiagInit() ==> Fialed!  ErrorCode:" + stFcaAns.strCode + "  ErrorMsg:" + stFcaAns.strMsg, DF_MB_OK);
+				return;
+			}
+
+			artiShowMsgBox("FCA INIT", "Data Loading...", DF_MB_NOBUTTON);
+
+			stFcaAdChallReq stFcaChaReq;
+			stFcaChaReq.strSessionID = stFcaAns.strSessionID;
+			stFcaChaReq.strChallenge = "DD64BAD6541763C68F64122AF8280085A2158F7C885F2AEC442645080D5DC814";
+
+			stFcaAdChallAns stFcaChaAns;
+			iRetCode = CArtiGlobal::FcaAuthDiagRequest(stFcaChaReq, stFcaChaAns);
+			if (iRetCode == 0)
+			{
+				if (stFcaChaAns.strCode == "2000")
+				{
+					artiShowMsgBox("FCA Request", "FcaAuthDiagRequest() => Succeed!", DF_MB_OK);
+					//return;
+				}
+				else
+				{
+					artiShowMsgBox("FCA Request", "FcaAuthDiagRequest() ==> Fialed!  ErrorCode:" + stFcaChaAns.strCode + "  ErrorMsg:" + stFcaChaAns.strMsg, DF_MB_OK);
+					return;
+				}
+			}
+			else
+			{
+				artiShowMsgBox("FCA Request", "FcaAuthDiagRequest() ==> Fialed!  ErrorCode:" + stFcaChaAns.strCode + "  ErrorMsg:" + stFcaChaAns.strMsg, DF_MB_OK);
+				return;
+			}
+		}
+		return;
+	}
+
+	uint8_t CArtiGlobalTest::ArtiGlobalTest_SetCurVehNotSupport()
+	{
+		if (artiShowMsgBox("Test SetCurVehNotSupport", "if Exit veh?", DF_MB_YESNO) == DF_ID_YES)
+		{
+#ifndef WIN32
+			CArtiGlobal::SetCurVehNotSupport(VBST_VEH_NOT_SUPPORT);
+#endif // !WIN32
+
+			return 0;
+		}
+		else
+		{
+#ifndef WIN32
+			CArtiGlobal::SetCurVehNotSupport(VBST_SUPPORT_NORMAL);
+#endif // !WIN32
+		}
+		return 1;
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_SetEventTracking()
+	{
+		stTrackingItem	stMakeTrack;
+		stTrackingItem	stVINTrack;
+		stTrackingItem	stVehInfoTrack;
+		stTrackingItem	stSysTrack;
+		stTrackingItem	stDtc;
+		stTrackingItem	stDs;
+		stTrackingItem	stFun;
+
+		vector<stTrackingItem> vctParaMake;
+		vector<stTrackingItem> vctParaVIN;
+		vector<stTrackingItem> vctParaTemp;
+		vector<stTrackingItem> vctParaDtc;
+		vector<stTrackingItem> vctParaDs;
+
+		stMakeTrack.eType = TIT_MAKE;
+		stMakeTrack.strValue = "DEMO";
+		vctParaMake.push_back(stMakeTrack);
+
+		stVINTrack.eType = TIT_VIN;
+		stVINTrack.strValue = "LSG11111111111111";
+		vctParaVIN.push_back(stVINTrack);
+
+		stVehInfoTrack.eType = TIT_MODEL;
+		stVehInfoTrack.strValue = "Corolla";
+
+		stSysTrack.eType = TIT_SYS_NAME;
+		stSysTrack.strValue = "Engine";
+
+		stDtc.eType = TIT_DTC_CODE;
+		stDtc.strValue = "P0100";
+
+		stDs.eType = TIT_DS_INFOR;
+		stDs.strValue = "Engine speed";
+
+		stFun.eType = TIT_FUNC_INFOR;
+
+		//enum eTrackingInfoType
+		//{
+		//	TIT_VIN = 0,               //  表示类型为车辆车架号
+		//	TIT_MAKE = 1,              //  表示类型为车辆品牌
+		//	TIT_MODEL = 2,             //  表示类型为车型
+		//	TIT_YEAR = 3,              //  表示类型为车辆年份
+		//	TIT_VEH_INFORMATION = 4,   //  表示类型为车辆信息，例如，宝马/3'/320Li_B48/F35/
+		//	TIT_SYS_NAME = 5,          //  表示类型为系统名称，例如，RCM-安全保护控制系统
+		//	TIT_ENGINE_INFO = 6,       //  表示类型为发动机信息，例如，"F62-D52"
+		//	TIT_ENGINE_SUB_TYPE = 7,   //  表示类型为发动机子型号或者其它信息，例如，"N542"
+		//	TIT_DTC_CODE = 8,          //  表示类型为故障码编码，例如，"P1145"
+		//	TIT_FUNC_INFOR = 9,        //  表示类型为功能名，例如，"Oil Reset"
+		//	TIT_DS_INFOR = 10,         //  表示类型为数据流信息，例如，"0x00002661"或者""0x00002661$0x00002662""
+		//};
+
+		CArtiGlobal::SetEventTracking(ETI_CLICK_DIAGNOSTIC_AUTOMATIC, vctParaMake);        // 诊断类型-Automatic               功能使用率
+		CArtiGlobal::SetEventTracking(ETI_CLICK_DIAGNOSTIC_MANUAL, vctParaMake);           // 诊断类型-Manual                  功能使用率
+		CArtiGlobal::SetEventTracking(ETI_DIAG_VIN_READ_FAIL, vctParaMake);                // VIN码读取失败                    
+		CArtiGlobal::SetEventTracking(ETI_DIAG_VIN_READ_SUCC, vctParaVIN);                // VIN码读取成功                    
+		CArtiGlobal::SetEventTracking(ETI_DIAG_VIN_DECODER_SUCC, vctParaVIN);             // 车辆信息解析成功                 VIN解析车型信息成功
+		CArtiGlobal::SetEventTracking(ETI_DIAG_VIN_DECODER_FAIL, vctParaVIN);             // 车辆信息解析失败                 VIN解析车型信息失败
+
+		vctParaTemp.push_back(stVINTrack);
+		vctParaTemp.push_back(stMakeTrack);
+		vctParaTemp.push_back(stVehInfoTrack);
+		CArtiGlobal::SetEventTracking(ETI_CLICKVEHICLE_PROFILE_CONFIRM, vctParaTemp);      // 选车完成                         点击VehicleProfile界面的Confirm按钮
+
+		vctParaTemp.push_back(stSysTrack);
+		CArtiGlobal::SetEventTracking(ETI_ENTER_SYSTEM_TIME, vctParaTemp);                 // 进系统成功耗时                   大退或杀掉APP数据不统计
+		CArtiGlobal::SetEventTracking(ETI_ENTER_SYSTEM_FAIL, vctParaTemp);                 // 进系统失败                       进系统失败（否定或未回复）
+
+		vctParaDtc = vctParaTemp;
+		vctParaDtc.push_back(stDtc);
+		CArtiGlobal::SetEventTracking(ETI_READ_DTC_SUCC, vctParaDtc);                     // 读取故障码成功                   
+
+		CArtiGlobal::SetEventTracking(ETI_READ_DTC_FAIL, vctParaTemp);                     // 读取故障码失败                   故障码读取失败（否定或未回复）
+		CArtiGlobal::SetEventTracking(ETI_CLEAR_DTC_FAIL, vctParaTemp);                    // 清除故障码失败                   故障码清除失败（否定或未回复）
+
+		vctParaDs = vctParaTemp;
+		vctParaDs.push_back(stDs);
+		CArtiGlobal::SetEventTracking(ETI_DS_VALUE_ABNORMAL, vctParaDs);                 // 数据流值异常                     当前屏数据流项值异常（比如空、N/A、？等）
+		CArtiGlobal::SetEventTracking(ETI_DS_READ_FAIL, vctParaTemp);                      // 读取数据流失败                   数据流读取失败（全部否定或未回复）
+
+		stFun.strValue = "Act";
+		vctParaTemp.push_back(stFun);
+		CArtiGlobal::SetEventTracking(ETI_AT_NAME, vctParaTemp);                           // 动作测试项名称                   
+		CArtiGlobal::SetEventTracking(ETI_AT_EXECUTE_FAIL, vctParaTemp);                   // 动作测试执行失败                 动作测试项执行失败（否定或未回复）
+
+		stFun.strValue = "Special";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_SP_NAME, vctParaTemp);                           // 特殊功能项名称                   
+		CArtiGlobal::SetEventTracking(ETI_SP_EXECUTE_FAIL, vctParaTemp);                   // 特殊功能执行失败                 特殊功能项执行失败
+
+		stFun.strValue = "OIL RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_OIL_RESET, vctParaTemp);                // HF_Oilreset                      保养归零功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_OIL_RESET_FAIL, vctParaTemp);                 // HF_Oilreset执行失败              保养归零功能执行失败
+
+		stFun.strValue = "THROTTLE ADAPTATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_THROTTLE_ADAPTATION, vctParaTemp);      // HF_Throttleadaptation            节气门匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_THROTTLE_ADAPTATION_FAIL, vctParaTemp);       // HF_Throttleadaptation执行失败    节气门匹配功能执行失败
+
+		stFun.strValue = "EPB RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_EPB_RESET, vctParaTemp);                // HF_EPBreset                      刹车片更换功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_EPB_RESET_FAIL, vctParaTemp);                 // HF_EPBreset执行失败              刹车片更换功能执行失败
+
+		stFun.strValue = "BMS RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_BMS_RESET, vctParaTemp);                // HF_BMSreset                      电池匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_BMS_RESET_FAIL, vctParaTemp);                 // HF_BMSreset执行失败              电池匹配功能执行失败
+
+		stFun.strValue = "SAS RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_SAS_RESET, vctParaTemp);                // HF_SASreset                      转向角复位功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_SAS_RESET_FAIL, vctParaTemp);                 // HF_SASreset执行失败              转向角复位功能执行失败
+
+		stFun.strValue = "DPF REGENERATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_DPF_REGENERATION, vctParaTemp);         // HF_DPFregeneration               DPF再生功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_DPF_REGENERATION_FAIL, vctParaTemp);          // HF_DPFregeneration执行失败       DPF再生功能执行失败
+
+		stFun.strValue = "ABS BLEEDING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_ABS_BLEEDING, vctParaTemp);             // HF_ABSbleeding                   ABS排气功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_ABS_BLEEDING_FAIL, vctParaTemp);              // HF_ABSbleeding执行失败           ABS排气功能执行失败
+
+		stFun.strValue = "AIRBAG RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_AIRBAG_RESET, vctParaTemp);             // HF_Airbagreset                   气囊复位功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_AIRBAG_RESET_FAIL, vctParaTemp);              // HF_Airbagreset执行失败           气囊复位功能执行失败
+
+		stFun.strValue = "TPMS RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_TPMS_RESET, vctParaTemp);               // HF_TPMSreset                     胎压复位功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_TPMS_RESET_FAIL, vctParaTemp);                // HF_TPMSreset执行失败             胎压复位功能执行失败
+
+		stFun.strValue = "INJECTOR CODING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_INJECTOR_CODING, vctParaTemp);          // HF_Injectorcoding                喷油嘴编码功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_INJECTOR_CODING_FAIL, vctParaTemp);           // HF_Injectorcoding执行失败        喷油嘴编码功能执行失败
+
+		stFun.strValue = "IMMO KEYS";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_IMMO_KEYS, vctParaTemp);                // HF_IMMOkeys                      防盗/钥匙功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_IMMO_KEYS_FAIL, vctParaTemp);                 // HF_IMMOkeys执行失败              防盗/钥匙功能执行失败
+
+		stFun.strValue = "SUSPENSION MATCHING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_SUSPENSION_MATCHING, vctParaTemp);      // HF_Suspensionmatching            悬挂匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_SUSPENSION_MATCHING_FAIL, vctParaTemp);       // HF_Suspensionmatching执行失败    悬挂匹配功能执行失败
+
+		stFun.strValue = "SEAT CALIBRATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_SEAT_CALIBRATION, vctParaTemp);         // HF_Seatcalibration               座椅标定功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_SEAT_CALIBRATION_FAIL, vctParaTemp);          // HF_Seatcalibration执行失败       座椅标定功能执行失败
+
+		stFun.strValue = "WINDOWS CALIBRATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_WINDOWS_CALIBRATION, vctParaTemp);      // HF_Windowscalibration            门窗标定功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_WINDOWS_CALIBRATION_FAIL, vctParaTemp);       // HF_Windowscalibration            门窗标定功能执行失败
+
+		stFun.strValue = "SUNROOF INITIALIZATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_SUNROOF_INITIALIZATION, vctParaTemp);   // HF_Sunroofinitialization         天窗初始化功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_SUNROOF_INITIALIZATION_FAIL, vctParaTemp);    // HF_Sunroofinitialization执行失败 天窗初始化功能执行失败
+
+		stFun.strValue = "ODO RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_ODO_RESET, vctParaTemp);                // HF_ODOreset                      里程表调教功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_ODO_RESETFAIL, vctParaTemp);                  // HF_ODOreset执行失败              里程表调教功能执行失败
+
+		stFun.strValue = "LANGUAGE CHANGE";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_LANGUAGE_CHANGE, vctParaTemp);          // HF_Languagechange                语言设置功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_LANGUAGE_CHANGE_FAIL, vctParaTemp);           // HF_Languagechange执行失败        语言设置功能执行失败
+
+		stFun.strValue = "AFS RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_AFS_RESET, vctParaTemp);                // HF_AFSreset                      大灯匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_AFS_RESET_FAIL, vctParaTemp);                 // HF_AFSreset执行失败              大灯匹配功能执行失败
+
+		stFun.strValue = "TIRE RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_TIRE_RESET, vctParaTemp);               // HF_Tirereset                     轮胎改装功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_TIRERESET_FAIL, vctParaTemp);                 // HF_Tirereset执行失败             轮胎改装功能执行失败
+
+		stFun.strValue = "GEARBOX MATCHING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_GEARBOX_MATCHING, vctParaTemp);         // HF_Gearboxmatching               变速箱匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_GEARBOX_MATCHING_FAIL, vctParaTemp);          // HF_Gearboxmatching执行失败       变速箱匹配功能执行失败
+
+		stFun.strValue = "CLUTCH MATCHING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_CLUTCH_MATCHING, vctParaTemp);          // HF_Clutchmatching                离合器匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_CLUTCH_MATCHING_FAIL, vctParaTemp);           // HF_Clutchmatching执行失败        离合器匹配功能执行失败
+
+		stFun.strValue = "GEAR LEARNING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_GEAR_LEARNING, vctParaTemp);            // HF_Gearlearning                  齿轮学习功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_GEAR_LEARNING_FAIL, vctParaTemp);             // HF_Gearlearning执行失败          齿轮学习功能执行失败
+
+		stFun.strValue = "BALANCE TEST";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_CYLINDER_BALANCE_TEST, vctParaTemp);    // HF_Cylinderbalancetest           气缸平衡测试功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_CYLINDER_BALANCE_TEST_FAIL, vctParaTemp);     // HF_Cylinderbalancetest执行失败   气缸平衡测试功能执行失败
+
+		stFun.strValue = "EGR RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_EGR_RESET, vctParaTemp);                // HF_EGRreset                      EGR自学习功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_EGR_RESET_FAIL, vctParaTemp);                 // HF_EGRreset执行失败              EGR自学习功能执行失败
+
+		stFun.strValue = "VGT LEARNING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_VGT_LEARNING, vctParaTemp);             // HF_VGTlearning                   涡轮增压匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_VGT_LEARNING_FAIL, vctParaTemp);              // HF_VGTlearning执行失败           涡轮增压匹配功能执行失败
+
+		stFun.strValue = "HF VIN";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_VIN, vctParaTemp);                      // HF_VIN                           VIN功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_VIN_FAIL, vctParaTemp);                       // HF_VIN执行失败                   VIN功能执行失败
+
+		stFun.strValue = "TRANSPORT MODE";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_TRANSPORT_MODE, vctParaTemp);           // HF_Transportmode                 运输模式解除功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_TRANSPORT_MODE_FAIL, vctParaTemp);            // HF_Transportmode执行失败         运输模式解除功能执行失败
+
+		stFun.strValue = "START STOP RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_START_STOP_RESET, vctParaTemp);         // HF_StartStopreset                启停设置功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_START_STOP_RESET_FAIL, vctParaTemp);          // HF_StartStopreset执行失败        启停设置功能执行失败
+
+		stFun.strValue = "AC LEARNING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_AC_LEARNING, vctParaTemp);              // HF_AClearning                    空调学习功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_AC_LEARNINGFAIL, vctParaTemp);                // HF_AClearning执行失败            空调学习功能执行失败
+
+		stFun.strValue = "AF reset";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_AF_RESET, vctParaTemp);                 // HF_AFreset                       A/F 调校功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_AF_RESET_FAIL, vctParaTemp);                  // HF_AFreset执行失败               A/F 调校功能执行失败
+
+		stFun.strValue = "Rain Light sensor";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_RAIN_LIGHT_SENSOR, vctParaTemp);        // HF_RainLightsensor               雨量光线传感器功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_RAIN_LIGHT_SENSOR_FAIL, vctParaTemp);         // HF_RainLightsensor执行失败       雨量光线传感器功能执行失败
+
+		stFun.strValue = "ACC Calibration";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_ACC_CALIBRATION, vctParaTemp);          // HF_ACCcalibration                巡航校准功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_ACC_CALIBRATIONFAIL, vctParaTemp);            // HF_ACCcalibration执行失败        巡航校准功能执行失败
+
+		stFun.strValue = "COOLANT BLEEDING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_COOLANT_BLEEDING, vctParaTemp);         // HF_Coolantbleeding               电子水泵激活功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_COOLANT_BLEEDING_FAIL, vctParaTemp);          // HF_Coolantbleeding执行失败       电子水泵激活功能执行失败
+
+		stFun.strValue = "NOX SENSOR RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_NOX_SENSOR_RESET, vctParaTemp);         // HF_NOxsensorreset                NOx复位功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_NOX_SENSOR_RESET_FAIL, vctParaTemp);          // HF_NOxsensorreset执行失败        NOx复位功能执行失败
+
+		stFun.strValue = "AD BLUE RESET";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_AD_BLUE_RESET, vctParaTemp);            // HF_AdBluereset                   尿素复位功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_AD_BLUE_RESET_FAIL, vctParaTemp);             // HF_AdBluereset执行失败           尿素复位功能执行失败
+
+		stFun.strValue = "HV BATTERY";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_HV_BATTERY, vctParaTemp);               // HF_HVbattery                     高压电池功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_HV_BATTERYF_AIL, vctParaTemp);                // HF_HVbattery执行失败             高压电池功能执行失败
+
+		stFun.strValue = "ADAS CALIBRATION";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_ADAS_CALIBRATION, vctParaTemp);         // HF_ADAScalibration               ADAS校准功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_ADAS_CALIBRATION_FAIL, vctParaTemp);          // HF_ADAScalibration执行失败       ADAS校准功能执行失败
+
+		stFun.strValue = "SMART KEY MATCHING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_SMART_KEY_MATCHING, vctParaTemp);       // HF_Smartkeymatching              智能钥匙匹配功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_SMART_KEY_MATCHING_FAIL, vctParaTemp);        // HF_Smartkeymatching执行失败      智能钥匙匹配功能执行失败
+
+		stFun.strValue = "PIN CODE READING";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_PIN_CODE_READING, vctParaTemp);         // HF_PINCodereading                密码读取功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_PIN_CODE_READING_FAIL, vctParaTemp);          // HF_PINCodereading执行失败        密码读取功能执行失败
+
+		stFun.strValue = "HF EEPROM";
+		vctParaTemp[4] = stFun;
+		CArtiGlobal::SetEventTracking(ETI_CLICK_HF_EEPROM, vctParaTemp);                   // HF_EEPROM                        EEPROM适配器功能使用率
+		CArtiGlobal::SetEventTracking(ETI_HF_EEPROM_FAIL, vctParaTemp);                    // HF_EEPROM执行失败                EEPROM适配器功能执行失败
+
+		artiShowMsgBox("Test", "Test Finish");
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetCurUnitMode()
+	{
+#ifndef WIN32
+		if (CArtiGlobal::GetCurUnitMode() == 0)
+		{
+			artiShowMsgBox("Unit", "METRIC");
+		}
+		else
+		{
+			artiShowMsgBox("Unit", "ENGLISH");
+		}
+#endif // !WIN32
+
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_FcaGetLoginRegion()
+	{
+
+		if (ArtiGlobalTest_FcaAuthDiagInit() != 0)
+		{
+			return;
+		}
+#ifndef WIN32
+		if (CArtiGlobal::FcaGetLoginRegion() == 0)
+		{
+			artiShowMsgBox("Area", "AMERICA");
+		}
+		else if (CArtiGlobal::FcaGetLoginRegion() == 1)
+		{
+			artiShowMsgBox("Area", "EUROPE");
+		}
+		else
+		{
+			artiShowMsgBox("Area", "OTHER");
+		}
+#endif // !WIN32
+	}
+
+	void CArtiGlobalTest::ArtiGlobalTest_GetAutoVinEntryType()
+	{
+		uint64_t	uType = (uint64_t)CArtiGlobal::GetAutoVinEntryType();
+		string		strType;
+
+		if (uType == 1)
+		{
+			strType = "DIAG";
+		}
+		else if (uType == 2)
+		{
+			strType = "IMMO";
+		}
+		else if (uType == 4)
+		{
+			strType = "MOTOR";
+		}
+		artiShowMsgBox("AutoVinEntryType", strType);
+	}
+}

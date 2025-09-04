@@ -1,0 +1,2584 @@
+#include "DemoArtiListTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+#include "DemoAPITest.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiListTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitTitle");		            vctMenuID.push_back(0);
+		uiMenu.AddItem("InitTitle1");			        vctMenuID.push_back(1);
+		uiMenu.AddItem("SetColWidth");		            vctMenuID.push_back(2);
+		uiMenu.AddItem("SetHeads");		                vctMenuID.push_back(3);
+		uiMenu.AddItem("SetBlockStatus");	            vctMenuID.push_back(4);
+		//uiMenu.AddItem("AddButton");	                vctMenuID.push_back(5);
+		uiMenu.AddItem("AddGroup");	                    vctMenuID.push_back(6);
+		uiMenu.AddItem("AddItem");                      vctMenuID.push_back(7);
+		uiMenu.AddItem("AddItem1");			            vctMenuID.push_back(8);
+		uiMenu.AddItem("SetItem");	                    vctMenuID.push_back(9);
+		uiMenu.AddItem("SetRowHighLight");	            vctMenuID.push_back(10);
+		uiMenu.AddItem("SetDefaultSelectedRow");	    vctMenuID.push_back(11);
+		uiMenu.AddItem("SetCheckBoxStatus");	        vctMenuID.push_back(12);
+		uiMenu.AddItem("SetButtonStatus");	            vctMenuID.push_back(13);
+		uiMenu.AddItem("SetButtonText");	            vctMenuID.push_back(14);
+		uiMenu.AddItem("GetSelectedRow");	            vctMenuID.push_back(15);
+		uiMenu.AddItem("GetSelectedRowEx");	            vctMenuID.push_back(16);
+		uiMenu.AddItem("AddButtonEx");	                vctMenuID.push_back(17);
+		uiMenu.AddItem("DelButton");	                vctMenuID.push_back(18);
+		uiMenu.AddItem("SetItemPicture");	            vctMenuID.push_back(19);
+		uiMenu.AddItem("SetLockFirstRow");	            vctMenuID.push_back(20);
+		uiMenu.AddItem("SetTipsOnTop");					vctMenuID.push_back(21);
+		uiMenu.AddItem("SetTipsTitleOnTop");			vctMenuID.push_back(24);
+		uiMenu.AddItem("SetTipsOnBottom");	            vctMenuID.push_back(22);
+		uiMenu.AddItem("Show");						    vctMenuID.push_back(23);
+		uiMenu.AddItem("Add_SetTipsOnLeft_RowHighLight");				vctMenuID.push_back(25);
+		uiMenu.AddItem("SetSelectedType");				vctMenuID.push_back(26);
+		uiMenu.AddItem("SetRowInCurrentScreen");				vctMenuID.push_back(27);
+		uiMenu.AddItem("SetShareButtonVisible");				vctMenuID.push_back(28);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_InitTitle();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_InitTitle1();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetColWidth();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetHeads();
+				}
+				else if (4 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetBlockStatus();
+				}
+				else if (5 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddButtonEx();
+				}
+				else if (6 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddGroup();
+				}
+				else if (7 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddItem();
+				}
+				else if (8 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddItem1();
+				}
+				else if (9 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetItem();
+				}
+				else if (10 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetRowHighLight();
+				}
+				else if (11 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetDefaultSelectedRow();
+				}
+				else if (12 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetCheckBoxStatus();
+				}
+				else if (13 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetButtonStatus();
+				}
+				else if (14 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetButtonText();
+				}
+				else if (15 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_GetSelectedRow();
+				}
+				else if (16 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_GetSelectedRowEx();
+				}
+				else if (17 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddButtonEx();
+				}
+				else if (18 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_DelButton();
+				}
+				else if (19 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetItemPicture();
+				}
+				else if (20 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetLockFirstRow();
+				}
+				else if (21 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetTipsOnTop();
+				}
+				else if (22 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetTipsOnBottom();
+				}
+				else if (23 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_Show();
+				}
+				else if (24 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetTipsTitleOnTop();
+				}
+				else if (25 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_AddTipsOnLeft();
+				}
+				else if (26 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetSelectedType();
+				}
+				else if (27 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetRowInCurrentScreen();
+				}
+				else if (28 == vctMenuID[uRetBtn])
+				{
+					ArtiListTest_SetShareButtonVisible();
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_InitTitle()
+	{
+		string strTitle;
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				strTitle = "";
+			}
+			else if (1 == uRetBtn)
+			{
+				strTitle = TextSingleLine;
+			}
+			else
+			{
+				strTitle = TextMulitLineTitle;
+			}
+
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(50);
+			vctColWidth.push_back(50);
+
+			vector<string> vctItems;
+			vctItems.push_back(artiGetText("FF0600000001"));//"01 - 列表测试项名"
+			vctItems.push_back(artiGetText("FF0600000002"));//"01 - 列表测试项值"
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(strTitle);
+			uiList.SetColWidth(vctColWidth);
+
+			uiList.AddItem(vctItems, false);
+			//uiList.AddItem(vctItems, true);
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_InitTitle1()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));
+		uiMenu.AddItem(artiGetText("FF0600000003"));//"每行前面没有复选框"
+		uiMenu.AddItem(artiGetText("FF0600000004"));//"每行前面有互斥复选框"
+		uiMenu.AddItem(artiGetText("FF0600000005"));//"每行前面有多选复选框"
+
+		CArtiList::eListViewType uType = CArtiList::eListViewType::ITEM_NO_CHECKBOX;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				uType = CArtiList::eListViewType::ITEM_NO_CHECKBOX;
+			}
+			else if (1 == uRetBtn)
+			{
+				uType = CArtiList::eListViewType::ITEM_WITH_CHECKBOX_SINGLE;
+			}
+			else
+			{
+				uType = CArtiList::eListViewType::ITEM_WITH_CHECKBOX_MULTI;
+			}
+
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(50);
+			vctColWidth.push_back(50);
+
+			vector<string> vctItems;
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(artiGetText("FF0600000000"), uType);//"列表控件测试"
+			uiList.SetColWidth(vctColWidth);
+
+			for (uint32_t i = 0; i < 5; i++)
+			{
+				vctItems.clear();
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF0000000024").c_str(), i);//"%d - 列表测试项名"
+				vctItems.push_back(buff + artiGetText("FF0600000006"));
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF0000000024").c_str(), i);//"0%d - 列表测试项值"
+				vctItems.push_back(buff + artiGetText("FF0600000007"));
+
+				uiList.AddItem(vctItems);
+			}
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetColWidth()
+	{
+		vector<uint32_t> vctColNum;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));
+		uiMenu.AddItem(artiGetText("FF0600000008"));	vctColNum.push_back(0);    //"500行0列"
+		uiMenu.AddItem(artiGetText("FF0600000009"));    vctColNum.push_back(1);	   //"500行1列(列宽100)"
+		uiMenu.AddItem(artiGetText("FF060000000A"));    vctColNum.push_back(2);	   //"500行2列(列宽50)"
+		uiMenu.AddItem(artiGetText("FF060000000B"));    vctColNum.push_back(5);	   //"500行5列(列宽20)"
+		uiMenu.AddItem(artiGetText("FF060000000C"));    vctColNum.push_back(10);   //"500行10列(列宽10)"
+
+		vector<int32_t> vctColWidth;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				vctColWidth.clear();
+				if (0 == uRetBtn)
+				{
+					vctColWidth.clear();
+				}
+				else
+				{
+					for (uint32_t i = 0; i < vctColNum[uRetBtn]; i++)
+					{
+						vctColWidth.push_back(100 / vctColNum[uRetBtn]);
+					}
+				}
+			}
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+			uiList.SetColWidth(vctColWidth);
+
+			vector<string> vctItems;
+			for (uint32_t i = 0; i < 500; i++)
+			{
+				vctItems.clear();
+
+				for (uint32_t j = 0; j < vctColNum[uRetBtn]; j++)
+				{
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, j);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+				}
+				uiList.AddItem(vctItems);
+			}
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetHeads()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		vector<string> vctItems;
+		vector<string> vctHeadNames;
+
+		while (1)
+		{
+			vctHeadNames.clear();
+
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				vctHeadNames.push_back("");
+				vctHeadNames.push_back("");
+			}
+			else if (1 == uRetBtn)
+			{
+				vctHeadNames.push_back(TextSingleLine);
+				vctHeadNames.push_back(TextSingleLine);
+			}
+			else
+			{
+				vctHeadNames.push_back(TextMulitLineTitle);
+				vctHeadNames.push_back(TextMulitLineTitle);
+			}
+
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(50);
+			vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+			uiList.SetColWidth(vctColWidth);
+			uiList.SetHeads(vctHeadNames);
+
+			for (uint32_t i = 1; i < 5; i++)
+			{
+				vctItems.clear();
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				uiList.AddItem(vctItems);
+			}
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetTipsOnTop()
+	{
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth({ 40, 60 });
+		//uiList.SetHeads({"", ""});
+
+		for (uint32_t i = 1; i < 5; i++)
+		{
+			vector<string> vctItems;
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			uiList.AddItem(vctItems);
+		}
+		uiList.SetTipsOnTop(TextMulitLineValue);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetTipsTitleOnTop()
+	{
+		vector<int32_t> vctColWidth;
+		vctColWidth.push_back(40);
+		vctColWidth.push_back(60);
+
+		string struAlignType = "DT_LEFT";
+		string streSize = "FORT_SIZE_SMALL";
+		string streBold = "BOLD_TYPE_NONE";
+
+		uint32_t uAlignType = DT_LEFT;
+		eFontSize eSize = eFontSize::FORT_SIZE_SMALL;
+		eBoldType eBold = eBoldType::BOLD_TYPE_NONE;
+
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle("SetTipsTitleOnTop");		//"参数列表"
+		uiList.SetColWidth(vctColWidth);
+
+		uiList.AddItem("uAlignType");
+		uiList.AddItem("eSize");
+		uiList.AddItem("eBold");
+
+		uiList.SetItem(0, 1, struAlignType);
+		uiList.SetItem(1, 1, streSize);
+		uiList.SetItem(2, 1, streBold);
+
+		//uiList.AddButtonEx("Help");
+		uiList.AddButtonEx("Test");
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn) // 显示帮助信息
+			{
+				#if __Multi_System_Test__
+				CArtiList uiList1(m_uThread);
+				#else
+				CArtiList uiList1;
+				#endif
+				
+				uiList1.InitTitle("Title");		//"参数列表"
+				uiList1.SetColWidth(vctColWidth);
+
+				uiList1.SetTipsTitleOnTop("strTipsTitle", uAlignType, eSize, eBold);
+				uiList1.SetTipsOnTop("1.Test1\n2.Test2\n3.Test3\n");
+
+				for (uint32_t i = 1; i < 5; i++)
+				{
+					vector<string> vctItems;
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					uiList1.AddItem(vctItems);
+				}
+
+				uint32_t uRetBtn1 = DF_ID_NOKEY;
+				while (1)
+				{
+					uRetBtn1 = uiList1.Show();
+					if (uRetBtn1 == DF_ID_BACK)
+					{
+						break;
+					}
+				}
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uAlignType, struAlignType, mapAlignType);
+					uiList.SetItem(0, 1, struAlignType);
+				}
+				else if (1 == uSelect)
+				{
+					GetParamValue(eSize, streSize, mapFontSize);
+					uiList.SetItem(1, 1, streSize);
+				}
+				else if (2 == uSelect)
+				{
+					GetParamValue(eBold, streBold, mapBoldType);
+					uiList.SetItem(2, 1, streBold);
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetTipsOnBottom()
+	{
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth({ 40, 60 });
+		//uiList.SetHeads({"", ""});
+
+		for (uint32_t i = 1; i < 5; i++)
+		{
+			vector<string> vctItems;
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			uiList.AddItem(vctItems);
+		}
+		uiList.SetTipsOnBottom(TextMulitLineValue);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetBlockStatus()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));
+		uiMenu.AddItem(artiGetText("FF060000000E"));//"阻塞界面"
+		uiMenu.AddItem(artiGetText("FF060000000F"));//"非阻塞界面"
+
+		bool bIsBlock = false;
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				bIsBlock = true;
+			}
+			else if (1 == uRetBtn)
+			{
+				bIsBlock = false;
+			}
+
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(50);
+			vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+			uiList.SetColWidth(vctColWidth);
+			uiList.SetBlockStatus(bIsBlock);
+
+			uiList.AddItem(artiGetText("FF0600000010"));//"界面刷新次数"
+			uiList.AddButtonEx(artiGetText("FF0600000011"));//"刷新界面"
+
+			uint32_t uCnt = 0;
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_BACK)
+				{
+					break;
+				}
+				else
+				{
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF0600000012").c_str(), uCnt++);//"第%d次"
+					uiList.SetItem(0, 1, buff);
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddButtonEx()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+		uiMenu.AddItem(artiGetText("FF0600000013"));	//"增加5个按键"
+
+		//bool bIsBlock = false;
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (0 == uRetBtn || 1 == uRetBtn || 2 == uRetBtn)
+				{
+					string strBtnText = "";
+					if (0 == uRetBtn)
+					{
+						strBtnText = "";
+					}
+					else if (2 == uRetBtn)
+					{
+						strBtnText = TextMulitLineValue;
+					}
+					else
+					{
+						strBtnText = artiGetText("FF0600000014");
+					}
+
+					vector<int32_t> vctColWidth;
+					vctColWidth.push_back(50);
+					vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+					CArtiList uiList(m_uThread);
+#else
+					CArtiList uiList;
+#endif
+					uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+					uiList.SetColWidth(vctColWidth);
+
+					uiList.AddItem(artiGetText("FF0600000015"));//"第0行第0列"
+					uiList.SetItem(0, 1, artiGetText("FF0600000016"));//"第0行第1列"
+
+					uiList.AddButtonEx(artiGetText("FF0600000017"));//"增加按键"
+
+					while (1)
+					{
+						Delay(100);
+						uRetBtn = uiList.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+						else if (DF_ID_FREEBTN_0 == uRetBtn)
+						{
+							uiList.AddButtonEx(strBtnText);
+						}
+					}
+				}
+				else
+				{
+					vector<int32_t> vctColWidth;
+					vctColWidth.push_back(50);
+					vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+					CArtiList uiList(m_uThread);
+#else
+					CArtiList uiList;
+#endif
+					uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+					uiList.SetColWidth(vctColWidth);
+
+					uiList.AddItem(artiGetText("FF0600000015"));
+					uiList.SetItem(0, 1, artiGetText("FF0600000016"));
+
+					uiList.AddButtonEx(artiGetText("FF0600000017"));//"增加按键"
+
+					uint32_t uBtnCnt = 0;
+					while (1)
+					{
+						Delay(100);
+						uRetBtn = uiList.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+						else if (DF_ID_FREEBTN_0 == uRetBtn)
+						{
+							for (uint32_t i = 0; i < 5; i++)
+							{
+								memset(buff, 0, sizeof(buff));
+								SPRINTF_S(buff, "%d", uBtnCnt++);
+								uiList.AddButtonEx(artiGetText("FF0000000025") + buff);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddButton()
+	{
+		vector<int32_t> vctColWidth;
+		vctColWidth.push_back(50);
+		vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth(vctColWidth);
+
+		uiList.AddItem(artiGetText("FF0600000015"));//"第0行第0列"
+		uiList.SetItem(0, 1, artiGetText("FF0600000016"));//"第0行第1列"
+
+		uiList.AddButton(artiGetText("FF0600000017"));//"增加按键"
+
+		uint32_t uBtnCnt = 0;
+		uint32_t uBtnRet = 0;
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				string strBtnID = "";
+				string strBtnText = "";
+
+				uBtnCnt = uBtnCnt + 1;
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, "%d", uBtnCnt);
+
+				strBtnText = artiGetText("FF000000000C") + buff;//"测试键%d"
+
+				uBtnRet = uiList.AddButtonEx(strBtnText);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, "%d", uBtnRet - DF_ID_FREEBTN_0);
+				strBtnID = strBtnID + "DF_ID_FREEBTN_" + buff;
+				/*
+				* 新增测试按键
+				* \n按键ID:
+				*/
+				ShowMsgBoxDemo(artiGetText("FF0000000026"), strBtnText + artiGetText("FF0000000027") + strBtnID, DF_MB_OK, DT_LEFT, -1, m_uThread);
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_DelButton()
+	{
+		vector<int32_t> vctColWidth;
+		vctColWidth.push_back(50);
+		vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth(vctColWidth);
+
+		uiList.AddItem(artiGetText("FF0600000015"));//"第0行第0列"
+		uiList.SetItem(0, 1, artiGetText("FF0600000016"));//"第0行第1列"
+
+		uiList.AddButtonEx(artiGetText("FF060000002F"));//"删除按键"
+
+		vector<uint32_t> vctBtnID;
+		uiList.AddButtonEx(artiGetText("FF090000001A"));//"测试键1"
+		uiList.AddButtonEx(artiGetText("FF090000001B"));//"测试键2"
+		uiList.AddButtonEx(artiGetText("FF090000001C"));//"测试键3"
+
+		vctBtnID.push_back(DF_ID_FREEBTN_1);
+		vctBtnID.push_back(DF_ID_FREEBTN_2);
+		vctBtnID.push_back(DF_ID_FREEBTN_3);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_0)
+			{
+				if (vctBtnID.size())
+				{
+					uiList.DelButton(vctBtnID[vctBtnID.size() - 1]);
+					vctBtnID.pop_back();
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddGroup()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				string strText = "";
+				if (0 == uRetBtn)
+				{
+					strText = "";
+				}
+				else if (1 == uRetBtn)
+				{
+					strText = artiGetText("FF0600000018");//"GroupName"
+				}
+				else
+				{
+					strText = TextMulitLineTitle;
+				}
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(50);
+				vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+				uiList.AddGroup(strText);
+
+				vector<string> vctItems;
+				for (uint32_t i = 1; i < 5; i++)
+				{
+					vctItems.clear();
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					uiList.AddItem(vctItems);
+				}
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddItem()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0600000019"));	//"500项，文本为空"
+		uiMenu.AddItem(artiGetText("FF060000001A"));	//"500项，文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF060000001B"));	//"500项，文本为多行文本"
+		uiMenu.AddItem(artiGetText("FF060000001C"));	//"500项，偶行锁定，奇行不锁定"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(50);
+				vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+
+				vector<string> vctItems;
+
+				if (0 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						vctItems.clear();
+						vctItems.push_back("");
+						vctItems.push_back("");
+						uiList.AddItem(vctItems);
+					}
+
+				}
+				else if (1 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						vctItems.clear();
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+						vctItems.push_back(buff);
+
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+						vctItems.push_back(buff);
+
+						uiList.AddItem(vctItems);
+					}
+				}
+				else if (2 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						vctItems.clear();
+						vctItems.push_back(TextMulitLineTitle);
+						vctItems.push_back(TextMulitLineValue);
+						uiList.AddItem(vctItems);
+					}
+				}
+				else
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						vctItems.clear();
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+						vctItems.push_back(buff);
+
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+						vctItems.push_back(buff);
+
+						uiList.AddItem(vctItems, (i + 1) % 2);
+					}
+				}
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddItem1()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0600000019"));	//"500项，文本为空"
+		uiMenu.AddItem(artiGetText("FF060000001A"));	//"500项，文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF060000001B"));	//"500项，文本为多行文本"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(50);
+				vctColWidth.push_back(50);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+
+				string strItem = "";
+
+				if (0 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						uiList.AddItem(strItem);
+					}
+				}
+				else if (1 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						memset(buff, 0, sizeof(buff));
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, artiGetText("FF0000000024").c_str(), i);//"%d - 列表测试项名"
+						uiList.AddItem(buff + artiGetText("FF0600000006"));
+					}
+				}
+				else if (2 == uRetBtn)
+				{
+					for (uint32_t i = 0; i < 500; i++)
+					{
+						uiList.AddItem(TextMulitLineTitle);
+					}
+				}
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetItem()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF060000001E"));	//"3行1列，设置文本为空"
+		uiMenu.AddItem(artiGetText("FF060000001F"));	//"3行1列，文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0600000020"));	//"3行1列，文本为多行文本"
+
+		string strText = "";
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (0 == uRetBtn)
+				{
+					strText = "";
+				}
+				else if (1 == uRetBtn)
+				{
+					strText = TextSingleLine;
+				}
+				else if (2 == uRetBtn)
+				{
+					strText = TextMulitLineTitle;
+				}
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+
+				vector<string> vctItems;
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					vctItems.clear();
+					memset(buff, 0, sizeof(buff));
+					//SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					//vctItems.push_back(buff);
+
+					//memset(buff, 0, sizeof(buff));
+					//SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					//vctItems.push_back(buff);
+
+					//memset(buff, 0, sizeof(buff));
+					//SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+					//vctItems.push_back(buff);
+
+					//memset(buff, 0, sizeof(buff));
+					//SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+					//vctItems.push_back(buff);
+
+					if (i % 2 == 0)
+					{
+						vctItems.push_back(TextSingleLine);
+						vctItems.push_back(TextSingleLine);
+						vctItems.push_back(TextSingleLine);
+						vctItems.push_back(TextSingleLine);
+					}
+					else
+					{
+						vctItems.push_back(TextMulitLine);
+						vctItems.push_back(TextMulitLine);
+						vctItems.push_back(TextMulitLine);
+						vctItems.push_back(TextMulitLine);
+					}
+
+					uiList.AddItem(vctItems);
+				}
+
+				uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					else if (DF_ID_FREEBTN_0 == uRetBtn)
+					{
+						uiList.SetItem(3, 1, strText);
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetItemPicture()
+	{
+		vector<int32_t> vctColWidth;
+		vctColWidth.push_back(30);
+		vctColWidth.push_back(30);
+		vctColWidth.push_back(40);
+
+		vector<string> vctHeadNames;
+		vctHeadNames.clear();
+		vctHeadNames.push_back(artiGetText("FF00000000B1"));//"车型"
+		vctHeadNames.push_back(artiGetText("FF00000000B2"));//"文本"
+		vctHeadNames.push_back(artiGetText("FF00000000B3"));//"图片"
+
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth(vctColWidth);
+
+		uiList.SetHeads(vctHeadNames);
+		uiList.SetHeads(vctHeadNames);
+
+		uiList.AddItem("Audi");
+		uiList.AddItem("Benz");
+		uiList.AddItem("BWM");
+
+		uiList.SetItem(0, 1, "Audi.png");
+		uiList.SetItem(1, 1, "Benz.png");
+		uiList.SetItem(2, 1, "BWM.png");
+
+		uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+		vector<std::string> vctPath;
+		vctPath.push_back(CArtiGlobal::GetVehPath() + "/Logo/Audi.png");
+		vctPath.push_back(CArtiGlobal::GetVehPath() + "/Logo/Benz.png");
+		vctPath.push_back(CArtiGlobal::GetVehPath() + "/Logo/BWM.png");
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				uiList.SetItemPicture(2, vctPath);
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetRowHighLight()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenuRowHighLight(m_uThread);
+#else
+		CArtiMenu uiMenuRowHighLight;
+#endif
+
+		uiMenuRowHighLight.InitTitle("Test SetRowHighLight");
+		uiMenuRowHighLight.AddItem("SetRowHighLight(uint16_t uRowIndex)");
+		uiMenuRowHighLight.AddItem("SetRowHighLight(uint16_t uRowIndex,eColourType uColourType)");
+		uiMenuRowHighLight.AddItem("SetRowHighLight(const std::vector<uint16_t>& vctRowIndex, const std::vector<eColourType>& vctColourType)");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenuRowHighLight.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			if ((uRet&0xff) == 0)
+			{
+				CArtiMenu uiMenu;
+				uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+				uiMenu.AddItem(artiGetText("FF0600000021"));	//"锁定第0行"
+				uiMenu.AddItem(artiGetText("FF0600000022"));	//"锁定第2行"
+				uiMenu.AddItem(artiGetText("FF0600000023"));	//"锁定奇数行"
+				uiMenu.AddItem(artiGetText("FF0600000024"));	//"锁定所有行"
+
+				uint32_t uSelect = 0;
+				while (1)
+				{
+					uRetBtn = uiMenu.Show();
+					if (DF_ID_BACK == uRetBtn)
+					{
+						break;
+					}
+					else
+					{
+						uSelect = uRetBtn;
+
+						vector<int32_t> vctColWidth;
+						vctColWidth.push_back(40);
+						vctColWidth.push_back(20);
+						vctColWidth.push_back(20);
+						vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+						CArtiList uiList(m_uThread);
+#else
+						CArtiList uiList;
+#endif
+						uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+						uiList.SetColWidth(vctColWidth);
+
+						vector<string> vctItems;
+						for (uint32_t i = 0; i < 500; i++)
+						{
+							vctItems.clear();
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							uiList.AddItem(vctItems);
+						}
+
+						uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+						while (1)
+						{
+							Delay(100);
+							uRetBtn = uiList.Show();
+							if (uRetBtn == DF_ID_CANCEL)
+							{
+								break;
+							}
+							else if (DF_ID_FREEBTN_0 == uRetBtn)
+							{
+								if (0 == uSelect)
+								{
+									uiList.SetRowHighLight(0);
+								}
+								else if (1 == uSelect)
+								{
+									uiList.SetRowHighLight(2);
+								}
+								else if (2 == uSelect)
+								{
+									for (uint32_t i = 0; i < 500; i++)
+									{
+										if (i % 2)
+										{
+											uiList.SetRowHighLight(i);
+										}
+									}
+								}
+								else
+								{
+									for (uint32_t i = 0; i < 500; i++)
+									{
+										uiList.SetRowHighLight(i);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			else if ((uRet & 0xff) == 1 || (uRet & 0xff) == 2)
+			{
+				CArtiList	uiList;
+
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+				if ((uRet & 0xff) ==1)
+				{
+					uiList.InitTitle("First/Second Row HighLight and COLOUR_TYPE_DEFAULT,Other COLOUR_TYPE_GRAY");
+				}
+				else
+				{
+					uiList.InitTitle("Other Row HighLight and COLOUR_TYPE_DEFAULT,First/Second COLOUR_TYPE_GRAY");
+				}
+				uiList.SetColWidth(vctColWidth);
+				uiList.AddItem("First Row");
+				uiList.AddItem("Second Row");
+				uiList.AddItem("Other Row");
+				uiList.AddItem("Other Row");
+				uiList.AddItem("Fifth Row");
+				uiList.AddItem("Sixth Row");
+
+				if ((uRet & 0xff) ==1)
+				{
+					uiList.SetRowHighLight(0, COLOUR_TYPE_DEFAULT);
+					uiList.SetRowHighLight(1, COLOUR_TYPE_DEFAULT);
+					uiList.SetRowHighLight(2, COLOUR_TYPE_GRAY);
+					uiList.SetRowHighLight(3, COLOUR_TYPE_GRAY);
+				}
+				else
+				{
+					vector<uint16_t> vctRowIndex;
+					vector<eColourType> vctColourType;
+
+					vctRowIndex.emplace_back(0);
+					vctRowIndex.emplace_back(1);
+					vctRowIndex.emplace_back(2);
+					vctRowIndex.emplace_back(3);
+
+					vctColourType.push_back(COLOUR_TYPE_GRAY);
+					vctColourType.push_back(COLOUR_TYPE_GRAY);
+					vctColourType.push_back(COLOUR_TYPE_DEFAULT);
+					vctColourType.push_back(COLOUR_TYPE_DEFAULT);
+					uiList.SetRowHighLight(vctRowIndex, vctColourType);
+				}
+				while (1)
+				{
+					if (uiList.Show()==DF_ID_BACK)
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetLockFirstRow()
+	{
+		vector<int32_t> vctColWidth;
+		vctColWidth.push_back(40);
+		vctColWidth.push_back(20);
+		vctColWidth.push_back(20);
+		vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+		uiList.SetColWidth(vctColWidth);
+
+		vector<string> vctItems;
+		for (uint32_t i = 0; i < 50; i++)
+		{
+			vctItems.clear();
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			memset(buff, 0, sizeof(buff));
+			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+			vctItems.push_back(buff);
+
+			uiList.AddItem(vctItems);
+		}
+
+		uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				uiList.SetLockFirstRow();
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetDefaultSelectedRow()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenuRow(m_uThread);
+#else
+		CArtiMenu	uiMenuRow;
+#endif
+		uiMenuRow.InitTitle("Test SetDefaultSelectedRow");
+
+		uiMenuRow.AddItem("SetDefaultSelectedRow(uint16_t uRowIndex)");
+		uiMenuRow.AddItem("SetDefaultSelectedRow(const std::vector<uint16_t>& vctRowIndex)");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenuRow.Show();
+
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			else if ((uRet&0xff)==0)
+			{
+				CArtiMenu uiMenu;
+
+				uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+				uiMenu.AddItem(artiGetText("FF0600000025"));	//"选中第0行"
+				uiMenu.AddItem(artiGetText("FF0600000026"));	//"选中第5行"
+				uiMenu.AddItem(artiGetText("FF060000002E"));	//"选中第20行"
+
+				uint32_t uSelect = 0;
+
+				while (1)
+				{
+					uRetBtn = uiMenu.Show();
+					if (DF_ID_BACK == uRetBtn)
+					{
+						break;
+					}
+					else
+					{
+						uSelect = uRetBtn;
+
+						vector<int32_t> vctColWidth;
+						vctColWidth.push_back(40);
+						vctColWidth.push_back(20);
+						vctColWidth.push_back(20);
+						vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+						CArtiList uiList(m_uThread);
+#else
+						CArtiList uiList;
+#endif
+						uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+						uiList.SetColWidth(vctColWidth);
+
+						vector<string> vctItems;
+						for (uint32_t i = 0; i < 500; i++)
+						{
+							vctItems.clear();
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+							vctItems.push_back(buff);
+
+							uiList.AddItem(vctItems);
+						}
+
+						uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+						while (1)
+						{
+							Delay(100);
+							uRetBtn = uiList.Show();
+							if (uRetBtn == DF_ID_CANCEL)
+							{
+								break;
+							}
+							else if (DF_ID_FREEBTN_0 == uRetBtn)
+							{
+								/*
+								* SetDefaultSelectedRow()设置默认选中行，PC界面无选中效果，可使用GetSelectedRow()获取当前选中行号。
+								*/
+								ShowMsgBoxDemo("SetDefaultSelectedRow", artiGetText("FF060000002D"), DF_MB_OK, DT_LEFT, -1, m_uThread);
+								if (0 == uSelect)
+								{
+									uiList.SetDefaultSelectedRow(0);
+								}
+								else if (1 == uSelect)
+								{
+									uiList.SetDefaultSelectedRow(5);
+								}
+								else if (2 == uSelect)
+								{
+									uiList.SetDefaultSelectedRow(20);
+								}
+
+								uint16_t uRowNo = uiList.GetSelectedRow();
+								memset(buff, 0, sizeof(buff));
+								SPRINTF_S(buff, artiGetText("FF0000000045").c_str(), uRowNo);//"
+
+								ShowMsgBoxDemo("SetDefaultSelectedRow", artiGetText("FF060000002C") + buff, DF_MB_OK, DT_LEFT, -1, m_uThread);
+							}
+						}
+					}
+				}
+			}
+			else if ((uRet&0xff)==1)
+			{
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+				CArtiList uiList;
+				vector<uint16_t> vctRowIndex;
+
+				vctRowIndex.emplace_back(0);
+				vctRowIndex.emplace_back(2);
+				vctRowIndex.emplace_back(4);
+				uiList.InitTitle("Select First Third Fifth");
+				uiList.SetColWidth(vctColWidth);
+				uiList.AddItem("First Row");
+				uiList.AddItem("Second Row");
+				uiList.AddItem("Other Row");
+				uiList.AddItem("Other Row");
+				uiList.AddItem("Fifth Row");
+				uiList.AddItem("Sixth Row");
+				uiList.SetDefaultSelectedRow(vctRowIndex);
+				while (1)
+				{
+					if (DF_ID_BACK==uiList.Show())
+					{
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetCheckBoxStatus()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0600000027"));	//"设置第0行被选中"
+		uiMenu.AddItem(artiGetText("FF0600000028"));	//"设置奇数行被选中"
+
+		uint32_t uSelect = 0;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				uSelect = uRetBtn;
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"), CArtiList::eListViewType::ITEM_WITH_CHECKBOX_MULTI);
+				uiList.SetColWidth(vctColWidth);
+
+				vector<string> vctItems;
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					vctItems.clear();
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					uiList.AddItem(vctItems);
+				}
+
+				uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					else if (DF_ID_FREEBTN_0 == uRetBtn)
+					{
+						if (0 == uSelect)
+						{
+							uiList.SetCheckBoxStatus(0, true);
+						}
+						else
+						{
+							for (uint32_t i = 0; i < 500; i++)
+							{
+								if (i % 2)
+								{
+									uiList.SetCheckBoxStatus(i, true);
+								}
+								else
+								{
+									uiList.SetCheckBoxStatus(i, false);
+								}
+							}
+						}
+
+						string strRow = "";
+						vector<uint16_t> vctRow = uiList.GetSelectedRowEx();
+						for (uint16_t i = 0; i < vctRow.size(); i++)
+						{
+							memset(buff, 0, sizeof(buff));
+							SPRINTF_S(buff, artiGetText("FF0000000045").c_str(), vctRow[i]);
+							if (i != 0)
+							{
+								strRow = strRow + "," + buff;
+							}
+							else
+							{
+								strRow = buff;
+							}
+						}
+						ShowMsgBoxDemo("SetDefaultSelectedRow", artiGetText("FF060000002C") + strRow, DF_MB_OK, DT_LEFT, -1, m_uThread);
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetButtonStatus()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0600000029"));	//"按钮状态为可见并且可点击"
+		uiMenu.AddItem(artiGetText("FF060000002A"));	//"按钮状态为可见但不可点击"
+		uiMenu.AddItem(artiGetText("FF060000002B"));	//"按钮状态为不可见，隐藏"
+
+		uint32_t uSelect = 0;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				uSelect = uRetBtn;
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+
+				vector<string> vctItems;
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					vctItems.clear();
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					uiList.AddItem(vctItems);
+				}
+
+				uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+				uiList.AddButtonEx(artiGetText("FF000000000C"));					//"测试键"
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					else if (DF_ID_FREEBTN_0 == uRetBtn)
+					{
+						uint32_t uStatus = 0;
+						if (0 == uSelect)
+						{
+							uStatus = DF_ST_BTN_ENABLE;
+						}
+						else if (1 == uSelect)
+						{
+							uStatus = DF_ST_BTN_DISABLE;
+						}
+						else
+						{
+							uStatus = DF_ST_BTN_UNVISIBLE;
+						}
+						uiList.SetButtonStatus(1, uStatus);
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetButtonText()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+
+		string strText = "";
+		uint32_t uSelect = 0;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				uSelect = uRetBtn;
+
+				vector<int32_t> vctColWidth;
+				vctColWidth.push_back(40);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+				vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+				CArtiList uiList(m_uThread);
+#else
+				CArtiList uiList;
+#endif
+				uiList.InitTitle(artiGetText("FF0600000000"));//"列表控件测试"
+				uiList.SetColWidth(vctColWidth);
+
+				vector<string> vctItems;
+				for (uint32_t i = 0; i < 500; i++)
+				{
+					vctItems.clear();
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+					vctItems.push_back(buff);
+
+					uiList.AddItem(vctItems);
+				}
+
+				uiList.AddButtonEx(artiGetText("FF060000001D"));					//"设置"
+				uiList.AddButtonEx(artiGetText("FF000000000C"));					//"测试键"
+
+				while (1)
+				{
+					Delay(100);
+					uRetBtn = uiList.Show();
+					if (uRetBtn == DF_ID_CANCEL)
+					{
+						break;
+					}
+					else if (DF_ID_FREEBTN_0 == uRetBtn)
+					{
+						if (0 == uSelect)
+						{
+							strText = "";
+						}
+						else if (1 == uSelect)
+						{
+							strText = TextSingleLine;
+						}
+						else
+						{
+							strText = TextMulitLineTitle;
+						}
+						uiList.SetButtonText(1, strText);
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_GetSelectedRow()
+	{
+		CArtiMenu	uiMenu;
+		uint32_t	uRet;
+
+		uiMenu.InitTitle("Test tips,group mix SelectedRow");
+
+		uiMenu.AddItem("SetTipsOnTop");
+		uiMenu.AddItem("AddGroup");
+
+		while (1)
+		{
+			uRet = uiMenu.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(40);
+			vctColWidth.push_back(20);
+			vctColWidth.push_back(20);
+			vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			uiList.InitTitle(artiGetText("FF0600000000"), CArtiList::eListViewType::ITEM_NO_CHECKBOX);//"列表控件测试"
+			uiList.SetColWidth(vctColWidth);
+
+			if ((uRet & 0xff) == 0)
+			{
+				uiList.SetTipsOnTop("SetTipsOnTopSetTipsOnTopSetTipsOnTopSetTipsOnTopSetTipsOnTop");
+			}
+			else if ((uRet & 0xff) == 1)
+			{
+				uiList.AddGroup("AddGroup");
+			}
+			uiList.AddItem(vector<string>{"Row0", "Row1"}, true);
+
+			vector<string> vctItems;
+			for (uint32_t i = 0; i < 10; i++)
+			{
+				vctItems.clear();
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				uiList.AddItem(vctItems);
+			}
+
+			uiList.AddButtonEx(artiGetText("FF0100000027"));					//"返回行号"
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+				else if (DF_ID_FREEBTN_0 == uRetBtn)
+				{
+					memset(buff, 0, sizeof(buff));
+					SPRINTF_S(buff, "%d", uiList.GetSelectedRow());
+
+					ShowMsgBoxDemo(artiGetText("FF0100000028"), buff, DF_MB_OK, DT_LEFT, -1, m_uThread);
+				}
+			}
+		}
+	}
+
+ 	void CArtiListTest::ArtiListTest_GetSelectedRowEx()
+ 	{
+ 		CArtiMenu	uiMenu;
+ 		uint32_t	uRet;
+ 
+ 		uiMenu.InitTitle("Test tips,group mix SelectedRow");
+ 
+ 		uiMenu.AddItem("SetTipsOnTop CHECKBOX_SINGLE");
+		uiMenu.AddItem("SetTipsOnTop CHECKBOX_MULTI");
+ 		uiMenu.AddItem("AddGroup CHECKBOX_SINGLE");
+		uiMenu.AddItem("AddGroup CHECKBOX_MULTI");
+ 		while (1)
+ 		{
+ 			uRet = uiMenu.Show();
+ 			if (uRet == DF_ID_BACK)
+ 			{
+ 				break;
+ 			}
+			vector<int32_t> vctColWidth;
+			vctColWidth.push_back(40);
+			vctColWidth.push_back(20);
+			vctColWidth.push_back(20);
+			vctColWidth.push_back(20);
+
+#if __Multi_System_Test__
+			CArtiList uiList(m_uThread);
+#else
+			CArtiList uiList;
+#endif
+			if ((uRet & 0xff) <= 1)
+			{
+				uiList.InitTitle(artiGetText("FF0600000000"), CArtiList::eListViewType::ITEM_WITH_CHECKBOX_SINGLE);//"列表控件测试"
+			}
+			else if ((uRet & 0xff) <= 3)
+			{
+				uiList.InitTitle(artiGetText("FF0600000000"), CArtiList::eListViewType::ITEM_WITH_CHECKBOX_MULTI);//"列表控件测试"
+			}
+			uiList.SetColWidth(vctColWidth);
+			uiList.SetBlockStatus(true);
+
+			if ((uRet & 0xff) <= 1)
+			{
+				uiList.SetTipsOnTop("SetTipsOnTopSetTipsOnTopSetTipsOnTopSetTipsOnTopSetTipsOnTop");
+			}
+			else if ((uRet & 0xff) <=3)
+			{
+				uiList.AddGroup("AddGroup");
+			}
+			uiList.AddItem(vector<string>{"Row0", "Row1", "Row2", "Row3"}, true);
+
+			vector<string> vctItems;
+			for (uint32_t i = 0; i < 10; i++)
+			{
+				vctItems.clear();
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				memset(buff, 0, sizeof(buff));
+				SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+				vctItems.push_back(buff);
+
+				uiList.AddItem(vctItems);
+			}
+
+			uiList.AddButtonEx(artiGetText("FF0100000027"));					//"返回行号"
+
+			while (1)
+			{
+				Delay(100);
+				uRetBtn = uiList.Show();
+				if (uRetBtn == DF_ID_CANCEL)
+				{
+					break;
+				}
+				else if (DF_ID_FREEBTN_0 == uRetBtn)
+				{
+					string strItem = "";
+					memset(buff, 0, sizeof(buff));
+					vector<uint16_t> vctSelect;
+					vctSelect = uiList.GetSelectedRowEx();
+					for (uint32_t i = 0; i < vctSelect.size(); i++)
+					{
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, "%d\n", vctSelect[i]);
+						strItem = strItem + buff;
+					}
+
+					ShowMsgBoxDemo(artiGetText("FF0100000028"), strItem, DF_MB_OK, DT_LEFT, -1, m_uThread);
+				}
+			}
+ 		}
+ 
+ 	}
+
+
+//  	void CArtiListTest::ArtiListTest_GetSelectedRowEx()
+//  	{
+//  		vector<int32_t> vctColWidth;
+//  		vctColWidth.push_back(40);
+//  		vctColWidth.push_back(20);
+//  		vctColWidth.push_back(20);
+//  		vctColWidth.push_back(20);
+//  
+//  #if __Multi_System_Test__
+//  		CArtiList uiList(m_uThread);
+//  #else
+//  		CArtiList uiList;
+//  #endif
+//  		uiList.InitTitle(artiGetText("FF0600000000"), CArtiList::eListViewType::ITEM_WITH_CHECKBOX_MULTI);
+//  		uiList.SetColWidth(vctColWidth);
+//  
+//  		vector<string> vctItems;
+//  		for (uint32_t i = 0; i < 500; i++)
+//  		{
+//  			vctItems.clear();
+//  			memset(buff, 0, sizeof(buff));
+//  			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 0);//"第%d行 - 第%d列"
+//  			vctItems.push_back(buff);
+//  
+//  			memset(buff, 0, sizeof(buff));
+//  			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 1);//"第%d行 - 第%d列"
+//  			vctItems.push_back(buff);
+//  
+//  			memset(buff, 0, sizeof(buff));
+//  			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 2);//"第%d行 - 第%d列"
+//  			vctItems.push_back(buff);
+//  
+//  			memset(buff, 0, sizeof(buff));
+//  			SPRINTF_S(buff, artiGetText("FF060000000D").c_str(), i, 3);//"第%d行 - 第%d列"
+//  			vctItems.push_back(buff);
+//  
+//  			uiList.AddItem(vctItems);
+//  		}
+//  
+//  		uiList.AddButtonEx(artiGetText("FF0100000027"));					//"返回行号"
+//  
+//  		while (1)
+//  		{
+//  			Delay(100);
+//  			uRetBtn = uiList.Show();
+//  			if (uRetBtn == DF_ID_CANCEL)
+//  			{
+//  				break;
+//  			}
+//  			else if (DF_ID_FREEBTN_0 == uRetBtn)
+//  			{
+//  				string strItem = "";
+//  				vector<uint16_t> vctSelect;
+//  				vctSelect = uiList.GetSelectedRowEx();
+//  				for (uint32_t i = 0; i < vctSelect.size(); i++)
+//  				{
+//  					memset(buff, 0, sizeof(buff));
+//  					SPRINTF_S(buff, "%d\n", vctSelect[i]);
+//  					strItem = strItem + buff;
+//  				}
+//  
+//  				ShowMsgBoxDemo(artiGetText("FF0100000028"), strItem, DF_MB_OK, DT_LEFT, -1, m_uThread);
+//  			}
+//  		}
+//  	}
+
+	void CArtiListTest::ArtiListTest_Show()
+	{
+		CArtiMenu uiMenu;
+		uiMenu.InitTitle("Show");
+		uiMenu.AddItem(artiGetText("FF0000000110"));//"按键响应时间测试"
+		uiMenu.AddItem(artiGetText("FF0000000111"));//"连续点击按键测试"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_CANCEL == uRetBtn)
+			{
+				break;
+			}
+			else if (0 == uRetBtn)
+			{
+				ArtiListTest_Show_Type1();
+			}
+			else if (1 == uRetBtn)
+			{
+				ArtiListTest_Show_Type2();
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_Show_Type1()
+	{
+		CArtiList uiList;
+		uiList.InitTitle(artiGetText("FF0000000110"));
+		uiList.SetColWidth(vector<int32_t>{40, 40, 20});
+		uiList.AddItem(vector<string>{artiGetText("FF0000000112"), "0", "ms"});//"响应时间"
+		uiList.AddButtonEx("Test");
+
+		while (1)
+		{
+			time_t time_start = GetSysTime();
+			uRetBtn = uiList.Show();
+			if (DF_ID_CANCEL == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				time_t time_end = GetSysTime();
+				uiList.SetItem(0, 1, uint32ToString(time_end - time_start));
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_Show_Type2()
+	{
+		CArtiList uiList1;
+		uiList1.InitTitle(artiGetText("FF0000000111"));//"连续点击按键测试"
+		uiList1.SetColWidth(vector<int32_t>{40, 40, 20});
+		uiList1.AddItem(vector<string>{"Sleep Time", "0", "s"});
+		uiList1.AddButtonEx("Sleep 0 s");
+		uiList1.AddButtonEx("Sleep 2 s");
+		uiList1.AddButtonEx("Sleep 4 s");
+		uiList1.AddButtonEx("Sleep 6 s");
+		uiList1.AddButtonEx("Sleep 8 s");
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList1.Show();
+			if (DF_ID_CANCEL == uRetBtn)
+			{
+				return;
+			}
+			else if ((uRetBtn >= DF_ID_FREEBTN_0) && (uRetBtn <= DF_ID_FREEBTN_0 + 4))
+			{
+				uiList1.SetItem(0, 1, uint32ToString((uRetBtn - DF_ID_FREEBTN_0) * 2));
+				Delay((uRetBtn - DF_ID_FREEBTN_0) * 2000);
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_AddTipsOnLeft()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("Key information");
+		uiList.SetColWidth(vector<int32_t>{30,40,30});
+		uiList.AddItem(vector<string>{"Key1","",""});
+		uiList.AddItem(vector<string>{"Key2", "", ""});
+		uiList.AddItem(vector<string>{"Key3", "", ""});
+		uiList.AddItem(vector<string>{"Key4", "", ""}, false);
+		uiList.AddItem(vector<string>{"Key5", "", ""}, false);
+		uiList.AddItem(vector<string>{"Key6", "", ""}, false);
+		uiList.AddButton("One-touch processing");
+		uiList.AddButton("Load data");
+		uiList.AddButton("Make key");
+		uiList.AddButton("Operation guide");
+		uiList.SetTipsTitleOnLeft("Help information", BOLD_TYPE_BOLD);
+		uiList.AddTipsOnLeft("\n\nOriginal transponder chip:\nMEGAMOS 48\nAllowed transponder chip:\nMEGAMOS 48", BOLD_TYPE_BOLD);
+		uiList.SetRowHighLight(0, COLOUR_TYPE_DEFAULT);
+		uiList.SetRowHighLight(1, COLOUR_TYPE_DEFAULT);
+		uiList.SetRowHighLight(2, COLOUR_TYPE_GRAY);
+
+		while (1)
+		{
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+			else if ((uRetBtn >= DF_ID_FREEBTN_0) && (uRetBtn <= DF_ID_FREEBTN_0 + 4))
+			{
+				artiShowMsgBox("Information", "OK");
+			}
+			
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetSelectedType()
+	{
+
+		CArtiMenu	uiMenu;
+
+		uiMenu.InitTitle("ArtiListTest_SetSelectedType");
+
+		uiMenu.AddItem("ITEM_SELECT_DEFAULT");
+		uiMenu.AddItem("ITEM_SELECT_DISABLED");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			CArtiList uiList;
+
+			uiList.InitTitle("Key information");
+			uiList.SetColWidth(vector<int32_t>{30, 40, 30});
+			uiList.AddItem(vector<string>{"Key1", "", ""});
+			uiList.AddItem(vector<string>{"Key2", "", ""});
+			uiList.AddItem(vector<string>{"Key3", "", ""});
+			uiList.AddItem(vector<string>{"Key4", "", ""}, false);
+			uiList.AddItem(vector<string>{"Key5", "", ""}, false);
+			uiList.AddItem(vector<string>{"Key6", "", ""}, false);
+			uiList.AddButton("sel");
+			if ((uRet&0xff) ==0)
+			{
+				uiList.SetSelectedType(CArtiList::ITEM_SELECT_DEFAULT);
+			}
+			else
+			{
+				uiList.SetSelectedType(CArtiList::ITEM_SELECT_DISABLED);
+				
+				CArtiMenu	uiMenuSet;
+
+				uiMenuSet.InitTitle("if SetDefaultSelectedRow");
+				uiMenuSet.AddItem("Set");
+				uiMenuSet.AddItem("Not Set");
+				while (1)
+				{
+					uint32_t uSet = uiMenuSet.Show();
+					if (uSet == DF_ID_BACK)
+					{
+						artiShowMsgBox("Must to Select", "cant click back,must to select 'Set' or 'Not Set'");
+						continue;
+					}
+					if ((uSet&0xff) == 0)
+					{
+						uiList.SetDefaultSelectedRow(2);
+					}
+					break;
+				}
+			}
+
+			while (1)
+			{
+				uint32_t uRetList = uiList.Show();
+				if (uRetList == DF_ID_CANCEL)
+				{
+					break;
+				}
+				else if (uRetList != DF_ID_NOKEY)
+				{
+					uint16_t uSelcet = uiList.GetSelectedRow();
+
+					if (uSelcet == DF_LIST_LINE_NONE)//这里表示类型为ITEM_SELECT_DISABLED
+					{
+						artiShowMsgBox("cant select row", uint16ToString(uSelcet));
+					}
+					else
+					{
+						if (uRetList&0x00000100)
+						{
+							artiShowMsgBox("Select Row", uint16ToString(uSelcet));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiListTest::ArtiListTest_SetRowInCurrentScreen()
+	{
+		CArtiMenu	uiMenu;
+
+		uiMenu.InitTitle("SetRowInCurrentScreen Type");
+		uiMenu.AddItem("SCREEN_TYPE_FIRST_ROW");
+		uiMenu.AddItem("SCREEN_TYPE_LAST_ROW");
+
+		while (1)
+		{
+			uint32_t uRetMenu = uiMenu.Show();
+			if (uRetMenu==DF_ID_BACK)
+			{
+				break;
+			}
+			
+			CArtiList uiList;
+
+			uiList.InitTitle("SetRowInCurrentScreen");
+			uiList.SetColWidth(vector<int32_t>{30, 40, 30});
+
+			for (uint32_t i = 0; i < 50; i++)
+			{
+				string	strStep = "Step";
+
+				strStep += uint32ToString(i + 1);
+				uiList.AddItem(strStep);
+			}
+
+			uiList.SetSelectedType(CArtiList::ITEM_SELECT_DISABLED);
+			uint32_t iStep = 0;
+			uiList.SetRowInCurrentScreen(CArtiList::SCREEN_TYPE_FIRST_ROW, iStep);
+			uiList.SetRowHighLight(iStep);
+			iStep++;
+			while (1)
+			{
+				uint32_t uRet = uiList.Show();
+				if (uRet == DF_ID_BACK)
+				{
+					break;
+				}
+				Delay(2000);
+				if (iStep > 9)
+				{
+					artiShowMsgBox("Test", "Test Finish");
+					break;
+				}
+				if ((uRetMenu & 0xff) == 0)
+				{
+					uiList.SetRowInCurrentScreen(CArtiList::SCREEN_TYPE_FIRST_ROW, iStep * 5);
+				}
+				else
+				{
+					uiList.SetRowInCurrentScreen(CArtiList::SCREEN_TYPE_LAST_ROW, iStep * 5);
+				}
+				uiList.SetRowHighLight(iStep * 5);
+				iStep++;
+			}
+		}
+
+	}
+
+	void CArtiListTest::ArtiListTest_SetShareButtonVisible()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("Key information");
+		uiList.SetColWidth(vector<int32_t>{30, 40, 30});
+		uiList.AddItem(vector<string>{"Key1", "", ""});
+		uiList.AddItem(vector<string>{"Key2", "", ""});
+		uiList.AddItem(vector<string>{"Key3", "", ""});
+		uiList.AddItem(vector<string>{"Key4", "", ""}, false);
+		uiList.AddItem(vector<string>{"Key5", "", ""}, false);
+		uiList.AddItem(vector<string>{"Key6", "", ""}, false);
+		uiList.AddButton("One-touch processing");
+		uiList.AddButton("Load data");
+		uiList.AddButton("Make key");
+		uiList.AddButton("Operation guide");
+		uiList.SetTipsTitleOnLeft("Help information", BOLD_TYPE_BOLD);
+		uiList.AddTipsOnLeft("\n\nOriginal transponder chip:\nMEGAMOS 48\nAllowed transponder chip:\nMEGAMOS 48", BOLD_TYPE_BOLD);
+		uiList.SetRowHighLight(0, COLOUR_TYPE_DEFAULT);
+		uiList.SetRowHighLight(1, COLOUR_TYPE_DEFAULT);
+		uiList.SetRowHighLight(2, COLOUR_TYPE_GRAY);
+		uiList.SetShareButtonVisible(true,"share","share QR");
+		while (1)
+		{
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_CANCEL)
+			{
+				break;
+			}
+			else if ((uRetBtn >= DF_ID_FREEBTN_0) && (uRetBtn <= DF_ID_FREEBTN_0 + 4))
+			{
+				artiShowMsgBox("Information", "OK");
+			}
+
+		}
+	}
+
+}

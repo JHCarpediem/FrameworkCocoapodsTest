@@ -1,0 +1,186 @@
+#include "DemoArtiFloatMiniTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiFloatMiniTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle("ArtiFloatMiniTest");
+// 		uiMenu.AddItem("NewInstance");		    vctMenuID.push_back(0);
+// 		uiMenu.AddItem("DeleteInstance");		vctMenuID.push_back(1);
+// 		uiMenu.AddItem("Display");				vctMenuID.push_back(2);
+// 		uiMenu.AddItem("Hidden");				vctMenuID.push_back(3);
+		uiMenu.AddItem("Test ArtiFloatMini 1");	vctMenuID.push_back(0);
+		uiMenu.AddItem("Test ArtiFloatMini 2");	vctMenuID.push_back(1);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					TestArtiFloatMini();
+				}
+				else if(1 == vctMenuID[uRetBtn])
+				{
+					TestArtiFloatMini2();
+				}
+			}
+		}
+	}
+
+	void CArtiFloatMiniTest::TestArtiFloatMini()
+	{
+		CArtiFloatMini	FloatMini;
+		CArtiMenu		uiMenu;
+
+		uiMenu.InitTitle("Test ArtiFloatMini");
+		uiMenu.AddItem("Test");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			FloatMini.NewInstance(CArtiFloatMini::eFloatType::FT_TIMER_TYPE);
+			FloatMini.Display(0, "Float");
+			artiShowMsgBox("Test Hide", "Mini Hide", DF_MB_OK);
+			FloatMini.Hidden(0);
+			artiShowMsgBox("Test Display", "Mini Display", DF_MB_OK);
+			FloatMini.Display(0, "Float");
+			artiShowMsgBox("Test Delete", "Delete Mini", DF_MB_OK);
+			FloatMini.DeleteInstance(0);
+		}
+	}
+
+	void CArtiFloatMiniTest::TestArtiFloatMini2()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("Test ArtiFloatMini");
+		uiList.SetColWidth({60, 40});
+		uiList.AddItem("FloatMini 1");
+		uiList.SetItem(0, 1, "NewInstance");
+		
+		uiList.AddButton("NewInstance");
+		uiList.AddButton("Display");
+		uiList.AddButton("Hidden");
+		uiList.AddButton("DeleteInstance");
+
+		/*
+		ArtiFloatMini接口测试说明:
+		-1.NewInstance按钮增加悬浮窗。
+		-2.选中某一行可以执行对应窗口的Display、Hidden、DeleteInstance函数。
+		-3.如果选中窗口已删除，则不执行对应的Display、Hidden、DeleteInstance函数。"
+		*/
+		uiList.SetTipsOnBottom(artiGetText("FF0000000012"));
+
+		vector<uint32_t> vctFloatMiniId;
+		uint32_t uFloatMiniID = CArtiFloatMini::NewInstance(CArtiFloatMini::eFloatType::FT_TIMER_TYPE);
+		vctFloatMiniId.push_back(uFloatMiniID);
+		
+		string strFloatName = "FloatMini ";
+		string strName = strFloatName + "1";
+
+		map<string, string> mapFloatStatus;
+		mapFloatStatus[strName] = "NewInstance";
+
+		while (1)
+		{
+			uint32_t uRet = uiList.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				for (uint32_t uCnt = 0; uCnt < vctFloatMiniId.size(); uCnt++)
+				{
+					CArtiFloatMini::DeleteInstance(vctFloatMiniId[uCnt]);
+				}
+				break;
+			}
+			else if (uRet == DF_ID_FREEBTN_0)
+			{
+				uFloatMiniID = CArtiFloatMini::NewInstance(CArtiFloatMini::eFloatType::FT_TIMER_TYPE);
+				auto it = std::find(vctFloatMiniId.begin(), vctFloatMiniId.end(), uFloatMiniID);
+				if (it == vctFloatMiniId.end())
+				{
+					vctFloatMiniId.push_back(uFloatMiniID);
+					strName = strFloatName + uint32ToString(uFloatMiniID + 1);
+					if (mapFloatStatus.count(strName) !=0)
+					{
+						mapFloatStatus[strName] = "NewInstance";
+						uiList.SetItem(uFloatMiniID, 1, "NewInstance");
+					}
+					else
+					{
+						uiList.AddItem(strName);
+						mapFloatStatus[strName] = "NewInstance";
+						uiList.SetItem(mapFloatStatus.size(), 1, "NewInstance");
+					}				
+				}
+			}
+			else if (uRet == DF_ID_FREEBTN_1)
+			{
+				uint32_t uSelect = uiList.GetSelectedRow();
+				auto it = std::find(vctFloatMiniId.begin(), vctFloatMiniId.end(), uSelect);
+				if (it != vctFloatMiniId.end()) 
+				{
+					if (uSelect < mapFloatStatus.size())
+					{
+						uiList.SetItem(uSelect, 1, "Display");
+						strName = strFloatName + uint32ToString(uSelect + 1);
+						mapFloatStatus[strName] = "Display";
+
+						CArtiFloatMini::Display(uSelect, strName);
+					}
+				}
+			}
+			else if (uRet == DF_ID_FREEBTN_2)
+			{
+				uint32_t uSelect = uiList.GetSelectedRow();
+				auto it = std::find(vctFloatMiniId.begin(), vctFloatMiniId.end(), uSelect);
+				if (it != vctFloatMiniId.end())
+				{
+					if (uSelect < mapFloatStatus.size())
+					{
+						uiList.SetItem(uSelect, 1, "Hidden");
+						strName = strFloatName + uint32ToString(uSelect + 1);
+						mapFloatStatus[strName] = "Hidden";
+
+						CArtiFloatMini::Hidden(uSelect);
+					}
+				}
+			}
+			else if (uRet == DF_ID_FREEBTN_3)
+			{
+				uint32_t uSelect = uiList.GetSelectedRow();
+				auto it = std::find(vctFloatMiniId.begin(), vctFloatMiniId.end(), uSelect);
+				if (it != vctFloatMiniId.end())
+				{
+					vctFloatMiniId.erase(it);
+					if (uSelect < mapFloatStatus.size())
+					{
+						uiList.SetItem(uSelect, 1, "DeleteInstance");
+						strName = strFloatName + uint32ToString(uSelect + 1);
+						mapFloatStatus[strName] = "DeleteInstance";
+
+						CArtiFloatMini::DeleteInstance(uSelect);
+					}
+				}
+			}
+		}
+	}
+
+}

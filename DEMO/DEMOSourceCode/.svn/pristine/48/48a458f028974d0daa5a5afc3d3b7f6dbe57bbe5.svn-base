@@ -1,0 +1,431 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Src\Diagnosis">
+      <UniqueIdentifier>{fa726a2f-e820-4142-8fb0-63080a7dbe51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Communication">
+      <UniqueIdentifier>{dfe1ad05-9e1d-4837-98d5-0c17a9902b36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Std">
+      <UniqueIdentifier>{aac5bc51-e3e8-479f-8e66-7d0700d285d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Comm">
+      <UniqueIdentifier>{856be6db-aaae-40ab-81d4-69454d6d4b0a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Includes\Show">
+      <UniqueIdentifier>{856eb6b0-b70e-4105-b3e9-145bc494cecf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\APITest">
+      <UniqueIdentifier>{a79e2dd9-13be-4fa3-9300-8bdea9dbfa03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\public">
+      <UniqueIdentifier>{6a97b3c2-db93-4237-8f14-8383cfc7c394}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\DemoNetLayer.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoNetCan.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoNetKwp2000.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\EcuInterface.h">
+      <Filter>Includes\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\StdCommMaco.h">
+      <Filter>Includes\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiActive.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiEcuInfo.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFreeze.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiGlobal.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiInput.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiList.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiLiveData.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMenu.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMsgBox.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiReport.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiSystem.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiTrouble.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\StdShowMaco.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Binary.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\BinaryGroup.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\DataFile.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Expression.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameCs.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameFormat.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Mathematics.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Md5.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MultiRecvFrame.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MultiSendFrame.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\ProFile.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\PublicInterface.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\RecvFrame.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\RecvFrameEx.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\SendFrame.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInclude.h">
+      <Filter>Includes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameNegative.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFileDialog.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiWeb.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\AlgorithmData.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MemDataFile.h">
+      <Filter>Includes\Std</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\Tprog.h">
+      <Filter>Includes\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\TproMaco.h">
+      <Filter>Includes\Comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiReportTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiActiveTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiEcuInfoTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiFileDialogTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiFreezeTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiGlobalTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiInputTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiListTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiLiveDataTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiMenuTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiMsgBoxTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiSystemTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiTroubleTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiWebTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFreqWave.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoImmoTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoPublicAPI.h">
+      <Filter>Src\public</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Demo.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoAppLayer.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoVehicleStruct.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoActive.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoAPITest.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoEnterSys.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoHotFunction.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoInfomation.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoLiveData.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoMaco.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoMulitSysInfo.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoTroubleCode.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMiniMsgBox.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiPopup.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiMiniMsgBoxTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiPopupTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiCoilReader.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiCoilReaderTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiFreqWaveTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiPicture.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiPictureTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiObdReview.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiObdReviewTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiTopTap.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoEcuTest.h">
+      <Filter>Src\Diagnosis</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoNetSaeJ1850.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoNetTp20.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoNetNormal.h">
+      <Filter>Src\Communication</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFloatMini.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoArtiFloatMiniTest.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\VehAutoAuth.h">
+      <Filter>Includes\Show</Filter>
+    </ClInclude>
+    <ClInclude Include="..\DemoUnlockGW.h">
+      <Filter>Src\APITest</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Demomain.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetLayer.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetCan.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetKwp2000.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiReportTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiActiveTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiEcuInfoTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiFileDialogTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiFreezeTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiGlobalTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiInputTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiListTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiLiveDataTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiMenuTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiMsgBoxTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiSystemTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiTroubleTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiWebTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoImmoTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoPublicAPI.cpp">
+      <Filter>Src\public</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Demo.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoAppLayer.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoTroubleCode.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoActive.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoAPITest.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoEnterSys.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoHotFunction.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoInfomation.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoLiveData.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiMiniMsgBoxTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiPopupTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiCoilReaderTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiFreqWaveTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiPictureTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiObdReviewTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoEcuTest.cpp">
+      <Filter>Src\Diagnosis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetSaeJ1850.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetTp20.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoNetNormal.cpp">
+      <Filter>Src\Communication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoArtiFloatMiniTest.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DemoUnlockGW.cpp">
+      <Filter>Src\APITest</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

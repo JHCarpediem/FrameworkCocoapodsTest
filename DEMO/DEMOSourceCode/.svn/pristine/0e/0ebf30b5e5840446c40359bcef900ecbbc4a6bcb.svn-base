@@ -1,0 +1,460 @@
+#include "DemoArtiPopupTest.h"
+#include "ArtiPopup.h"
+#include "DemoMaco.h"
+#include "PublicInterface.h"
+#include "DemoPublicAPI.h"
+namespace Topdon_AD900_Demo {
+
+	typedef void (CArtiPopupTest::* func)();
+
+	void CArtiPopupTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+		map<uint32_t, func> mapTestFunc;
+
+		CArtiMenu uiMenu;
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitTitle");				mapTestFunc.emplace(make_pair(0, &CArtiPopupTest::ArtiPopupTest_InitTitle));
+		uiMenu.AddItem("SetTitle");					mapTestFunc.emplace(make_pair(1, &CArtiPopupTest::ArtiPopupTest_SetTitle));
+		uiMenu.AddItem("SetContent");				mapTestFunc.emplace(make_pair(2, &CArtiPopupTest::ArtiPopupTest_SetContent));
+		uiMenu.AddItem("SetPopDirection");			mapTestFunc.emplace(make_pair(3, &CArtiPopupTest::ArtiPopupTest_SetPopDirection));
+		uiMenu.AddItem("AddButton");				mapTestFunc.emplace(make_pair(4, &CArtiPopupTest::ArtiPopupTest_AddButton));
+		uiMenu.AddItem("SetButtonText");			mapTestFunc.emplace(make_pair(5, &CArtiPopupTest::ArtiPopupTest_SetButtonText));
+		uiMenu.AddItem("SetColWidth");				mapTestFunc.emplace(make_pair(6, &CArtiPopupTest::ArtiPopupTest_SetColWidth));
+		uiMenu.AddItem("AddItem");					mapTestFunc.emplace(make_pair(7, &CArtiPopupTest::ArtiPopupTest_AddItem));
+		uiMenu.AddItem(artiGetText("FF000000011F"));mapTestFunc.emplace(make_pair(8, &CArtiPopupTest::ArtiPopupTest_DemoList));
+		
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (mapTestFunc.find(uRetBtn & 0xFF) != mapTestFunc.end())
+			{
+				(this->*mapTestFunc[uRetBtn & 0xFF])();
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_InitTitle()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("InitTitle");
+		uiList.SetColWidth(vctColWidth2);
+		//uiList.AddItem("strTitle");
+		uiList.AddItem("uPopupType");
+		uiList.AddButtonEx("Test");
+
+		uint32_t uPopupType = DF_POPUP_TYPE_MSG;
+		string strPopupType = "DF_POPUP_TYPE_MSG";
+
+		uiList.SetItem(0, 1, strPopupType);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiPopup uiPopup;
+				uiPopup.InitTitle("InitTitle", uPopupType);
+				if (uPopupType == DF_POPUP_TYPE_MSG)
+				{
+					uiPopup.SetContent(artiGetText("FF090000002B"));
+				}
+				else
+				{
+					uiPopup.SetColWidth(vector<uint32_t>{20,50,30});
+
+					CBinary binText = CBinary("\xFF\x00\x00\x00\x01\x20", 6);
+					for (uint8_t i = 0; i < 8; i++)
+					{
+						binText.SetAt(5, i + 0x20);
+						string strText = artiGetText(binText);
+
+						vector<string> vctItem = SeparateString(strText, "$");
+						uiPopup.AddItem(vctItem);
+					}
+				}
+				//uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+				uiPopup.Show();
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uPopupType, strPopupType, mapPopupType);
+					uiList.SetItem(0, 1, strPopupType);
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_SetTitle()
+	{
+		bool bLengText = false;
+		bool bOffSet = false;
+		string strTemp = "";
+
+		CArtiPopup uiPopup;
+		/*
+		*  "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiPopup.InitTitle("ArtiPopupTest_SetTitle", DF_POPUP_TYPE_MSG);
+		uiPopup.SetContent(artiGetText("FF0900000003"));
+		uiPopup.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+		//uiPopup.AddButton(artiGetText("FF000000000B"));//"切换文本长度"
+
+		while (1)
+		{
+			uRetBtn = uiPopup.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiPopup.SetTitle(artiGetText("FF0900000006") + strTemp);//"SetTitle接口测试\n"
+				}
+				else
+				{
+					uiPopup.SetTitle(artiGetText("FF0900000007") + strTemp);//"测试SetTitle接口\n"
+				}
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_2)
+			{
+				bLengText = !bLengText;
+				if (bLengText)
+				{
+					strTemp = TextMulitLineTitle;
+				}
+				else
+				{
+					strTemp = "";
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_SetContent()
+	{
+		bool bLengText = false;
+		bool bOffSet = false;
+		string strTemp = "";
+
+		CArtiPopup uiPopup;
+
+		/*
+		* "测试SetContent接口"
+		* "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiPopup.InitTitle(artiGetText("FF090000000A"), DF_POPUP_TYPE_MSG);
+		uiPopup.SetContent(artiGetText("FF0900000003"));
+		uiPopup.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+		//uiPopup.AddButton(artiGetText("FF000000000B"));//"切换文本长度"
+
+		while (1)
+		{
+			uRetBtn = uiPopup.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiPopup.SetContent(artiGetText("FF0900000008") + strTemp);//"这是SetContent测试程序！\n点击[确定]开始测试！\n"
+				}
+				else
+				{
+					uiPopup.SetContent(artiGetText("FF0900000009") + strTemp);//"这是一个测试程序！\n点击[确定]开始测试！\n"
+				}
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_2)
+			{
+				bLengText = !bLengText;
+				if (bLengText)
+				{
+					strTemp = TextMulitLineTitle;
+				}
+				else
+				{
+					strTemp = "";
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_SetPopDirection()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("SetPopDirection");
+		uiList.SetColWidth(vctColWidth2);
+		//uiList.AddItem("strTitle");
+		uiList.AddItem("uDirection");
+		uiList.AddButtonEx("Test");
+
+		uint32_t uDirection = DF_POPUP_DIR_TOP;
+		string strDirection = "DF_POPUP_DIR_TOP";
+
+		uiList.SetItem(0, 1, strDirection);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiPopup uiPopup;
+				uiPopup.InitTitle("SetPopDirection", DF_POPUP_TYPE_MSG);
+				uiPopup.SetContent(artiGetText("FF090000002B"));
+				uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+				uiPopup.Show();
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uDirection, strDirection, mapPopupDirection);
+					uiList.SetItem(0, 1, strDirection);
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_AddButton()
+	{
+		CArtiPopup uiPopup;
+
+		/*
+		* "测试AddButton接口"
+		* "这是一个测试程序！\n点击[确定]开始测试！"
+		*/
+		uiPopup.InitTitle(artiGetText("FF090000000B"), DF_POPUP_TYPE_MSG);
+		uiPopup.SetContent(artiGetText("FF0900000003"));
+		uiPopup.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+
+		while (1)
+		{
+			uRetBtn = uiPopup.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				uiPopup.AddButton(artiGetText("FF000000000C"));//"测试键"
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_SetButtonText()
+	{
+
+		bool bOffSet = false;
+
+		CArtiPopup uiPopup;
+		/*
+		* "测试SetButtonText接口"
+		*/
+		uiPopup.InitTitle(artiGetText("FF0900000015"), DF_POPUP_TYPE_MSG);
+		uiPopup.SetContent(artiGetText("FF0900000003"));
+		uiPopup.AddButton(artiGetText("FF0000000009"));//"取消"
+		uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+		uiPopup.AddButton(artiGetText("FF000000000D"));// "测试键0";
+		while (1)
+		{
+			uRetBtn = uiPopup.Show();
+			if (uRetBtn == DF_ID_FREEBTN_0 || uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (uRetBtn == DF_ID_FREEBTN_1)
+			{
+				bOffSet = !bOffSet;
+				if (bOffSet)
+				{
+					uiPopup.SetButtonText(2, "TestBtn_0");
+				}
+				else
+				{
+					uiPopup.SetButtonText(2, artiGetText("FF000000000D"));// "测试键0");
+				}
+			}
+			else
+			{
+
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_SetColWidth()
+	{
+		CArtiList uiList;
+		uiList.InitTitle("SetColWidth");
+		uiList.SetColWidth(vctColWidth2);
+		uiList.AddItem("vctColWidth");
+		uiList.AddButtonEx("Test");
+
+		vector<uint32_t> vctColWidth = {100};
+		string strColWidth = "{100}";
+
+		uiList.SetItem(0, 1, strColWidth);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				CArtiPopup uiPopup;
+				uiPopup.InitTitle("SetColWidth", DF_POPUP_TYPE_LIST);
+				uiPopup.SetColWidth(vctColWidth);
+
+				string strText = artiGetText("FF060000000D");//"第%d行 - 第%d列"
+				for (uint32_t i = 0; i < 3; i++)
+				{
+					vector<string> vctItems;
+					for (uint32_t j = 0 ; j < vctColWidth.size(); j++)
+					{
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, strText.c_str(), i, j);
+						vctItems.push_back(buff);
+					}
+					uiPopup.AddItem(vctItems);
+				}
+				uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+				uiPopup.Show();
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(vctColWidth, strColWidth, mapColWidth);
+					uiList.SetItem(0, 1, strColWidth);
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_AddItem()
+	{
+		uint32_t uRowNum = 1;
+		uint32_t uColNum = 1;
+		string  strRowNum = "1";
+		string strColNum = "1";
+
+		CArtiList uiList;
+		uiList.InitTitle("AddItem");
+		uiList.SetColWidth(vctColWidth2);
+		uiList.AddItem(artiGetText("FF00000000DD"));//"行数"
+		uiList.AddItem(artiGetText("FF00000000DE"));//"列数"
+		uiList.AddButtonEx("Test");
+
+		uiList.SetItem(0, 1, strRowNum);
+		uiList.SetItem(1, 1, strColNum);
+
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (uRetBtn == DF_ID_BACK)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				vector<uint32_t> vctColWidth;
+				vctColWidth.clear();
+				for (uint32_t i = 0; i < uColNum; i++)
+				{
+					vctColWidth.push_back(100 / (i + 1));
+				}
+				
+				//显示界面
+				CArtiPopup uiPopup;
+				uiPopup.InitTitle("SetColWidth", DF_POPUP_TYPE_LIST);
+				uiPopup.SetColWidth(vctColWidth);
+
+				string strText = artiGetText("FF060000000D");//"第%d行 - 第%d列"
+				for (uint32_t i = 0; i < uRowNum; i++)
+				{
+					vector<string> vctItems;
+					for (uint32_t j = 0; j < vctColWidth.size(); j++)
+					{
+						memset(buff, 0, sizeof(buff));
+						SPRINTF_S(buff, strText.c_str(), i, j);
+						vctItems.push_back(buff);
+					}
+					uiPopup.AddItem(vctItems);
+				}
+				uiPopup.AddButton(artiGetText("FF000000000A"));//"确定"
+				uiPopup.Show();
+			}
+			else if (DF_ID_NOKEY != uRetBtn)
+			{
+				uint16_t uSelect = uiList.GetSelectedRow();
+				if (0 == uSelect)
+				{
+					GetParamValue(uRowNum, strRowNum, mapRowNum);
+					uiList.SetItem(0, 1, strRowNum);
+				}
+				else if (1 == uSelect)
+				{
+					GetParamValue(uColNum, strColNum, mapRowNum);
+					uiList.SetItem(1, 1, strColNum);
+				}
+			}
+		}
+	}
+
+	void CArtiPopupTest::ArtiPopupTest_DemoList()
+	{
+		CArtiPopup uiPopup;
+		uiPopup.InitTitle(artiGetText("FF000000011F"), DF_POPUP_TYPE_LIST);
+
+		uiPopup.SetColWidth(vector<uint32_t>{20, 50, 30});
+
+		CBinary binText = CBinary("\xFF\x00\x00\x00\x01\x20", 6);
+		for (uint8_t i = 0; i < 8; i++)
+		{
+			binText.SetAt(5, i + 0x20);
+			string strText = artiGetText(binText);
+
+			vector<string> vctItem = SeparateString(strText, "$");
+			uiPopup.AddItem(vctItem);
+		}
+
+		uiPopup.Show();
+	}
+
+}

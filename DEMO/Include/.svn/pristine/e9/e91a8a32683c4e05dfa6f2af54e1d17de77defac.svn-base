@@ -1,0 +1,1124 @@
+#ifndef _STD_SHOW_MACO_H_
+#define _STD_SHOW_MACO_H_
+
+#include "StdInclude.h"
+
+/*-----------------------------------------------------------------------------
+说    明：适用所有接口，如果APP没有实现此接口（即JNI找不到APK的函数定义，或者
+          iOS的App没有注册接口的回调函数），返回此值
+-----------------------------------------------------------------------------*/
+#define DF_FUNCTION_APP_CURRENT_NOT_SUPPORT     (0xFFFFFFF0)    // -16
+
+/*-----------------------------------------------------------------------------
+说    明：适用所有接口，如果APP没有此对象实例，返回此值
+-----------------------------------------------------------------------------*/
+#define DF_FUNCTION_APP_OBJ_NOT_CONSTRUCTOR     (0xFFFFFFF1)    // -15
+
+/*-----------------------------------------------------------------------------
+说    明：适用所有接口，如果APP没有此对象实例，返回此值
+-----------------------------------------------------------------------------*/
+#define STR_FUNCTION_APP_OBJ_NOT_CONSTRUCTOR     ("object not construct!")
+
+
+
+#if !defined(_WIN32)&!defined (_WIN64)
+#define DT_TOP                      0x00000000
+#define DT_LEFT                     0x00000000
+#define DT_CENTER                   0x00000001
+#define DT_RIGHT                    0x00000002
+#define DT_BOTTOM                   0x00000008
+#endif
+
+
+#define DT_LEFT_TOP                 0x00000010  // 左上角
+#define DT_RIGHT_TOP                0x00000011  // 右上角
+#define DT_LEFT_BOTTOM              0x00000012  // 左下角
+#define DT_RIGHT_BOTTOM             0x00000013  // 右下角
+
+
+/*-----------------------------------------------------------------------------
+说    明：界面阻塞/非阻塞 适用于所有显示类
+-----------------------------------------------------------------------------*/
+#define DF_MB_NONBLOCK                          0x0000
+#define DF_MB_BLOCK                             0x0100
+
+
+/*-----------------------------------------------------------------------------
+说    明：固定按钮
+-----------------------------------------------------------------------------*/
+#define DF_MB_NOBUTTON                       0x0000   //  无按钮的非阻塞消息框
+#define DF_MB_YES                            0x0101   //  Yes 按钮的阻塞消息框
+#define DF_MB_NO                             0x0102   //  No 按钮的阻塞消息框
+#define DF_MB_YESNO                          0x0103   //  Yes/No 按钮的阻塞消息框
+#define DF_MB_OK                             0x0104   //  OK 按钮的阻塞消息框
+#define DF_MB_CANCEL                         0x0108   //  Cancel 按钮的阻塞消息框
+#define DF_MB_OKCANCEL                       0x010C   //  OK/Cancel 按钮的阻塞消息框
+#define DF_MB_NEXTEXIT                       0x010D   //  Next/Exit 按钮的阻塞消息框
+
+
+/*-----------------------------------------------------------------------------
+说    明：自由按钮开关（自由添加按钮）
+-----------------------------------------------------------------------------*/
+#define DF_MB_FREE                            0x0200  // 自由按钮的非阻塞消息框
+
+
+/*-----------------------------------------------------------------------------
+说    明：固定按钮返回值
+-----------------------------------------------------------------------------*/
+#define DF_ID_OK                             0x00000000
+#define DF_ID_YES                            0x00000000
+#define DF_ID_CANCEL                         0xFFFFFFFF
+#define DF_ID_NO                             0xFFFFFFFF
+#define DF_ID_BACK                           0xFFFFFFFF
+#define DF_ID_EXIT                           0xFFFFFFFF
+#define DF_ID_HELP                           0x80000001
+#define DF_ID_CLEAR_DTC                      0x80000002   // 点击清除故障码
+#define DF_ID_REPORT                         0x80000003
+#define DF_ID_NEXT                           0x80000010   // 下一个
+#define DF_ID_PREV                           0x80000011   // 前一个
+#define DF_ID_RESTORE                        0x80000020   // 恢复数据
+
+
+/*-----------------------------------------------------------------------------
+说    明：自由按钮返回值（或者编号），使用于各种可自由添加按钮的控件
+-----------------------------------------------------------------------------*/
+#define DF_ID_FREEBTN_0                      0x00000100
+#define DF_ID_FREEBTN_1                      0x00000101
+#define DF_ID_FREEBTN_2                      0x00000102
+#define DF_ID_FREEBTN_3                      0x00000103
+//#define DF_ID_FREEBTN_XX                   0x000001XX //一共FF个自由按钮
+
+
+#define DF_ST_BTN_ENABLE                     ((uint32_t)0x00)     // 按钮状态为可见并且可点击
+#define DF_ST_BTN_DISABLE                    ((uint32_t)0x01)     // 按钮状态为可见但不可点击
+#define DF_ST_BTN_UNVISIBLE                  ((uint32_t)0x02)     // 按钮状态为不可见，隐藏
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：获取固定按钮文本的宏值ID，用于接口 GetButtonText
+-----------------------------------------------------------------------------*/
+#define DF_TEXT_ID_OK                             0x00000001
+#define DF_TEXT_ID_YES                            0x00000002
+#define DF_TEXT_ID_CANCEL                         0x00000003
+#define DF_TEXT_ID_NO                             0x00000004
+#define DF_TEXT_ID_BACK                           0x00000005
+#define DF_TEXT_ID_EXIT                           0x00000006
+#define DF_TEXT_ID_HELP                           0x00000007
+#define DF_TEXT_ID_CLEAR_DTC                      0x00000008
+#define DF_TEXT_ID_REPORT                         0x00000009
+#define DF_TEXT_ID_NEXT                           0x0000000A
+#define DF_TEXT_ID_PREV                           0x0000000B
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：无操作返回值
+-----------------------------------------------------------------------------*/
+#define DF_ID_NOKEY                               0x04000000
+
+
+/*-----------------------------------------------------------------------------
+说    明：没有选中任意一行返回值
+          如果诊断应用程序调用了SetSelectedType接口，并设置为ITEM_SELECT_DISABLED
+          并且没有调用SetDefaultSelectedRow，情况下
+          CArtiList的Show返回值为没有选中任意一行DF_LIST_LINE_NONE
+          且GetSelectedRow也返回没有选中任意一行DF_LIST_LINE_NONE
+-----------------------------------------------------------------------------*/
+#define DF_LIST_LINE_NONE                         0xFFFF
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：CArtiSystem 按钮返回值宏 Show 的按钮返回值
+          按钮包括：一键扫描，一键清码，帮助，诊断报告，返回
+          例如，点击“一键扫描”返回 DF_ID_START
+-----------------------------------------------------------------------------*/
+#define DF_ID_SYS_START                       0x80000004
+#define DF_ID_SYS_STOP                        0x80000005
+#define DF_ID_SYS_ERASE                       DF_ID_CLEAR_DTC  
+#define DF_ID_SYS_REPORT                      DF_ID_REPORT
+#define DF_ID_SYS_HELP                        DF_ID_HELP
+#define DF_ID_SYS_BACK                        DF_ID_BACK
+#define DF_ID_SYS_NOKEY                       DF_ID_NOKEY
+
+
+
+/*-----------------------------------------------------------------------------
+说    明： CArtiSystem 页面列表项返回值(Show)，表示点击了那个系统
+-----------------------------------------------------------------------------*/
+#define DF_ID_SYS_0                         0x00000000
+#define DF_ID_SYS_1                         0x00000001    
+#define DF_ID_SYS_3                         0x00000003
+//...                                       
+//#define DF_ID_SYS_X                       0x0000XXXX
+
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+// CArtiSystem 系统扫描菜单下，点击ADAS，(Show)返回值
+#define DF_ID_SYS_ADAS_0                    0x01000000      // 点击了第0个系统的ADAS
+#define DF_ID_SYS_ADAS_1                    0x01000001      // 点击了第1个系统的ADAS
+#define DF_ID_SYS_ADAS_2                    0x01000002      // 点击了第2个系统的ADAS
+#define DF_ID_SYS_ADAS_3                    0x01000003      // 点击了第3个系统的ADAS
+//...  
+//#define DF_ID_SYS_ADAS_X 
+#define DF_ID_SYS_ADAS_MASK                 0x0000FFFF
+#define DF_SYS_GET_ADAS_SYS_NO(x)           (((x) & DF_ID_SYS_DTC_MASK))   // 系统编号
+
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+// CArtiSystem 系统扫描菜单下，点击快速查看故障码，(Show)返回值
+#define DF_ID_SYS_DTC_0                     0x00100000      // 点击了第0个系统的故障码快速浏览按钮
+#define DF_ID_SYS_DTC_1                     0x00100001      // 点击了第1个系统的故障码快速浏览按钮
+#define DF_ID_SYS_DTC_2                     0x00100002      // 点击了第2个系统的故障码快速浏览按钮
+#define DF_ID_SYS_DTC_3                     0x00100003      // 点击了第3个系统的故障码快速浏览按钮
+//...  
+//#define DF_ID_SYS_DTC_X 
+#define DF_ID_SYS_DTC_MASK                  0x0000FFFF
+#define DF_SYS_GET_DTC_SYS_NO(x)            (((x) & DF_ID_SYS_DTC_MASK))   // 系统编号
+
+
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+// CArtiSystem 多线程系统诊断，点击了哪个系统
+#define DF_ID_SYS_TH1_0                     0x00010000      // 开启“编号为0的系统”第1个线程
+#define DF_ID_SYS_TH1_1                     0x00010001      // 开启“编号为1的系统”第1个线程
+#define DF_ID_SYS_TH1_2                     0x00010002      // 开启“编号为2的系统”第1个线程
+//...  
+//#define DF_ID_SYS_TH1_X                   0x0001000X
+#define DF_ID_SYS_TH2_1                     0x00020001      // 开启“编号为1的系统”第2个线程
+#define DF_ID_SYS_TH3_2                     0x00030002      // 开启“编号为2的系统”第3个线程
+#define DF_ID_SYS_TH4_3                     0x00040003      // 开启“编号为3的系统”第4个线程
+//...  
+//#define DF_ID_SYS_TH2_X 
+//#define DF_ID_SYS_TH3_X  
+//#define DF_ID_SYS_TH4_X  
+#define DF_ID_SYS_TH_MASK                   0x000F0000
+#define DF_SYS_GET_TH_NO(x)                 (((x) & DF_ID_SYS_TH_MASK) >> 16)   // 线程编号
+
+
+
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：CArtiSystem 系统状态宏， uResult 指定系统项的最终结果
+          适用于void SetItemResult(uint16_t uIndex, uint32_t uResult);
+-----------------------------------------------------------------------------*/
+#define DF_ENUM_UNKNOWN                     0x10000000  //未知
+#define DF_ENUM_NOTEXIST                    0x20000000  //不存在
+#define DF_ENUM_NOTSUPPORT                  0x30000000  //不支持
+#define DF_ENUM_NODTC                       0x40000000  //无码
+#define DF_ENUM_DTCNUM                      0x80000000  //有码    
+//DF_ENUM_DTCNUM + 1 为有1个故障码
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：CArtiSystem ADAS系统状态宏， uAdasResult 指定ADAS系统项的结果
+          适用于void SetItemAdas(uint16_t uIndex, uint32_t uAdasResult);
+-----------------------------------------------------------------------------*/
+#define DF_ENUM_NO_ADAS                     0  // 不存在ADAS
+#define DF_ENUM_ADAS_EXIST                  1  // 存在ADAS
+
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：CArtiSystem 系统扫描状态宏，用于 SetScanStatus 
+-----------------------------------------------------------------------------*/
+#define DF_SYS_SCAN_START                        0  // 开始扫描
+#define DF_SYS_SCAN_PAUSE                        1  // 暂停扫描
+#define DF_SYS_SCAN_FINISH                       2  // 扫描结束
+
+
+/*-----------------------------------------------------------------------------
+说    明：CArtiSystem 系统扫描状态宏，用于 SetClearStatus
+-----------------------------------------------------------------------------*/
+#define DF_SYS_CLEAR_START                       0  // 一键清码开始
+#define DF_SYS_CLEAR_FINISH                      1  // 一键清码结束
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：输入框 Show 返回值，适用于 CArtiInput 类
+          三种按钮类型，确定、取消、自定义按键
+-----------------------------------------------------------------------------*/
+#define DF_ID_INPUT_OK                      DF_ID_OK
+#define DF_ID_INPUT_CANCLE                  DF_ID_CANCEL
+
+#define DF_ID_INPUT_0                       DF_ID_FREEBTN_0
+#define DF_ID_INPUT_1                       DF_ID_FREEBTN_1
+#define DF_ID_INPUT_2                       DF_ID_FREEBTN_2
+#define DF_ID_INPUT_3                       DF_ID_FREEBTN_3
+//...                                       
+//#define DF_ID_INPUT_X                     DF_ID_FREEBTN_X
+
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：菜单项 Show 返回值，适用于 CArtiMenu 类
+-----------------------------------------------------------------------------*/
+#define DF_ID_MENU_BACK                     DF_ID_BACK
+#define DF_ID_MENU_HELP                     DF_ID_HELP
+
+#define DF_ID_MENU_TREE                     0x80000000  // 菜单树部分，暂定
+
+#define DF_ID_MENU                          0x00000000
+#define DF_ID_MENU_0                        0x00000000
+#define DF_ID_MENU_1                        0x00000001
+#define DF_ID_MENU_2                        0x00000002
+#define DF_ID_MENU_3                        0x00000003
+//...                                       
+//#define DF_ID_MENU_X                      0x0000XXXX
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：数据流 Show 返回值，适用于 CArtiLiveData 类
+-----------------------------------------------------------------------------*/
+#define DF_ID_LIVEDATA_BACK                 DF_ID_BACK
+#define DF_ID_LIVEDATA_NEXT                 DF_ID_NEXT
+#define DF_ID_LIVEDATA_PREV                 DF_ID_PREV
+#define DF_ID_LIVEDATA_REPORT               DF_ID_REPORT
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：故障码 Show 返回值，适用于 CArtiTrouble 类
+-----------------------------------------------------------------------------*/
+#define DF_ID_TROUBLE_BACK                       DF_ID_BACK
+#define DF_ID_TROUBLE_CLEAR                      DF_ID_CLEAR_DTC
+#define DF_ID_TROUBLE_REPORT                     DF_ID_REPORT
+
+// 故障码 点击 "冻结帧" 的 Show 返回值，适用于 CArtiTrouble 类
+#define DF_ID_TROUBLE_0                          0x00000000
+#define DF_ID_TROUBLE_1                          0x00000001
+#define DF_ID_TROUBLE_2                          0x00000002
+#define DF_ID_TROUBLE_3                          0x00000003
+#define DF_ID_TROUBLE_4                          0x00000004
+//...                                       
+//#define DF_ID_TROUBLE_X                        0x0000XXXX
+
+// 故障码 点击 "维修资料" 的 Show 返回值，适用于 CArtiTrouble 类
+#define DF_ID_REPAIR_MANUAL_0                    0x40000000
+#define DF_ID_REPAIR_MANUAL_1                    0x40000001
+#define DF_ID_REPAIR_MANUAL_2                    0x40000002
+#define DF_ID_REPAIR_MANUAL_3                    0x40000003
+#define DF_ID_REPAIR_MANUAL_4                    0x40000004
+//...                                       
+//#define DF_ID_REPAIR_MANUAL_XXXX               0x4000XXXX
+////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：诊断报告故障码状态，用于故障码项，结构体 stDtcNode 的 uStatus
+----------------------------------------------------------------------------------*/
+#define DF_DTC_STATUS_NONE                 (0)            // 无状态
+#define DF_DTC_STATUS_CURRENT              (1 << 0)       // 当前故障码    Current
+#define DF_DTC_STATUS_HISTORY              (1 << 1)       // 历史故障码    History
+#define DF_DTC_STATUS_PENDING              (1 << 2)       // 待定故障码    Pending
+#define DF_DTC_STATUS_TEMP                 (1 << 3)       // 临时故障码    Temporary
+#define DF_DTC_STATUS_NA                   (1 << 4)       // 未知故障码    N/A
+#define DF_DTC_STATUS_OTHERS               (0xFFFFFFFF)   // 无法归类到以上枚举分类，直接按strStatus显示
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：弹出框组件，1、纯消息文本弹出框类型     2、表格类型的弹出框
+          适用于 CArtiPopup 的 InitTitle 接口的 uPopupType 参数
+----------------------------------------------------------------------------------*/
+#define DF_POPUP_TYPE_MSG              0x00000001       // 纯消息文本弹出框类型
+#define DF_POPUP_TYPE_LIST             0x00000002       // 表格类型的弹出框
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于弹出框组件 CArtiPopup 接口SetPopDirection，设置弹出框弹出的方向
+          void SetPopDirection(uint32_t uDirection);
+----------------------------------------------------------------------------------*/
+#define DF_POPUP_DIR_TOP              0x00000000       // 顶部弹出
+#define DF_POPUP_DIR_CENTER           0x00000001       // 居中弹出
+#define DF_POPUP_DIR_RIGHT            0x00000002       // 右侧弹出
+#define DF_POPUP_DIR_BOTTOM           0x00000004       // 底部弹出
+#define DF_POPUP_DIR_LEFT             0x00000008       // 左侧弹出
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：图片添加返回值（或者编号），使用于CArtiPicture的
+-----------------------------------------------------------------------------*/
+#define DF_ID_PICTURE_NONE                   0xFFFFFFFF
+#define DF_ID_PICTURE_0                      0x00000000
+#define DF_ID_PICTURE_1                      0x00000001
+#define DF_ID_PICTURE_2                      0x00000002
+#define DF_ID_PICTURE_3                      0x00000003
+//#define DF_ID_PICTURE_XX                   0x000000XX //一共FF张图片
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：小车探UI类型，适用于 artiMsgBoxActTest 的形参 uTestType
+          或者用于 CArtiLiveData 的接口 SetComponentType
+-----------------------------------------------------------------------------*/
+#define DF_TYPE_ENTRY_COMMING                0x00000001     // 正在通信中，例如点击部件测试、数据流等
+#define DF_TYPE_COMM_FAILED                  0x00000002     // 通信失败类型
+#define DF_TYPE_ACT_TEST_NOT_SUPPORT         0x00000003     // 不支持部件测试
+#define DF_TYPE_THROTTLE_CARBON              0x00000010     // 节气门积碳检测
+#define DF_TYPE_FULE_CORRECTION              0x00000020     // 燃油修正控制系统检测
+#define DF_TYPE_MAF_TEST                     0x00000030     // 空气流量传感器检测
+#define DF_TYPE_INTAKE_PRESSURE              0x00000040     // 进气压力传感器检测
+#define DF_TYPE_INTAKE_PRESSURE_ACC          0x00000041     // 进气压力传感器检测中的松开油门提示
+#define DF_TYPE_OXYGEN_SENSOR                0x00000050     // 氧传感器检测
+#define DF_TYPE_ENGINE_TEST_NO_DTC           0x00000060     // CarPal发动机检测，无故障码页面
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：部件测试结果值，用于 CArtiLiveData 的接口 SetComponentResult
+-----------------------------------------------------------------------------*/
+#define DF_RESULT_THROTTLE_NORMAL            0x00000001      // 发动机节气门运作正常
+#define DF_RESULT_THROTTLE_LIGHT_CARBON      0x00000002      // 节气门疑似有轻微积碳
+#define DF_RESULT_THROTTLE_SERIOUSLY         0x00000003      // 节气门积碳严重
+
+#define DF_RESULT_FULE_NORMAL                0x00000001      // 燃油修正正常
+#define DF_RESULT_FULE_HIGH                  0x00000002      // 燃油修正偏浓
+#define DF_RESULT_FULE_LOW                   0x00000003      // 燃油修正偏稀
+#define DF_RESULT_FULE_ABNORMAL              0x00000004      // 燃油修正异常
+
+#define DF_RESULT_MAF_NORMAL                 0x00000001      // 进气量正常
+#define DF_RESULT_MAF_HIGH                   0x00000002      // 进气量偏大
+#define DF_RESULT_MAF_LOW                    0x00000003      // 进气量偏小
+
+#define DF_RESULT_INTAKE_PRESSURE_NORMAL     0x00000001      // 进气压力正常
+#define DF_RESULT_INTAKE_PRESSURE_HIGH       0x00000002      // 进气压力偏高
+
+#define DF_RESULT_OXYGEN_NORMAL              0x00000001      // 氧传感器正常
+#define DF_RESULT_OXYGEN_ERROR               0x00000002      // 氧传感器出现故障
+
+
+
+/*-----------------------------------------------------------------------------
+说    明：导航栏TAP类型
+-----------------------------------------------------------------------------*/
+#define DF_TAP_TYPE_IS_TOP_NAVIG           1          /* 顶部导航栏     类型 */
+#define DF_TAP_TYPE_IS_MSGBOX              2          /* ArtiMsgBox     类型 */
+#define DF_TAP_TYPE_IS_INPUT               3          /* ArtiInput      类型 */
+#define DF_TAP_TYPE_IS_ACTIVE              4          /* ArtiActive     类型 */
+#define DF_TAP_TYPE_IS_ECUINFO             5          /* ArtiEcuInfo    类型 */
+#define DF_TAP_TYPE_IS_FILE_DIALOG         6          /* ArtiFileDialog 类型 */
+#define DF_TAP_TYPE_IS_FREEZE              7          /* ArtiFreeze     类型 */
+#define DF_TAP_TYPE_IS_LIST                8          /* ArtiList       类型 */
+#define DF_TAP_TYPE_IS_LIVE_DATA           9          /* ArtiLiveData   类型 */
+#define DF_TAP_TYPE_IS_MENU                10         /* ArtiMenu       类型 */
+#define DF_TAP_TYPE_IS_PICTURE             11         /* ArtiPicture    类型 */
+#define DF_TAP_TYPE_IS_SYSTEM              12         /* ArtiSystem     类型 */
+#define DF_TAP_TYPE_IS_TROUBLE             13         /* ArtiTrouble    类型 */
+
+
+////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：导航栏 Show 返回值，适用于 CArtiNavigation 类 或者 CArtiTopTap 类
+-----------------------------------------------------------------------------*/
+#define DF_ID_TAP_0                        0x00000000
+#define DF_ID_TAP_1                        0x00000001
+#define DF_ID_TAP_2                        0x00000002
+#define DF_ID_TAP_3                        0x00000003
+#define DF_ID_TAP_4                        0x00000004
+#define DF_ID_TAP_5                        0x00000005
+#define DF_ID_TAP_6                        0x00000006
+//...                                       
+//#define DF_ID_MENU_X                      0x0000XXXX
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：适用于 artiShowMsgBoxDs 接口返回值
+----------------------------------------------------------------------------------*/
+#define DF_ID_ADAS_RESULT_BACK             DF_ID_BACK       // 点击了“后退”
+#define DF_ID_ADAS_RESULT_OK               DF_ID_OK         // 点击了“完成”
+#define DF_ID_ADAS_RESULT_REPORT           DF_ID_REPORT     // 点击了“生成报告”
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：适用于 CArtiHidden 的 Show 接口返回值
+----------------------------------------------------------------------------------*/
+#define DF_ID_HIDDEN_BACK             DF_ID_BACK        // 点击了“后退”
+#define DF_ID_HIDDEN_OK               DF_ID_OK          // 点击了“确定执行设置”
+#define DF_ID_HIDDEN_RESTORE_DATA     DF_ID_RESTORE     // 点击了“恢复数据”
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于artiShowMsgBox接口，形参uType，指定UI消息类型
+          小车探新增需求，App根据指定的消息类型，绘制指定UI
+----------------------------------------------------------------------------------*/
+enum eMsgBoxType
+{
+    MBT_ERROR_DEFAULT           = 0,       // 默认类型，即App不会做任何效果
+    MBT_ERROR_ENTER_SYS_COMM    = 1,       // 进系统失败
+    MBT_ERROR_EXEC_FUNC_COMM    = 2,       // 功能执行失败
+
+    // CarPal Guru 软件小包下载，数据加载失败页面
+    MBT_ERROR_DATA_LOADING      = 0x10,    // "数据加载异常，请稍后再试！"
+                                           // 界面有一个按钮，"重新加载"按钮
+
+    // CarPal Guru 软件小包下载，网络异常页面
+    MBT_ERROR_NETWORK           = 0x11,    // "网络异常，请稍后再试！"
+                                           // 界面有一个按钮，"重新加载"按钮
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于artiShowMsgGroup接口，形参uType，指定UI消息类型
+          App根据指定的消息类型，绘制指定UI
+----------------------------------------------------------------------------------*/
+enum eMsgGroupType
+{
+    MGT_MSG_DEFAULT = 0,       // 默认类型，按消息组分类
+                               // 有“取消”和“确定”2个固定按钮
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于artiShowSpecial接口，形参uType，指定UI消息类型
+          绘制特殊UI，例如FCA登录界面
+----------------------------------------------------------------------------------*/
+enum eSpecialShowType
+{
+    SST_FUNC_FCA_AUTH = 0, // FCA认证登录界面
+    SST_FUNC_RNM_AUTH = 1, // 雷诺日产三星认证登录界面，Renault-Nissan-Mitsubishi
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于artiShowProgressBar接口，形参eType，指定UI界面类型，
+          绘制特殊UI，例如刷隐藏功能进度条界面
+----------------------------------------------------------------------------------*/
+enum eProgressBarShowType
+{
+    PBST_FUNC_HIDDEN_RUNNING = 0,      // 刷隐藏功能正在执行进度条界面，无按钮
+    PBST_FUNC_HIDDEN_READING = 1,      // 识别控制单元“功能读取中”界面，无按钮
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于ADAS接口artiShowAdasStep，形参uStep，指定步骤类型
+          ADAS新增需求，App根据指定的步骤，控制ADAS的UI流程
+----------------------------------------------------------------------------------*/
+enum eAdasCaliStep
+{
+    ACS_ADAS_CALIBRATION_DEFAULT      = 0,   // 默认，保留
+    ACS_DYNAMIC_CALIBRATION           = 1,   // 进入App控制的动态校准流程
+    ACS_STATIC_CALIBRATION            = 2,   // 进入App控制的静态校准流程
+
+    ACS_CALIBRATION_WHEEL_BROW_HEIGHT = 0x10,    // 轮眉高度类型
+
+    // ADAS静态校准，校准过程，标靶展示
+    ACS_STATIC_CALI_PROCESS_STEP_0    = 0x40, // ADAS静态校准校准过程标靶展示，步骤0
+    ACS_STATIC_CALI_PROCESS_STEP_1    = 0x41, // ADAS静态校准校准过程标靶展示，步骤1
+    ACS_STATIC_CALI_PROCESS_STEP_2    = 0x42, // ADAS静态校准校准过程标靶展示，步骤2
+    ACS_STATIC_CALI_PROCESS_STEP_3    = 0x43, // ADAS静态校准校准过程标靶展示，步骤3
+    ACS_STATIC_CALI_PROCESS_STEP_4    = 0x44, // ADAS静态校准校准过程标靶展示，步骤4
+    ACS_STATIC_CALI_PROCESS_STEP_5    = 0x45, // ADAS静态校准校准过程标靶展示，步骤5
+    ACS_STATIC_CALI_PROCESS_STEP_6    = 0x46, // ADAS静态校准校准过程标靶展示，步骤6
+    ACS_STATIC_CALI_PROCESS_STEP_7    = 0x47, // ADAS静态校准校准过程标靶展示，步骤7
+    ACS_STATIC_CALI_PROCESS_STEP_8    = 0x48, // ADAS静态校准校准过程标靶展示，步骤8
+    ACS_STATIC_CALI_PROCESS_STEP_9    = 0x49, // ADAS静态校准校准过程标靶展示，步骤9
+    ACS_STATIC_CALI_PROCESS_STEP_10   = 0x4A, // ADAS静态校准校准过程标靶展示，步骤10
+
+
+    ACS_DYNAMIC_CALI_NOT_SUPPORT      = 0x50, // TOPSCAN，控制单元不支持ADAS校准
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于带数据流显示的消息框，artiShowMsgBoxDs，形参uType，指定消息框类型
+          ADAS结果展示新增需求，App根据指定的uType，显示对应的消息框
+----------------------------------------------------------------------------------*/
+enum eMsgBoxDsType
+{
+    MBDT_ADAS_DYNAMIC_CALI_OK_WITH_DS = 0,  // 动态校准成功，带数据流列表，有“生成报告”，“完成”两个按钮
+    MBDT_ADAS_DYNAMIC_CALI_OK_ON_DS   = 1,  // 动态校准成功，没有数据流列表，有“生成报告”，“完成”两个按钮
+    MBDT_ADAS_DYNAMIC_CALI_FAIL_ON_DS = 2,  // 动态校准失败，没有数据流列表，有“生成报告”，“完成”两个按钮
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于ADAS接口GetAdasCalData，形参eAdasCaliData表示对应的数据类型
+          ADAS新增需求，诊断程序通过此接口获取App的ADAS相关数据
+----------------------------------------------------------------------------------*/
+enum eAdasCaliData
+{
+    ACD_CAL_WHEEL_BROW_HEIGHT_LF = 0,           // 左前轮数据类型
+    ACD_CAL_WHEEL_BROW_HEIGHT_RF = 1,           // 右前轮数据类型
+    ACD_CAL_WHEEL_BROW_HEIGHT_LR = 2,           // 左后轮数据类型
+    ACD_CAL_WHEEL_BROW_HEIGHT_RR = 4,           // 右后轮数据类型
+
+    ACD_CAL_FUEL_LEVEL           = 0x10         // 燃油液位数据类型
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：用于获取后台VIN接口返回的类型宏，CArtiGlobal 的接口 GetServerVinInfo
+          小车探新增需求
+----------------------------------------------------------------------------------*/
+enum eGetVinInfoType
+{
+    GET_VIN_BRAND               = 0,     //  品牌ID值，表示当前获取的是品牌ID值
+    GET_VIN_MODEL               = 1,     //  车型ID值
+    GET_VIN_MANUFACTURER_NAME   = 2,     //  厂家名称
+    GET_VIN_YEAR                = 3,     //  年份
+    GET_VIN_CLASSIS             = 4,     //  底盘号
+    GET_VIN_MANUFACTURER_TYPE   = 5,     //  厂家类型
+    GET_VIN_VEHICLE_TYPE        = 6,     //  车辆类型
+    GET_VIN_FULE_TYPE           = 7,     //  燃油类型
+    GET_VIN_ENERGY_TYPE         = 8,     //  能源类型
+    GET_VIN_COUNTRY             = 9,     //  国家
+    GET_VIN_AREA                = 10,    //  区域
+};
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+/*--------------------------------------------------------------------------------------
+说    明：用于获取App下载到的软件包路径，类型宏枚举，CArtiGlobal 的接口 GetDownloadFilePath
+
+          例如App下载了对应功能的刷隐藏软件小包，诊断程序通过GetDownloadFilePath接口获取
+          存储在本地的路径
+----------------------------------------------------------------------------------------*/
+enum eDlScenariosType // Download Scenarios 
+{
+    DS_HIDDEN_FUN_ZIP       = 0,     //  指定功能ID的刷隐藏软件小包下载
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：指定冻结帧的值为1列还是2列类型，用于 ArtiFreeze 的 SetValueType 接口，
+          默认为VALUE_1_COLUMN，即默认为1列
+----------------------------------------------------------------------------------*/
+enum eFreezeValueType
+{
+    VALUE_1_COLUMN = 1,   // 指定冻结帧的值为1列
+    VALUE_2_COLUMN = 2,   // 指定冻结帧的值为2列
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：输入框的提示符位置类型，通常情况下用于输入框，例如 ArtiInput 的 
+          SetTipsPosition 接口，默认为TIPS_IS_TOP
+
+          提示符的位置类型，也可以用于图表空间，例如 CArtiChart 的 SetChartTips 接口
+----------------------------------------------------------------------------------*/
+enum eTipsPosType
+{
+    TIPS_IS_TOP      = 0,   // 输入框/图表的提示符居于输入框上面（输入框上一行）
+    TIPS_IS_LEFT     = 1,   // 输入框/图表的提示符居于输入框左边（输入框同一行）
+    TIPS_IS_BOTTOM   = 2,   // 输入框/图表的提示符居于界面最底部
+    TIPS_IS_RIGHT    = 3,   // 图表的提示符居于图表的右侧
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：字体大小类型，通常情况下用于标题，例如 ArtiList 的 SetTipsTitleOnTop 接口
+----------------------------------------------------------------------------------*/
+enum eFontSize
+{
+    FORT_SIZE_SMALL     = 0,    // 小字体
+    FORT_SIZE_MEDIUM    = 1,    // 中字体
+    FORT_SIZE_LARGE     = 2,    // 大字体
+};
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：是否粗体，通常情况下用于标题，例如 ArtiList 的 SetTipsTitleOnTop 接口
+----------------------------------------------------------------------------------*/
+enum eBoldType
+{
+    BOLD_TYPE_NONE = 0,    // 不是粗体
+    BOLD_TYPE_BOLD = 1,    // 粗体
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：指定颜色，通常情况下用于指定字体颜色，如 ArtiList 的 SetRowHighLight 接口
+----------------------------------------------------------------------------------*/
+enum eColourType
+{
+    COLOUR_TYPE_DEFAULT = 0,    // 颜色有App自己决定
+    COLOUR_TYPE_GRAY    = 1,    // 灰色字体
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：针对小车探，增加诊断车型（非OBD）不支持当前车辆的返回值给APP
+          APP发现当前车辆不支持，立即进入OBD车
+          适用CArtiGlobal的接口SetCurVehNotSupport
+----------------------------------------------------------------------------------*/
+enum eVehNotSupportType
+{
+    VBST_SUPPORT_NORMAL   = 0,    // 默认值，默认支持
+    VBST_VEH_NOT_SUPPORT  = 1,    // 当前车型程序（非OBD）不支持当前车辆
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：指定诊断报告中的ADAS系统校准状态，用于 CArtiReport 的 SetAdasCaliResult 接口
+----------------------------------------------------------------------------------*/
+enum eReportAdasResult
+{
+    RAR_ADAS_CALI_OK        = 0,    // ADAS校准OK
+    RAR_ADAS_CALI_FAILED    = 1,    // ADAS校准失败
+};
+
+enum eReportAdasType
+{
+    RAT_ADAS_CALI_STATIC  = 0,    // ADAS校准类型时静态校准
+    RAT_ADAS_CALI_DYNAMIC = 1,    // ADAS校准类型时动态校准
+};
+
+struct stReportAdasResult
+{
+    std::string  strSysName;     // 系统Name，此名称不能为空，如空则添加无效
+    std::string  strStartTime;   // 校准开始时间，例如："2022-06-27 20:55:40"
+    std::string  strStopTime;    // 校准结束时间，例如："2022-06-27 20:56:48"
+    uint32_t     uTotalTimeS;    // 总校准耗时时间，单位为秒
+    uint32_t     uType;          // ADAS系统校准类型
+                                 // RAT_ADAS_CALI_STATIC    0   静态校准
+                                 // RAT_ADAS_CALI_DYNAMIC   1   动态校准
+    uint32_t     uStatus;        // 系统校准结果状态
+                                 // RAR_ADAS_CALI_OK      0   ADAS校准OK
+                                 // RAR_ADAS_CALI_FAILED  1   ADAS校准失败
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：系统诊断报告系统项，适用于 CArtiReport 类，系统诊断报告，用于AddSysItems接口
+----------------------------------------------------------------------------------*/
+struct stSysReportItem
+{
+    std::string strID;          // 系统ID, 如果无，则置空
+    std::string strName;        // 系统Name，此名称不能为空，如空则添加无效
+    uint32_t    uDtsNums;       // 对应系统的故障码个数
+};
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------
+说    明：系统属性宏定义，用于stSysReportItemEx结构体中的系统属性uSysProp
+-----------------------------------------------------------------------------*/
+#define DF_SYS_PROP_DEFAULT                0x00000000   // 默认，常规
+#define DF_SYS_PROP_ADAS                   0x00000001   // 具有ADAS功能属性
+#define DF_SYS_PROP_TPMS                   0x00000002   // 具有胎压功能属性
+
+
+////////////////////////////////////////////////////////////////////////////////////
+/*-------------------------------------------------------------------------------
+说    明：系统执行结果状态宏定义，用于stSysReportItemEx结构体中的执行状态uStatus
+-------------------------------------------------------------------------------*/
+#define DF_SYS_STATUS_ADAS_DEFAULT         0x00000000     // ADAS功能不可执行（空白）
+#define DF_SYS_STATUS_ADAS_OK              0x00000001     // ADAS功能执行OK或可执行（Yes）
+#define DF_SYS_STATUS_ADAS_FAILED          0x00000002     // ADAS功能执行失败
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+/*-----------------------------------------------------------------------------------
+说    明：扩展功能的系统诊断报告系统项（ADAS），适用于 CArtiReport 类，
+          系统诊断报告，用于AddSysItemEx接口
+------------------------------------------------------------------------------------*/
+struct stSysReportItemEx
+{
+    std::string strID;              // 系统ID, 如果无，则置空
+    std::string strName;            // 系统Name，此名称不能为空，如空则添加无效
+    
+    uint32_t    uSysProp;           // 对应系统的属性，例如具有ADAS属性，
+                                    // 则显示个ADAS图标，示意可以ADAS校准
+                                    // DF_SYS_PROP_DEFAULT      默认，常规
+                                    // DF_SYS_PROP_ADAS         具有ADAS功能属性
+                                    // DF_SYS_PROP_TPMS         具有胎压功能属性
+
+    uint32_t    uStatusPre;         // 执行前，对应系统功能的状态
+                                    // DF_SYS_STATUS_ADAS_DEFAULT   ADAS功能不可执行（空白）
+                                    // DF_SYS_STATUS_ADAS_OK        ADAS功能可执行（Yes）
+
+    uint32_t    uDtsNumsPre;        // 执行前，对应系统的故障码个数
+
+    uint32_t    uStatusPost;        // 执行后，对应系统功能的执行状态
+                                    // DF_SYS_STATUS_ADAS_DEFAULT   ADAS功能不可执行（空白）
+                                    // DF_SYS_STATUS_ADAS_OK        ADAS功能执行OK（Yes）
+                                    // DF_SYS_STATUS_ADAS_FAILED    ADAS功能执行失败
+
+    uint32_t    uDtsNumsPost;       // 执行后，对应系统的故障码个数
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码节点，适用于 CArtiReport 类，系统诊断报告 或者 故障码诊断报告
+----------------------------------------------------------------------------------*/
+struct stDtcNode
+{
+    std::string strCode;            // 故障代码，不能为空，例如："P0316:00-28"
+    std::string strDescription;     // 故障码描述
+    uint32_t    uStatus;            // 故障码状态
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码项，适用于 CArtiReport 类，系统诊断报告 或者 故障码诊断报告
+          用于接口 AddDtcItem 或者 AddDtcItems
+----------------------------------------------------------------------------------*/
+struct stDtcReportItem
+{
+    std::string strID;                  // 系统ID, 如果无，则置空
+    std::string strName;                // 系统Name，此名称不能为空，如空则添加无效
+    std::vector<stDtcNode> vctNode;     // 故障码数组，包含了此系统下的所有故障码
+                                        // 例如该系统有2个故障码，数组大小为2
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码节点Ex，适用于 CArtiReport 类，系统诊断报告 或者 故障码诊断报告
+          或者适用于 CArtiTrouble 类的 AddItemEx
+----------------------------------------------------------------------------------*/
+struct stDtcNodeEx
+{
+    std::string strCode;            // 故障代码，不能为空，例如："P0316:00-28"
+    std::string strDescription;     // 故障码描述
+    std::string strStatus;          // 故障码状态，字符串形式
+    uint32_t    uStatus;            // 故障码状态，枚举值形式
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码项Ex，适用于 CArtiReport 类，系统诊断报告 或者 故障码诊断报告
+          用于接口 AddDtcItemEx 或者 AddDtcItemsEx
+----------------------------------------------------------------------------------*/
+struct stDtcReportItemEx
+{
+    std::string strID;                  // 系统ID, 如果无，则置空
+    std::string strName;                // 系统Name，此名称不能为空，如空则添加无效
+    std::vector<stDtcNodeEx> vctNode;   // 故障码数组，包含了此系统下的所有故障码
+    // 例如该系统有2个故障码，数组大小为2
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：数据流项，适用于 CArtiReport 类，数据流诊断报告
+          用于接口 AddDsItem 或者 AddDsItems，或者artiShowMsgBoxDs
+----------------------------------------------------------------------------------*/
+struct stDsReportItem
+{
+    std::string strName;           // 数据流名称
+    std::string strValue;          // 数据流值
+    std::string strUnit;           // 数据流单位
+    std::string strMin;            // 数据流最小参考值
+    std::string strMax;            // 数据流最大参考值
+    std::string strReference;      // 数据流其他类型值的参考值
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码组件中，用于设置维修资料信息的类型名，适用于 CArtiTrouble 类的接口
+          SetRepairManualInfo的参数
+
+          bool SetRepairManualInfo(const std::vector<stRepairInfoItem>& vctDtcInfo);
+----------------------------------------------------------------------------------*/
+// 维修资料所需信息的类型定义
+enum eRepairInfoType
+{
+    RIT_DTC_CODE        = 0,       //  表示故障码编码
+    RIT_VEHICLE_BRAND   = 1,       //  表示车辆品牌
+    RIT_VEHICLE_MODEL   = 2,       //  表示车型
+    RIT_VEHICLE_YEAR    = 3,       //  表示车辆年款
+    RIT_VIN             = 4,       //  表示车辆VIN
+    RIT_SYSTEM_NAME     = 5,       //  表示系统名称
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：故障码组件中，用于设置维修资料信息，适用于 CArtiTrouble 类的接口
+          SetRepairManualInfo的参数
+
+          bool SetRepairManualInfo(const std::vector<stRepairInfoItem>& vctDtcInfo);
+----------------------------------------------------------------------------------*/
+// 维修资料所需信息的结构体
+struct stRepairInfoItem
+{
+    eRepairInfoType eType;         // 维修资料所需信息的类型
+                                   // 例如 RIT_DTC_CODE，表示strValue 此值是 "故障码编码"
+
+    std::string     strValue;      // 实际信息的字符串值
+                                   // 例如当 eType = RIT_DTC_CODE，strValue为 "P1145"
+                                   // 例如当 eType = RIT_VIN，strValue为 "KMHSH81DX9U478798"
+};
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：适用于 artiShowMsgGroup 接口
+          带多个消息组的信息展示页面，每个消息组包含标题和内容
+----------------------------------------------------------------------------------*/
+struct stMsgItem
+{
+    std::string strTitle;     // 标题
+    std::string strContent;   // 内容
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于获取单位制转换，适用于全局类的接口UnitsConversion形参和返回值
+
+          stUnitItem UnitsConversion(const stUnitItem& stUnitSrc);
+----------------------------------------------------------------------------------*/
+struct stUnitItem
+{
+    std::string strUnit;    // 单位   例如 km
+    std::string strValue;   // 值     例如 1234
+                            // 表示1234km
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于获取当前的单位制模式（公制还是英制），适用于全局类的接口
+          GetCurUnitMode
+
+          eUnitType GetCurUnitMode();
+----------------------------------------------------------------------------------*/
+enum eUnitType
+{
+    UT_METRIC_MODE  = 0,       //  表示App中，当前选择的是公制单位
+    UT_ENGLISH_MODE = 1,       //  表示App中，当前选择的是英制单位
+                               //  其它模式
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：CArtiHidMenu用于刷隐藏功能主菜单（是一个二级菜单）的二级菜单节点参数
+          用于uint32_t AddItem(const stHiddenItem& Item);
+          
+          或者 CArtiHidden 的 SetHidderResult 形参，设置刷隐藏功能执行的结果
+----------------------------------------------------------------------------------*/
+enum eHiddenNodeStatus
+{
+    // 当前功能执行的状态枚举，即刷隐藏状态
+    HNS_FUNC_HIDDEN_DEFAULT    = 0,       //  刷隐藏未进行，默认状态，列表中不显示图标
+    HNS_FUNC_HIDDEN_OK         = 1,       //  刷隐藏执行OK，列表中绿√图标
+    HNS_FUNC_HIDDEN_FAILED     = 2,       //  刷隐藏执行失败，列表中红色感叹号图标
+};
+
+struct stHiddenNode
+{
+    // 刷隐藏功能大类，二级菜单项节点
+    std::string strName;        // 菜单名称，即功能名称（二级，又叫子功能）
+                                // 例如“日间行车灯”“记忆自动启停”
+
+    std::string strCurValue;    // 当前功能的状态，例如“开启”“已激活”
+
+    uint32_t    uCurStatus;     // 当前功能执行的状态枚举，即刷写状态
+                                // HNS_FUNC_HIDDEN_DEFAULT 列表中不显示图标
+                                // HNS_FUNC_HIDDEN_OK      列表中绿√图标
+                                // HNS_FUNC_HIDDEN_FAILED  列表中红色感叹号图标
+
+    std::string strFuncId;      // 对应的功能ID
+
+    std::string strIconPath;    // 菜单项对应的图标路径，App根据对应的路径加载显示icon
+                                // 绝对路径
+};
+
+struct stHiddenItem
+{
+    // 刷隐藏功能大类，一级菜单项
+    std::string strName;        // 菜单名称，即系统名称或功能大类名称，例如“前端电子模块”
+                                // “灯光设置”
+
+    std::string strIconPath;    // 菜单项对应的图标路径，App根据对应的路径加载显示icon
+                                // 绝对路径
+
+    std::vector<stHiddenNode> vctNodes;    // 二级菜单项集合
+};
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：CArtiGlobal 用于刷隐藏历史诊断记录接口 SetHistoryHiddenItem
+          的形参 HiddenItem
+          uint32_t SetHistoryHiddenItem(const stHistoryHidden& HiddenItem);
+----------------------------------------------------------------------------------*/
+struct stHistoryHidden
+{
+    // 刷隐藏功能大类
+    std::string strName;         // 系统名称或功能大类名称
+                                 // 例如“前端电子模块”“灯光设置”
+
+    // 刷隐藏功能子类
+    std::string strSubName;      // 功能名称（子功能）
+                                 // 例如“日间行车灯”“左转向灯”“右转向灯”
+
+    // 刷写前后的状态
+    std::string strBeforeVal;  // 刷写前的状态，例如“未开启”“已激活”
+    std::string strAfterVal;   // 刷写后的状态，例如“开启”  “未激活”
+
+    // 刷写结果枚举
+    uint32_t    uCurStatus;     // 当前功能执行的状态枚举，即刷写状态
+                                // HNS_FUNC_HIDDEN_OK      1 刷写成功
+                                // HNS_FUNC_HIDDEN_FAILED  2 刷写失败
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于获取当前的FCA登录界面上用户选择的区域，适用于全局类的接口
+          FcaGetLoginRegion
+
+          eLoginRegionType FcaGetLoginRegion();
+----------------------------------------------------------------------------------*/
+enum eLoginRegionType
+{
+    LGT_SELECT_AMERICA = 0,      //  表示App的FCA登录中，当前选择的区域是美洲
+    LGT_SELECT_EUROPE = 1,       //  表示App的FCA登录中，当前选择的区域是欧洲
+    LGT_SELECT_OTHER = 2,        //  表示App的FCA登录中，当前选择的区域是其它
+};
+
+
+///////////////////////////////////////////////////////////////////////////////////
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于FCA网关算法认证初始化接口 FcaAuthDiagInit 的输入参数 Req
+----------------------------------------------------------------------------------*/
+struct stFcaAdInitReq
+{
+    std::string strSgwUUID;   // ECU PKI UUID，即 SGW(Secure Gateway) 的UUID（Base64）
+    std::string strSgwSN;     // ECU Serial Number, 即 SGW 的序列号
+    std::string strVin;       // 车辆车架号
+};
+struct stFcaAdInitReqEx       // 新增 兼容使用stFcaAdInitReq的车型程序
+{
+    std::string strSgwUUID;   // ECU PKI UUID，即 SGW(Secure Gateway) 的UUID（Base64）
+    std::string strSgwSN;     // ECU Serial Number, 即 SGW 的序列号
+    std::string strVin;       // 车辆车架号
+                              
+    std::string strEcuSN;     // 需要解锁的ECU序列号，ECU如果是SGW则跟strSgwSN一致
+                              // 北美可为空，欧洲必填，例如 "TF1170919C15240"
+                              
+    std::string strEcuCanId;  // 需要解锁的ECU的CANID，北美可为空，欧洲必填
+                              // 例如 "18DA10F1"是ECM，"18DA1020"是BSM
+
+    std::string strEcuPolicyType; // 需要解锁的ECU的策略类型，北美可为空，欧洲必填
+                                  // 例如"1"
+};
+
+
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于FCA网关算法认证初始化接口 FcaAuthDiagInit 的返回，在
+          输入参数 Ans 上
+----------------------------------------------------------------------------------*/
+struct stFcaAdInitAns
+{
+    std::string strCode;       // 公司服务器返回的错误代码 "code"，例如"200"
+    std::string strMsg;        // 公司服务器返回的描述 "msg"，例如"User authentication failed!"
+
+    std::string strOemInit;    // FCA返回，OEM特定的初始化缓冲区,对于FCA，这是AuthDiag证书
+                               // OEM Specific Initialization buffer. 
+                               // For FCA this is the AuthDiag Certificate
+                               // （Base64），最大长度2048
+
+    std::string strSessionID;  // FCA返回，Must be used in subsequent AuthDiag requests
+                               // （Base64），最大长度256
+};
+
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于向FCA服务器转发SGW的 Challenge 随机码的接口
+          FcaAuthDiagRequest 的输入参数 Req
+----------------------------------------------------------------------------------*/
+struct stFcaAdChallReq
+{
+    std::string strSessionID;   // FcaAuthDiagInit返回的SessionID（Base64）
+    std::string strChallenge;   // ECU Challenge（Base64）
+};
+
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于向FCA服务器转发SGW的 Challenge 随机码的接口
+          FcaAuthDiagRequest 的返回，在输入参数 Ans 上
+----------------------------------------------------------------------------------*/
+struct stFcaAdChallAns
+{
+    std::string strCode;        // 公司服务器返回的错误代码 "code"，例如"200"
+    std::string strMsg;         // 公司服务器返回的描述 "msg"，例如"User authentication failed!"
+
+    std::string strChallenge;   // SGW Challenge Response（Base64）
+};
+
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于向FCA服务器转发 SGW解锁的 TrackResponse 结果追踪的接口
+          FcaAuthDiagTrackResp 的输入参数 Req
+----------------------------------------------------------------------------------*/
+struct stFcaAdTrackReq
+{
+    std::string strSessionID;       // FcaAuthDiagInit返回的SessionID（Base64）
+    std::string strEcuResult;       // ECU 解锁的结果（Boolean），例如"True"
+    std::string strEcuResponse;     // ECU Response（Base64），例如6712...，或者7F27...
+};
+
+/*---------------------------------------------------------------------------------
+说    明：ArtiGlobal用于向FCA服务器转发 SGW解锁的 TrackResponse 结果追踪的接口
+          FcaAuthDiagTrackResp 的输入参数 Ans
+----------------------------------------------------------------------------------*/
+struct stFcaAdTrackAns
+{
+    std::string strCode;        // 公司服务器返回的错误代码 "code"，例如"200"
+    std::string strMsg;         // 公司服务器返回的描述 "msg"，例如"User authentication failed!"
+
+    std::string strSuccess;     // In case of success, true（Base64），例如"true"
+};
+
+
+#endif

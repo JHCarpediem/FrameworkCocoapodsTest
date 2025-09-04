@@ -1,0 +1,112 @@
+#include "DemoUnlockGW.h"
+#include "DemoPublicAPI.h"
+#include "PublicInterface.h"
+#include "ArtiMenu.h"
+#include "StdShowMaco.h"
+#include "VehAutoAuth.h"
+#include "ArtiMsgBox.h"
+#include "DataFile.h"
+#include "ArtiGlobal.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CUnlockGW::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+		CArtiMenu uiMenu;
+		uiMenu.InitTitle("Vehicle");			//车型
+// 		uiMenu.AddItem("FCA");	vctMenuID.push_back(0);	//FCA 网关解锁
+		uiMenu.AddItem("Renault");	vctMenuID.push_back(0);	//Reanult 网关解锁
+
+		while (true)
+		{
+			uint32_t uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					UnlockGW_Renault();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+				}
+			}
+		}
+	}
+
+	void CUnlockGW::UnlockGW_FCA()
+	{
+
+	}
+
+	void CUnlockGW::UnlockGW_Renault()
+	{
+		CVehAutoAuth	UnLockGW;
+		string			strCode;
+		string			strMsg;
+		string			strSeed;
+
+// 		CArtiMsgBox		uiMsg;
+
+		CArtiGlobal::SetVIN("VF1RJA00368175085");
+// 		uiMsg.InitMsgBox("Information", artiGetText("GatewayMsg01"), DF_MB_FREE | DF_MB_BLOCK);
+// 		uiMsg.AddButton(artiGetText("GatewayMsg02"));
+// 		uiMsg.AddButton(artiGetText("GatewayMsg03"));
+// 		uint32_t uRet = uiMsg.Show();
+// 		if ((uRet == DF_ID_BACK) || (uRet == DF_ID_FREEBTN_1))
+// 		{
+// 			return;
+// 		}
+		while (1)
+		{
+//			uint32_t iKey = artiShowSpecial(eSpecialShowType::SST_FUNC_RNM_AUTH); //显示登录界面
+//			if (iKey == DF_ID_BACK)
+//			{
+//				return;
+//			}
+			artiShowMsgBox("Renault GW", artiGetText("GatewayMsg04"), DF_MB_NOBUTTON);
+			UnLockGW.SetBrandType(CVehAutoAuth::eBrandType::BT_VEHICLE_RENAULT);
+			UnLockGW.SetVin("VF1RJA00368175085");
+			UnLockGW.SetEcuUnlockType("UnlockUdsECU");
+			UnLockGW.SetEcuPublicServiceData("4E426F73633863684757");
+			UnLockGW.SetEcuChallenge("812BA1EBF4A5987E5779D82E0B981229469020DE8E8C8495909209EEF4824309135036EB9386CAB4A2FE8FC1761576C3945B46AEE9420A57B4CF4AE998E26543B42445A9122E4E2EE9603D9E6D56AEF45A0EDAF9752F2A1CD3CA49C91A08C7E9998B79BFEFA9DA06FB81B1801F80879E116679BF693114940D22D65F5533BBE104808F218E7678330E9640B0141400C30D42C842484E8924C2271B84426CCFD4E6305E957844791E0E14B1F7C5229ED0521745F6A5514C7FED8E49C98172E8FB43090995582CB5EDB4F8A24ADF7800E26D05904FBD03C6DB83D0E492F27AF7CDB53CA7D0D1CAC8310CA81ECEB00D497116B13AB58E46E06397DFF9981A076762");
+			UnLockGW.SetEcuCanId("00D2");
+			UnLockGW.SetXRoutingPolicy("SecurityAccessV2_9");
+			uint32_t uValue = UnLockGW.SendRecv(CVehAutoAuth::eSendRecvType::SRT_RENAULT_DIAG_REQ);
+
+			strCode = UnLockGW.GetRespondCode();
+			strMsg = UnLockGW.GetRespondMsg();
+
+			if ((uint32_t(-5) == uValue) || (uint32_t(-4) == uValue))
+			{
+				continue;
+			}
+			if (strCode == "2000")
+			{
+				artiShowMsgBox("Renault GW", "GetRespondCode() ==> Success!", DF_MB_OK);
+			}
+			else
+			{
+				if (strMsg.size()==0)
+				{
+					strMsg = "Please try again";
+				}
+				if (DF_ID_CANCEL == artiShowMsgBox("Renault GW", "GetRespondCode() ==> Fialed!  ErrorCode:" + strCode + "  ErrorMsg:" + strMsg, DF_MB_OKCANCEL))
+				{
+					return;
+				}
+				artiShowMsgBox("Renault GW", "Communicating...", DF_MB_NOBUTTON);
+				Delay(500);
+				continue;
+			}
+			strSeed = UnLockGW.GetEcuChallenge();
+			artiShowMsgBox("Renault GW", "ECU-security-seed:" + strSeed, DF_MB_OK);
+			return;
+		}
+	}
+}

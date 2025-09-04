@@ -1,0 +1,1455 @@
+/*******************************************************************************
+* Copyright (C), 2020~ , Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 文档类标识
+* 功能描述 : ArtiDiag900全局接口定义
+* 创 建 人 : sujiya 20201210
+* 实 现 人 :
+* 审 核 人 : binchaolin
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#ifndef _ARTIGLOBAL_H_
+#define _ARTIGLOBAL_H_
+
+#include "StdInclude.h"
+#include "StdShowMaco.h"
+#include "EventTracking.h"
+
+class CAlgorithmData;
+class _STD_SHOW_DLL_API_ CArtiGlobal
+{
+public:
+
+    // 用于接口GetHostType的返回值
+    enum class eHostType :uint32_t
+    {   //APP的宿主机类型
+        HT_IS_TABLET    = 1,        //表示当前应用的主机是平板
+        HT_IS_PHONE     = 2,        //表示当前应用的主机是手机
+        HT_IS_PC        = 3,        //表示当前应用的主机是PC
+
+        HT_IS_INVALID   = 0xFFFFFFFF,
+    };
+
+
+    // 用于接口GetAppProductName的返回值
+    enum class eProductName :uint32_t
+    {   //当前app应用的产品名称
+        PD_NAME_AD900   = 1,          // "AD900",     表示当前产品名为AD900
+        PD_NAME_AD200   = 2,          // "AD200",     表示当前产品名为AD200
+        PD_NAME_TOPKEY  = 3,          // "TOPKEY",    表示当前产品名为TOPKEY
+
+        PD_NAME_NINJA1000PRO = 4,     // "NINJA1000PRO", 表示当前产品名为Ninja1000 Pro
+        PD_NAME_AD900_LITE   = 5,     // "AD900 LITE"
+        PD_NAME_KEYNOW       = 6,     // "KEYNOW"
+        PD_NAME_AD500        = 7,     // "AD500"
+        
+        PD_NAME_TP005_TOPVCI = 8,     // "TP005", 表示当前产品名为国内版TOPVCI，"小车探"
+        PD_NAME_PG1000_DOI   = 9,     // "PG1000 DOI远程诊断"
+
+        PD_NAME_ADAS_TABLET   = 10,   // "ADAS"
+        PD_NAME_TOPVCI_PRO    = 11,   // "TP011", 表示当前产品名为国内版"小车探Pro"
+        PD_NAME_TOPSCAN_HD    = 12,   // "TOPSCAN HD", 表示当前产品名为"TOPSCAN HD"
+        PD_NAME_TOPVCI_CARPAL = 13,   // "CARPAL", 表示当前产品名为国外版"小车探"，即"CarPal"
+        PD_NAME_CARPAL_GURU   = 14,   // "CARPAL GURU", 表示当前产品名为"CarPal Guru"（刷隐藏）
+        PD_NAME_AD800BT       = 15,   // "AD800BT", 表示当前产品名为"AD800BT 2"（自研AD800BT2）
+        
+        PD_NAME_INVALID = 0xFFFFFFFF,
+    };
+
+
+    // 用于接口GetAppScenarios的返回值
+    enum class eAppScenarios :uint32_t
+    {   //当前app应用使用的场景，例如是否是正式面向用户的使用场景
+        AS_EXTERNAL_USE = 1,          // 正式面向用户的使用场景，正常用户使用场景
+        AS_INTERNAL_USE = 2,          // 打开了对内使用场景的后门
+
+        AS_OTHER_INVALID = 0xFFFFFFFF,
+    };
+
+    // 用于接口GetAutoVinScannMode的返回值
+    enum class eAutoVinScannMode :uint32_t
+    {   //当前app应用中，AutoVin的扫描协议模式，例如使用上次保存的协议来获取VIN
+        AVSM_MODE_NORMAL            = 1,          // 正常AUTOVIN协议扫描模式
+        AVSM_MODE_LAST_PROTOCOL     = 2,          // AUTOVIN使用上次保存的协议去读取VIN
+
+        AVSM_MODE_INVALID = 0xFFFFFFFF,
+    };
+
+
+    // 用于接口 GetDiagEntryType 的返回值
+    enum class eDiagEntryType :uint64_t
+    {   //当前诊断的入口类型
+        DET_NORMAL_NONE                 = 0,           // 表示当前不支持任何功能
+
+        DET_BASE_VER                    = (1 << 0),    // 表示支持基本功能_读版本信息
+        DET_BASE_RDTC                   = (1 << 1),    // 表示支持基本功能_读故障码
+        DET_BASE_CDTC                   = (1 << 2),    // 表示支持基本功能_清故障码
+        DET_BASE_RDS                    = (1 << 3),    // 表示支持基本功能_读数据流
+        DET_BASE_ACT                    = (1 << 4),    // 表示支持动作测试
+        DET_BASE_FFRAME                 = (1 << 5),    // 表示支持冻结帧
+
+        // Maintenance 以下表示当前是通过保养下的某项进入的
+        /* Oil Reset */
+        DET_MT_OIL_RESET            = (1 << 6),  // 机油归零，点击保养"Oil Reset"下的车标进入的车型
+
+        /* Throttle Adaptation */
+        DET_MT_THROTTLE_ADAPTATION  = (1 << 7),  // 节气门匹配，点击保养"Throttle Adaptation"下的车标进入的车型
+
+        /* EPB Reset or Brake Reset */
+        DET_MT_EPB_RESET            = (1 << 8),  // EPB复位，刹车片更换，点击保养"EPB Reset"下的车标进入的车型
+
+        /* ABS Bleeding */
+        DEF_MT_ABS_BLEEDING         = (1 << 9),  // 点击保养"ABS Bleeding"下的车标进入的车型
+
+        /* Steering Angle Reset */
+        DEF_MT_STEERING_ANGLE_RESET = (1 << 10),  // 转向角复位，点击保养"Steering Angle Reset"下的车标进入的车型
+
+        /* DPF Regeneration */
+        DEF_MT_DPF_REGENERATION     = (1 << 11),  // DPF再生，点击保养"DPF Regeneration"下的车标进入的车型
+
+        /* Airbag Reset */
+        DEF_MT_AIRBAG_RESET         = (1 << 12),  // 点击保养"Airbag Reset"下的车标进入的车型
+
+        /* BMS Reset */
+        DEF_MT_BMS_RESET            = (1 << 13),  // 点击保养"BMS Reset"下的车标进入的车型
+
+        /* ADAS               */
+        DEF_MT_ADAS                 = (1 << 14),  // ADAS校准
+        
+        /* IMMO               */
+        DEF_MT_IMMO                 = (1 << 15),  // IMMO防盗匹配
+        
+        /* SmartKey           */
+        DEF_MT_SMART_KEY            = (1 << 16),  // 智能钥匙匹配
+        
+        /* PasswordReading    */
+        DEF_MT_PASSWORD_READING     = (1 << 17),  // 密码读取
+       
+        /* InjectorCode       */
+        DEF_MT_INJECTOR_CODE        = (1 << 19),  // 喷油嘴编码
+        
+        /* Suspension         */
+        DEF_MT_SUSPENSION           = (1 << 20),  // 悬挂匹配
+        
+        /* TirePressure       */
+        DEF_MT_TIRE_PRESSURE        = (1 << 21),  // 胎压复位
+        
+        /* Transmission       */
+        DEF_MT_TRANSMISSION         = (1 << 22),  // 变速箱匹配 Gearbox matching
+        
+        /* GearboxLearning    */
+        DEF_MT_GEARBOX_LEARNING     = (1 << 23),  // 齿讯学习 Gear Learn
+        
+        /* TransportMode      */
+        DEF_MT_TRANSPORT_MODE       = (1 << 24),  // 运输模式解除
+        
+        /* Headlight or AFS Reset  */
+        DEF_MT_HEAD_LIGHT           = (1 << 25),  // 大灯匹配 AFS Reset
+        
+        /* SunroofInit        */
+        DEF_MT_SUNROOF_INIT         = (1 << 26),  // 天窗初始化
+        
+        /* SeatCali           */
+        DEF_MT_SEAT_CALI            = (1 << 27),  // 座椅标定
+        
+        /* WindowCali         */
+        DEF_MT_WINDOW_CALI          = (1 << 28),  // 门窗标定
+        
+        /* StartStop          */
+        DEF_MT_START_STOP           = (1 << 29),  // 启停设置
+        
+        /* EGR                */
+        DEF_MT_EGR                  = (1 << 30),  // EGR自学习, 废气再循环 （ Exhaust Gas Recirculation）
+        
+        /* Odometer           */
+        DEF_MT_ODOMETER             = 0x80000000,  // 里程表调校, 1 << 31
+        
+        /* Language           */
+        DEF_MT_LANGUAGE             = 0x100000000,  // 语言设置, 1 << 32
+        
+        /* Tire               */
+        DEF_MT_TIRE_MODIFIED        = 0x200000000,  // 轮胎改装, 1 << 33
+        
+        /* A_F_Adj            */
+        DEF_MT_A_F_ADJ              = 0x400000000,  // A/F 调校, 1 << 34
+        
+        /* ElectronicPump     */
+        DEF_MT_ELECTRONIC_PUMP      = 0x800000000,  // 电子水泵激活, Coolant Bleed, 1 << 35
+        
+        /* NoxReset           */
+        DEF_MT_NOx_RESET            = 0x1000000000,  // 氮氧排放复位, 1 << 36
+        
+        /* UreaReset or  AdBlue Reset  */
+        DEF_MT_UREA_RESET           = 0x2000000000,  // 尿素复位, 1 << 37
+        
+        /* TurbineLearning    */
+        DEF_MT_TURBINE_LEARNING     = 0x4000000000,  // 涡轮叶片学习, 1 << 38
+        
+        /* Cylinder           */
+        DEF_MT_CYLINDER             = 0x8000000000,  // 气缸平衡测试, 1 << 39
+        
+        /* EEPROM             */
+        DEF_MT_EEPROM               = 0x10000000000,  // EEPROM适配器, 1 << 40
+        
+        /* ExhaustProcessing  */
+        DEF_MT_EXHAUST_PROCESSING   = 0x20000000000,  // 尾气后处理, 1 << 41
+
+        /* RFID */
+        DEF_MT_RFID                 = 0x40000000000,  // RFID,       1 << 42
+
+        /* 特殊功能 */
+        DET_MT_SPEC_FUNC            = 0x80000000000,  // 特殊功能,   1 << 43
+        
+        //以下为新增加20240629
+        /*Clutch*/
+        DEF_MT_CLUTCH               = 0x100000000000,  //离合器匹配,   1 << 44
+
+        /*Speed & PTO*/
+        DEF_MT_SPEED_PTO            = 0x200000000000,  //速度与功率,   1 << 45
+
+        /*FRM_RESET*/
+        DEF_MT_FRM_RESET            = 0x400000000000,  //FRM复位,   1 << 46
+
+        /*VIN*/
+        DEF_MT_VIN                  = 0x800000000000,  //VIN,      1 << 47
+
+        /*HV Battery*/
+        DEF_MT_HV_BATTERY           = 0x1000000000000,  //高压电池,   1 << 48
+
+        /*ACC*/
+        DEF_MT_ACC                  = 0x2000000000000,  //巡航校准,   1 << 49
+
+        /*A/C*/
+        DEF_MT_AC_LEARNING          = 0x4000000000000,  //空调学习,   1 << 50
+
+        /*Rain/Light Sensor*/
+        DEF_MT_RAIN_LIGHT_SENSOR    = 0x8000000000000,  //雨水/光传感器,   1 << 51
+
+        /*Reset control unit*/
+        DEF_MT_RESET_CONTROL_UNIT   = 0x10000000000000,  //控制单元复位,   1 << 52
+
+        /*CCS/ACC*/
+        DEF_MT_CSS_ACC              = 0x20000000000000,  //定速/自适应巡航 ,   1 << 53
+
+        /*Relative Compression*/
+        DEF_MT_RELATIVE_COMPRESSION = 0x40000000000000,  //相对压缩 ,   1 << 54
+
+        /*HV De-energization/Energization*/
+        DEF_MT_HV_DE_ENERGIZATION      = 0x80000000000000,  //高压断电/启用,   1 << 55
+
+        /*Coolant/Refrigerant Change*/
+        DEF_MT_COOLANT_REFRIGERANT_CHANGE  = 0x100000000000000,  //冷却液/制冷剂更换 ,   1 << 56
+
+        /*Resolver Sensor Calibration*/
+        DEF_MT_RESOLVER_SENSOR_CALIBRATION = 0x200000000000000,  //旋变传感器标定 ,   1 << 57
+
+        /*Camshaft learning*/
+        DEF_MT_CAMSHAFT_LEARNING           = 0x400000000000000,  //凸轮轴学习 ,   1 << 58
+
+        /*VIN/Odometer Check*/
+        DEF_MT_VIN_ODOMETER_CHECK          = 0x800000000000000,  //VIN/里程检查,   1 << 59
+
+        DET_ALLFUN                  = 0x7FFFFFFFFFFFFFFF,   // 支持任何功能
+        DET_INVALID                 = 0xFFFFFFFFFFFFFFFF,   // 不支持任何功能
+    };
+
+    // 用于接口GetDiagMenuMask的返回值，诊断应用对车型的菜单进行动态屏蔽
+    enum class eDiagMenuMask :uint64_t
+    {   //当前诊断的系统掩码值
+        DMM_SUPPORT_NONE_SYSTEM = 0,            // 表示当前不支持任何系统
+
+        DMM_ECM_CLASS      = (1 << 0),          // 动力系统类    包含：发动机、汽车网关、巡航、新能源电机系统等系统
+        DMM_TCM_CLASS      = (1 << 1),          // 传动系列类    包含：波箱等系统
+        DMM_ABS_CLASS      = (1 << 2),          // 制动系统类    包含：ABS、EPB、刹车片等系统
+        DMM_SRS_CLASS      = (1 << 3),          // 安全防御类    包含: SRS/Airbag、安全带、轮胎/胎压等系统
+        DMM_HVAC_CLASS     = (1 << 4),          // 空调系列类    包含：空调、交换机等系统
+        DMM_ADAS_CLASS     = (1 << 5),          // ADAS系列类    包含：ADAS、辅助行车类摄像头等
+        DMM_IMMO_CLASS     = (1 << 6),          // 安全防盗类    包含：immobiliser/immobilizer、Key、防盗摄像头等系统
+        DMM_BMS_CLASS      = (1 << 7),          // 电池系统类    包含：燃油车的电池、新能源的电池管理系统
+        DMM_EPS_CLASS      = (1 << 8),          // 转向系统类    包含：EPS、方向盘等
+        DMM_LED_CLASS      = (1 << 9),          // 灯光系统类    包含: 大灯、行车灯等
+        DMM_IC_CLASS       = (1 << 10),         // 仪表系统类    包含: 仪表、中控相关、保险丝的系统等
+        DMM_INFORMA_CLASS  = (1 << 11),         // 信息娱乐类    包含: DVD、收音机、行车/车内记录仪、导航、定位等系统
+        DMM_BCM_CLASS      = (1 << 12),         // 车身控制类    包含：车门、车窗、尾箱、发动机舱、喇叭、雨刮等
+
+        DMM_OTHER_CLASS    = (0xFFFFFFFF),      // 此值表示无法归类，统一用“其它”处理
+
+        DMM_ALL_SYSTEM_SUPPORT  = 0x7FFFFFFFFFFFFFFF,           // 支持所有系统任何功能
+        DMM_INVALID             = 0xFFFFFFFFFFFFFFFF,           // 不支持任何系统任何功能
+    };
+
+    // 用于接口GetHiddenMenuMask的返回值，刷隐藏诊断应用根据后台的菜单进行动态屏蔽
+    // 提示：诊断与App新增刷隐藏功能掩码接口，区分GetDiagMenuMask（From IOT：App与后台接口仍使用诊断系统掩码字段）
+    enum class eHiddenMenuMask :uint64_t
+    {   //当前刷隐藏的功能掩码值
+        HMM_SUPPORT_NONE_FUNCTION = 0,               // 表示当前不支持任何功能
+                                                     
+        HMM_CHASSIS_ENGINE_CLASS   = (1 << 0),       // Chassis & Engine                 底盘&动力
+        HMM_DRIVING_STEER_CLASS    = (1 << 1),       // Driving Assist&Steering Wheel    驾驶辅助 （方向盘）
+        HMM_AC_CLASS               = (1 << 2),       // Heater & A/C                     空调&加热
+        HMM_IM_CLASS               = (1 << 3),       // Instruments                      仪表&中控&多媒体
+        HMM_LIGHTS_CLASS           = (1 << 4),       // Lights                           灯光
+        HMM_LOCK_CLASS             = (1 << 5),       // Lock                             锁
+        HMM_MIRRORS_CLASS          = (1 << 6),       // Mirrors                          后视镜
+        HMM_DOOR_CLASS             = (1 << 7),       // Windows&Door&Sunroof             门&窗
+        HMM_WIPERS_CLASS           = (1 << 8),       // Wipers & Washer                  雨刮
+        HMM_SEATS_CLASS            = (1 << 9),       // Seats&Belt                       座椅&安全带
+        HMM_WARNING_OTHER_CLASS    = (1 << 10),      // Warnings & Other                 告警及其他
+
+        HMM_ALLFUN  = 0x7FFFFFFFFFFFFFFF,            // 支持任何功能
+        HMM_INVALID = 0xFFFFFFFFFFFFFFFF,            // 不支持任何功能
+    };
+
+
+    // 针对小车探/CarPal/CarPal Guru，用于接口GetObdEntryType的返回值
+    enum class eObdEntryType :uint32_t
+    {
+        //当前OBD和诊断车型的入口类型
+
+        // 首页“数据流”快捷方式进入，例如国内版TOPVCI(小车探)
+        OET_TOPVCI_DATASTREAM       = (1 << 0),  // 国内版TOPVCI首页数据流,   1 << 0
+
+        // 首页“部件测试”快捷方式进入，例如国内版TOPVCI(小车探)
+        OET_TOPVCI_ACTIVE_TEST      = (1 << 1),  // 国内版TOPVCI首页部件测试, 1 << 1
+
+        // 首页“抬头显示”快捷方式进入，例如国内版TOPVCI(小车探)
+        OET_TOPVCI_HUD              = (1 << 2),  // 国内版TOPVCI首页抬头显示, 1 << 2
+
+        // 首页“年检预审”快捷方式进入，例如国内版TOPVCI(小车探)
+        OET_TOPVCI_OBD_REVIEW       = (1 << 3),  // 国内版TOPVCI首页年检预审, 1 << 3
+
+        // 是否进行OBD一键扫描故障码系统，OBD诊断程序根据此值判断增加扫描功能
+        OET_TOPVCI_OBD_SCAN_SYS     = (1 << 4),  // 表示需要增加一键扫描OBD故障码系统, 1 << 4
+
+
+        ///////////////////////////////       CarPal      /////////////////////////////////////
+        // 首页“发动机检测”快捷方式进入，例如CarPal
+        OET_CARPAL_OBD_ENGINE_CHECK = (1 << 5),  // CarPal首页发动机检测, 1 << 5
+
+        // 首页“IM预排放”快捷方式进入，例如CarPal
+        OET_CARPAL_IM_PROTOCOL      = (1 << 6),  // CarPal首页IM预排放,   1 << 6
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+
+        ///////////////////////////////     CarPal Guru    /////////////////////////////////////
+        // CarPal Guru 首页“刷隐藏”快捷方式进入
+        OET_CARPAL_GURU_HIDDEN      = (1 << 7),  // CarPal Guru 首页刷隐藏,  1 << 7
+
+        // CarPal Guru 首页“数据流”快捷方式进入
+        OET_CARPAL_GURU_DATASTREAM  = (1 << 8),  // CarPal Guru 首页数据流,  1 << 8
+
+        // CarPal Guru 首页“动作测试”快捷方式进入
+        OET_CARPAL_GURU_ACTIVE_TEST = (1 << 9),  // CarPal Guru 首页动作测试, 1 << 9
+        ////////////////////////////////////////////////////////////////////////////////////////
+
+
+        // 当前App不支持此入口功能接口 
+        OET_APP_NOT_SUPPORT  = DF_FUNCTION_APP_CURRENT_NOT_SUPPORT,
+    };
+
+    // 针对AUTOVIN用于接口GetAutoVinEntryType的返回值
+    enum class eAutoVinEntryType :uint32_t
+    {
+        //当前AUTOVIN车型的入口类型
+
+        // 首页 ==> “诊断” ==> “AUTOVIN”  从首页的诊断入口进去后再点的AUTOVIN
+        AVET_DIAG = (1 << 0),     // 从首页的诊断入口进入的AUTOVIN,   1 << 0
+
+        // 首页 ==> “防盗” ==> “AUTOVIN”  从首页的防盗入口进去后再点的AUTOVIN
+        AVET_IMMO = (1 << 1),     // 从首页的防盗入口进入的AUTOVIN,   1 << 1
+
+        // 首页 ==> “摩托车” ==> “AUTOVIN”  从首页的摩托车入口进去后再点的AUTOVIN
+        AVET_MOTOR = (1 << 2),    // 从首页的摩托车入口进入的AUTOVIN,   1 << 2
+
+        // 当前App不支持此入口功能接口 
+        AVET_APP_NOT_SUPPORT = DF_FUNCTION_APP_CURRENT_NOT_SUPPORT,
+    };
+
+public:
+    CArtiGlobal() {}
+    ~CArtiGlobal() {}
+
+public:
+    /*-----------------------------------------------------------------------------
+      功    能：获取stdshow版本号
+
+                PC工具中，返回的是StdShow.dll的版本号
+                Android中，返回的是libstdshow.so的版本号
+
+      参数说明：无
+
+      返 回 值：32位 整型 0xHHLLYYXX
+
+      说    明：Coding of version numbers
+                HH 为 最高字节, Bit 31 ~ Bit 24   主版本号（正式发行），0...255
+                LL 为 次高字节, Bit 23 ~ Bit 16   次版本号（正式发行），0...255
+                YY 为 次低字节, Bit 15 ~ Bit 8    最低版本号（测试使用），0...255
+                XX 为 最低字节, Bit 7 ~  Bit 0    保留
+
+                例如 0x02010300, 表示 V2.01.003
+                例如 0x020B0000, 表示 V2.11
+    -----------------------------------------------------------------------------*/
+    static uint32_t GetVersion();
+
+
+    /*-----------------------------------------------------------------------------
+      功    能：获取显示应用的版本号
+
+                PC工具中，返回的是TOPDON.exe的版本号
+                Android中，返回的是APK的版本号
+
+      参数说明：无
+
+      返 回 值：32位 整型 0xHHLLYYXX
+
+      说    明：Coding of version numbers
+                HH 为 最高字节, Bit 31 ~ Bit 24   主版本号（正式发行），0...255
+                LL 为 次高字节, Bit 23 ~ Bit 16   次版本号（正式发行），0...255
+                YY 为 次低字节, Bit 15 ~ Bit 8    最低版本号（测试使用），0...255
+                XX 为 最低字节, Bit 7 ~  Bit 0    保留
+
+                例如 0x02010300, 表示 V2.01.003
+                例如 0x020B0000, 表示 V2.11
+    -----------------------------------------------------------------------------*/
+    static uint32_t GetAppVersion();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前语言
+    参数说明：无
+    返回值：en,cn
+    说明：无
+    -----------------------------------------------------------------------------*/
+    static std::string const GetLanguage() ;
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前车型路径
+    参数说明：无
+
+    返回值：当前车型路径，Windows 即Diag.dll所在路径
+
+    说明：路径为绝对路径，
+          Windows 例如："E:\SVN\Debug\TopDon\Diagnosis\Car\Europe\Demo"
+    -----------------------------------------------------------------------------*/
+    static std::string const GetVehPath();
+
+
+    /*-----------------------------------------------------------------------------------------------------
+    功能：获取指定品牌的车型路径
+
+    参数说明：strVehType    指定的车型类型，区分大小写
+                            例如DIAG,      "Diagnosis"
+                            例如IMMO,      "Immo"
+                            例如RFID,      "RFID"
+                            例如NewEnergy, "NewEnergy"
+
+              strVehArea    指定品牌车型所在的区域，区分大小写
+                            例如EOBD，     "Europe"
+                            例如AUDI，     "Europe"
+                            例如AUTOVIN，  "Public"
+              
+              strVehName    指定品牌车型名称，区分大小写
+                            例如EOBD，"EOBD"
+                            例如AUDI，"VW"
+
+    返回值：指定车型路径，Windows 即Diag.dll所在路径
+            如果strVehType为空，或不存在，返回空串""
+            如果strVehArea为空，或不存在，返回空串""
+            如果不存在此车，返回空串""
+
+            如果strVehName指定的是链接车，返回链接车指定的实际车型路径
+            例如strVehType="Diagnosis", strVehArea="Europe", strVehName="AUDI"，返回应该是实际的VW车型路径
+            /sdcard/Android/data/com.topdon.diag.artidiag/files/TopDon/AD900/11017762H10003/Diagnosis/Europe/VW
+
+    说 明：路径为绝对路径，
+           Windows 例如："E:\SVN\Debug\TopDon\Diagnosis\Car\Europe\Demo"
+           Windows 例如："E:\SVN\Debug\TopDon\Diagnosis\Car\Europe\EOBD"
+           Windows 例如："E:\SVN\Debug\TopDon\Diagnosis\Car\Europe\VW"
+           /sdcard/Android/data/com.topdon.diag.artidiag/files/TopDon/AD900/11017762H10003/Diagnosis/Public/AUTOVIN
+    ---------------------------------------------------------------------------------------------------------------------------------*/
+    static std::string const GetVehPathEx(const std::string& strVehType, const std::string& strVehArea, const std::string& strVehName);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前车型的用户数据路径（非车型路径）,此路径下的文件随着车型软件
+          升级不会被删除或更改
+
+    参数说明：无
+
+    返回值：当前车型的用户数据路径
+
+    说明：路径为绝对路径，
+          Windows 例如："C:\ProgramData\TOPDON\IMMO\BMW"
+          Android 例如："/mnt/sdcard/Android/data/com.topdon.diag.artidiag
+                         /files/TopDon/AD900/UserData/IMMO/BMW"
+    -----------------------------------------------------------------------------*/
+    static std::string const GetVehUserDataPath();
+
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前车型名称
+    参数说明：无
+
+    返回值：当前车型路径的文件夹名称，Windows 即Diag.dll所在路径的文件夹名称
+
+    说明：Windows 例如：
+          如果车型路径为"E:\SVN\Debug\TopDon\Diagnosis\Car\Europe\Demo"
+          则返回字符串为"Demo"
+    -----------------------------------------------------------------------------*/
+    static std::string const GetVehName();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前车辆VIN码
+    参数说明：无
+
+    返回值：应用已知的车辆VIN码（例如调用AutoVin获取到的，或者OCR扫描铭牌得到的）
+
+    说明：返回值举例：
+                    LFV3A23C2H3181097
+    -----------------------------------------------------------------------------*/
+    static std::string const GetVIN();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置当前车辆VIN码
+
+    参数说明：诊断设置当前获取到的VIN，例如 LFV3A23C2H3181097
+
+    返回值：无
+    -----------------------------------------------------------------------------*/
+    static void SetVIN(const std::string& strVin);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置VIN解析的车型给APK/APP，AUTOVIN和诊断车型调用
+
+          AUTOVIN诊断设置当前车辆车型
+          AUTOVIN根据获取到的VIN，解析相应的车型，将VIN对应的车型给APK/APP
+          诊断车型软件（A车软件）检测到当前自己车型软件不能测试当前车，将可以测试的车
+          型软件（B车软件）通过此接口设置给APK/APP，同时通过SetCurVehNotSupport接口通知
+          APK/APP需要切换重新进车
+
+    参数说明：vctVehicle     解析到的对应可能车型的集合
+                             如果解析到的可能车型有好几个，通过参数vctVehicle设给APP/APK
+                             如果解析不到对应的车型，则vctVehicle为空
+                             如果vctVehicle数组大小为2，则存在2种的可能存在车型
+                             APP/APK需要兼容字母大小写
+
+             例如：vctVehicle的数组大小为4，分别是"Chrysler","Fiat","JEEP","Dodge"
+             则VIN对应的车可能是4种车型
+
+             例如：vctVehicle的数组大小为7，分别"Fawcar", "FawDaihatsu", "MazdaChina",
+             "TJFAW", "ToyotaChina", "BesTune", "HongQi"
+             则VIN对应的车可能是7种车型
+
+
+    返回值：无
+
+
+    注  意：诊断设置当前车辆车型
+            AUTOVIN获取VIN码的途径，优先通过GETVIN来获取，其次可以从车辆通讯中获取
+    -----------------------------------------------------------------------------*/
+    static void SetVehicle(const std::vector<std::string>& vctVehicle);
+    
+
+    /*-----------------------------------------------------------------------------
+    功能：设置VIN解析的车型信息给APK/APP，软件编码可为空或者空串""
+
+          AUTOVIN诊断设置当前车辆车型信息
+          AUTOVIN根据获取到的VIN，解析相应的车型目录文件夹名称
+                                  将VIN对应的车型目录文件夹名称给APK/APP
+
+
+    参数说明：
+             vctVehDir       解析到的对应可能车型的目录文件夹名称的集合
+                             如果解析到的可能车型有好几个，通过参数vctVehDir设给APP/APK
+                             如果解析不到对应的车型，则vctVehDir为空
+                             如果vctVehDir数组大小为2，则存在2种的可能存在车型
+
+             vctVehName      暂没有使用，保留
+
+             vctSoftCode     对应的软件编码，vctVehDir和vctSoftCode的大小保持一致
+
+
+             举例1：vctVehDir的大小为3，分别是"BUICK", "CADILLAC", "CHEVROLET"
+
+                    vctVehName为空
+
+                    vctSoftCode的到校为3，分别是"AD900_CarSW_BUICK", "AD900_CarSW_CADILLAC", "AD900_CarSW_CHEVROLET"
+
+             举例2：vctVehDir的大小为2，分别是"GM", "GMBRAZIL"
+
+                    vctVehName为空
+
+                    vctSoftCode为空，分别是"AD900_CarSW_GM", "AD900_CarSW_GMBRAZIL"
+
+    返回值：无
+
+
+    注  意：诊断设置当前车辆车型
+            AUTOVIN获取VIN码的途径，优先通过GETVIN来获取，其次可以从车辆通讯中获取
+    -----------------------------------------------------------------------------*/
+    static void SetVehicleEx(const std::vector<std::string>& vctVehDir, const std::vector<std::string>& vctVehName, const std::vector<std::string>& vctSoftCode);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置车辆信息
+
+    参数说明：诊断设置当前车辆信息
+
+            例如：宝马/3'/320Li_B48/F35/
+
+    返回值：无
+    -----------------------------------------------------------------------------*/
+    static void SetVehInfo(const std::string& strVehInfo);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置系统名称
+
+    参数说明：诊断设置当前系统名称
+
+            例如：RCM-安全保护控制系统
+
+    返回值：无
+    -----------------------------------------------------------------------------*/
+    static void SetSysName(const std::string& strSysName);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置ADAS的MMYS信息
+
+    参数说明：strMake     品牌
+              strModel    车型
+              strYear     年份
+              strSys      系统
+
+    返回值：无
+    -----------------------------------------------------------------------------*/
+    static void SetAdasMMYS(const std::string& strMake, const std::string& strModel, const std::string& strYear, const std::string& strSys);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取ADAS的的校准数据，例如轮眉高度，燃油液位
+
+    参数说明：eAcdType    获取ADAS校准数据的类型
+
+                      ACD_CAL_WHEEL_BROW_HEIGHT_LF   左前轮数据类型
+                      ACD_CAL_WHEEL_BROW_HEIGHT_RF   右前轮数据类型
+                      ACD_CAL_WHEEL_BROW_HEIGHT_LR   左后轮数据类型
+                      ACD_CAL_WHEEL_BROW_HEIGHT_RR   右后轮数据类型
+                      ACD_CAL_FUEL_LEVEL             燃油液位数据类型
+
+    返回值：返回eAcdType对应数据输入的值
+    -----------------------------------------------------------------------------*/
+    static float GetAdasCalData(eAdasCaliData eAcdType);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取车型历史记录
+
+          在进入车型时，车型代码在初始化时会调用此接口，判定是否是从历史记录中进入，
+          并且获取到"SetHistoryRecord"中保存的字串信息，以便车型代码逻辑快速判定下一
+          步操作
+
+    参数说明：无
+
+    返回值：返回所点击的历史记录中的"SetHistoryRecord"设置的字串
+    -----------------------------------------------------------------------------*/
+    static std::string const GetHistoryRecord();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置车型历史记录
+
+          如果车型代码调用了此接口，App开始一条历史记录，车型代码如果需要添加相关的
+          历史信息可通过以下接口设置
+          SetHistoryMileage
+          SetHistoryDtcItem
+          SetHistoryMMY
+          SetHistoryEngine
+          
+
+    参数说明：strRecord  历史记录相关字串信息，信息内容由车型诊断自由决定
+                         App负责保存在车型历史数据库中，以便下次车型进入时
+                         调用"GetHistoryRecord"去获取
+
+    返回值：无
+    
+    说  明：
+          历史记录生成规则说明
+          1、选车完成进入诊断功能菜单界面，生成1条诊断历史记录
+          2、进系统读码或系统扫描，可以通过接口
+             SetHistoryMileage
+             SetHistoryDtcItem
+             SetHistoryMMY
+             SetHistoryEngine
+             将当前系统和故障码信息添加到诊断历史记录中
+          3、多次调用SetHistoryDtcItem，以系统Name来区分不同系统，
+             同一系统的多次故障信息以最后一次为准
+          4、多次调用SetHistoryHiddenItem，以功能大类名称和子类名称来区分
+    -----------------------------------------------------------------------------*/
+    static void SetHistoryRecord(const std::string& strRecord);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置历史记录中显示的车辆行驶里程（KM）
+
+    参数说明：诊断设置当前车辆行驶总里程（KM）
+
+            strMileage            当前车辆行驶总里程（KM）
+            strMILOnMileage        故障灯亮后的行驶里程（KM）
+
+            例如：568        表示行驶总里程为568KM
+
+    返回值：
+
+    说  明：如果无“故障灯亮后的行驶里程”，则strMILOnMileage为空串""或空
+    -----------------------------------------------------------------------------*/
+    static void SetHistoryMileage(const std::string& strMileage, const std::string& strMILOnMileage);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：添加历史记录中显示的故障码信息
+
+    参数说明：DtcItem    故障码列表项， 参考stDtcReportItemEx的定义
+
+    返回值：无
+
+    说  明：增加系统故障码信息，如果系统相同，以最后一次设置为准
+    -----------------------------------------------------------------------------*/
+    static void SetHistoryDtcItem(const stDtcReportItemEx &DtcItem);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置历史记录中的MMY信息
+
+    参数说明：strMake     品牌
+              strModel    车型
+              strYear     年份
+
+    返回值：  DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+              其他值，暂无意义
+    -----------------------------------------------------------------------------*/
+    static uint32_t SetHistoryMMY(const std::string& strMake, const std::string& strModel, const std::string& strYear);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置历史记录中的车辆发动机信息
+
+    参数说明：
+            strInfo      发动机机信息，例如，"F62-D52"
+            strSubType   发动机子型号或者其它信息，例如，"N542"
+
+    返回值：  DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+              其他值，暂无意义
+    -----------------------------------------------------------------------------*/
+    static uint32_t SetHistoryEngine(const std::string& strInfo, const std::string& strSubType);
+
+
+    /*-----------------------------------------------------------------------------------------------
+    功能：添加历史记录中的刷隐藏功能项信息
+
+    参数说明：
+            HiddenItem      刷隐藏功能项信息
+
+            struct stHistoryHidden
+            {
+                // 刷隐藏功能大类
+                std::string strName;      // 系统名称或功能大类名称
+                                          // 例如“前端电子模块”“灯光设置”
+
+                // 刷隐藏功能子类
+                std::string strSubName;   // 功能名称（子功能）
+                                          // 例如“日间行车灯”“左转向灯”“右转向灯”
+
+                // 刷写前后的状态
+                std::string strBeforeVal; // 刷写前的状态，例如“未开启”“已激活”
+                std::string strAfterVal;  // 刷写后的状态，例如“开启”  “未激活”
+
+                // 刷写结果枚举
+                uint32_t    uCurStatus;   // 当前功能执行的状态枚举，即刷写状态
+                                          // HNS_FUNC_HIDDEN_OK      1 刷写成功
+                                          // HNS_FUNC_HIDDEN_FAILED  2 刷写失败
+            };
+
+    返回值：  DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+              其他值，暂无意义
+
+    说  明： 刷隐藏功能项信息
+
+             如果多次调用SetHistoryHiddenItem，功能大类和功能子类都相同，
+             则：对应功能大类的刷写次数不变，功能子类结果以最后一次设置为准
+
+             多次调用SetHistoryHiddenItem，功能大类相同（strName不为空串），
+             功能子类不同（strSubName不为空串）
+             则，对应功能大类的刷写次数加1
+
+             如果功能大类相同（strName不为空串），功能子类strSubName为空串
+             则：没有对应的子类功能历史记录，即对应功能大类的刷写次数为0
+             对应功能大类的刷写次数为0，以最后一次调用为准
+             
+             例如，前面设置了功能大类和子类，现需要将指定的功能大类刷写次数清除掉，
+             将对应大类的功能子类置为空串即可
+    -----------------------------------------------------------------------------------------------*/
+    static uint32_t SetHistoryHiddenItem(const stHistoryHidden& HiddenItem);
+    
+
+
+    /*-----------------------------------------------------------------------------
+    功能：是否是从历史记录中进入
+
+    参数说明：无
+
+    返回值：如果用户是点击了历史进入的，返回 true
+            如果用户不是点击历史进入的，返回 false
+
+    说  明：用于诊断判定是否从历史记录进入
+    -----------------------------------------------------------------------------*/
+    static bool IsEntryFromHistory();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：设置AUTOVIN通讯的协议类型字串
+          APP保存以便下次进车(AutoVin)调用GetAutoVinProtocol获取协议快速进入
+
+    参数说明：strProtocol    诊断程序自己决定保存的协议字串信息
+
+    返回值：无
+
+    说  明：用于诊断程序AutoVin设置保存上一次的通讯协议，加快获取VIN类型
+            国内版TOPVCI小车探
+    -----------------------------------------------------------------------------*/
+    static void SetAutoVinProtocol(const std::string& strProtocol);
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取上次AUTOVIN通讯的协议类型字串
+          APP返回SetAutoVinProtocol保存的协议字串
+
+    参数说明：无
+
+    返回值：返回上次AUTOVIN通过SetAutoVinProtocol保存的协议类型字串
+
+    说  明：用于诊断程序AutoVin使用指定的协议类型去获取车辆VIN，实现快速获取VIN的功能
+            国内版TOPVCI小车探
+    -----------------------------------------------------------------------------*/
+    static std::string const GetAutoVinProtocol();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：获取当前AUTOVIN的协议扫描模式
+          APP返回，是否用指定的协议去读取VIN，还是用正常的全协议扫描模式去获取VIN
+          例如，国内版TOPVCI小车探
+
+    参数说明：无
+
+    返回值：  AVSM_MODE_NORMAL        = 1,  // 正常AUTOVIN协议扫描模式
+              AVSM_MODE_LAST_PROTOCOL = 2,  // AUTOVIN使用上次保存的协议去读取VIN
+
+    说  明：国内版TOPVCI小车探
+    -----------------------------------------------------------------------------*/
+    static eAutoVinScannMode GetAutoVinScannMode();
+
+
+    /*-----------------------------------------------------------------------------
+    功能：诊断程序设置不支持当前VIN码车辆
+
+          APP在车型（非OBD）调用此接口后需要判断此值，如果有设置为不支持，
+          小车探/CarPal，需立即进车OBD，TopScan等需要根据SetVehicle的车型进入到指定
+          的车型软件，APP需要处理退出逻辑和UI
+
+          诊断程序如不支持当前车辆需要调用此接口
+          
+    参数说明：eVehNotSupportType eType   设置是否支持
+
+              VBST_SUPPORT_NORMAL   = 0,    // 默认值，默认支持
+              VBST_VEH_NOT_SUPPORT  = 1,    // 当前车型程序（非OBD）不支持当前车辆
+
+    返回值：  DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+              其他值，暂无意义
+
+    说  明： 国内版TOPVCI小车探, TOPSCAN等
+    -----------------------------------------------------------------------------*/
+    static uint32_t SetCurVehNotSupport(eVehNotSupportType eType);
+
+
+    /*-------------------------------------------------------------------------------------------------------
+    功能：设置埋点事件
+          诊断程序调用此接口设置埋点事件给App，App将对应的埋点事件上传给后台，App注意此
+          接口不能阻塞，App缓存好对应的事件后立即返回给诊断程序
+
+    参数说明：eEventTrackingId                   eEventId   事件ID，所有事件宏值参考eEventTrackingId的定义
+              例如 eEventId = ETI_CLICK_HF_OIL_RESET 表示 HF_Oilreset 事件，用于统计“保养归零功能使用率”
+
+              std::vector<stTrackingItem>        &vctPara   参数集合
+              stTrackingItem结构体信息：
+              struct stTrackingItem
+              {
+                  eTrackingInfoType eType;         // 埋点的参数类型
+                  // 例如 TIT_DTC_CODE，表示strValue 此值是 "故障码编码"
+
+                  std::string     strValue;       // 实际埋点参数类型的字符串值
+                  // 例如当 eType = TIT_DTC_CODE，strValue为 "P1145"
+                  // 例如当 eType = TIT_VIN，strValue为 "KMHSH81DX9U478798"
+              };
+
+              eTrackingInfoType 可能宏值举例：
+              TIT_VIN               表示类型为车辆车架号
+              TIT_MAKE              表示类型为车辆品牌
+              TIT_MODEL             表示类型为车型
+              TIT_VEH_INFORMATION   表示类型为车辆信息，例如，宝马/3'/320Li_B48/F35/
+              TIT_DTC_CODE          表示类型为故障码编码，例如，"P1145"
+
+              例如，“带VIN&品牌&车辆信息&系统信息”
+              即：数组有4个元素，分别是VIN、品牌、车辆信息、系统信息
+              如果VIN没有获取到，则VIN字段为空
+
+    返回值：  DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口，此值由so返回
+              其他值，暂无意义
+
+    说  明：  无
+    -------------------------------------------------------------------------------------------------------*/
+    static uint32_t SetEventTracking(eEventTrackingId eEventId, const std::vector<stTrackingItem> &vctPara);
+
+
+    /*-----------------------------------------------------------------------------
+    *    功  能：将线程编号和车辆信息设给管理程序，用于多系统诊断
+    * 
+    *    参  数：
+                uThread    线程编号  uThread<=3
+                pVehicleInfo  指针表示最终能定位到系统集合 不能为空
+    *
+    *    返回值：无
+    -----------------------------------------------------------------------------*/
+    static void SetThreadVehiInfo(uint8_t uThread, void* pVehicleInfo);
+
+
+    /*-----------------------------------------------------------------------------
+    *    功  能：将指定SO名称的文件拷贝到运行目录并返回此目录，限于车型文件下的so文件
+    * 
+    *    参  数：
+    *            strSoName    需要拷贝的so文件名（含后缀）
+    *            
+    *    返回值：
+    *           拷贝到的实际目录路径名
+    *           例如：/data/user/0/com.topdon.artidiag/app_libs/TopDon/Diagnosis/Car/Asia/DEMO
+    * 
+    * 
+    *    举例1，说明：
+    *    源文件路径为：
+    *    /storage/emulated/0/TopDon/TD001/Diagnosis/Europe/BMW/libBmwPrg.so
+    *
+    *    拷贝目标目录为：
+    *    /data/user/0/com.topdon.artidiag/app_libs/TopDon/Diagnosis/Car/Europe/BMW
+    *
+    *    实参 strSoName 为： "libBmwPrg.so"
+    *    返回值为：
+    *    "/data/user/0/com.topdon.artidiag/app_libs/TopDon/Diagnosis/Car/Europe/BMW"
+    * 
+    * 
+    *    举例2，说明：
+    *    源文件路径为：
+    *    /storage/emulated/0/Android/data/com.topdon.diag.artidiag/files/TopDon/AD900/11017762H10003/Diagnosis/China/COMM/TEST/Test.so
+    * 
+    *    拷贝目标目录为：
+    *    /data/user/0/com.topdon.diag.artidiag/app_libs/TopDon/Diagnosis/Car/COMM/TEST/Test.so
+    * 
+    *    实参 strSoName 为： "TEST/Test.so"
+    *    返回值为：
+    *    "/data/user/0/com.topdon.diag.artidiag/app_libs/TopDon/Diagnosis/Car/COMM/"
+    * 
+    * 
+    *    *********
+    *    注意：当此车型退出后，不再需要的so还存在运行目录里，由APK进行维护删除
+    * 
+    -----------------------------------------------------------------------------*/
+    static std::string const Copy2RunPath(const std::string& strSoName);
+
+
+
+    /*-----------------------------------------------------------------------------
+    *    功  能：将指定SO名称的文件拷贝到运行目录并返回此目录
+    *            可以指定其它车型的so文件，并且可以重命名目标so文件名
+    *
+    *    参  数：
+    *            strVehType    指定的车型类型，区分大小写
+    *                          例如DIAG,      "Diagnosis"
+    *                          例如IMMO,      "Immo"
+    *                          例如RFID,      "RFID"
+    *                          例如NewEnergy, "NewEnergy"
+    * 
+    *            strVehArea    指定需要拷贝so文件的所在车型区域，例如Europe
+    * 
+    *            strVehName    指定需要拷贝so文件的所在车型名称，例如BMW
+    * 
+    *            strSoSrc      需要拷贝的so源文件名称，可以包括相对路径
+    *                          例如: E66/libDiag.so 或 libDiag.so
+    *            
+    *            strSoDst      需要拷贝的so目标文件名称，即重命名，可以包括相对路径
+    *                          例如: E66/libBmwPrg.so 或 libBmwPrg.so
+    * 
+    *    返回值：拷贝到的实际目录路径名
+    *           
+    *           例如：strVehType = Diagnosis, strVehArea = Europe, strVehName = BMW, strSoSrc = E66/libDiag.so, strSoDst = E66/libBmwPrg.so
+    *           返回值：/data/user/0/com.topdon.diag.artidiag/app_libs/TopDon/Diagnosis/Car/Europe/BMW
+    *
+    *
+    *    举例说明：
+    *    *********************************************************************
+    *    当前车型为NISSAN，需要调用AUTOVIN下的API/libDiag.so提供的接口，则需拷贝至运行目录
+    * 
+    *    需要拷贝源文件路径为：
+    *    /storage/emulated/0/Android/data/com.topdon.diag.artidiag/files/TopDon/AD900/11017762H10003/Diagnosis/Public/AUTOVIN/API/libDiag.so
+    *
+    *    拷贝目标文件路径为：
+    *    /data/user/0/com.topdon.artidiag/app_libs/TopDon/Diagnosis/Public/AUTOVIN/API/libDiag_20230601.so
+    *
+    *    则实参：
+    *           strVehType 为： "Diagnosis"
+    *           strVehArea 为： "Public"
+    *           strVehName 为： "AUTOVIN"
+    *           strSoSrc   为： "API/libDiag.so"
+    *           strSoDst   为： "API/libDiag_20230601.so"
+    * 
+    *    返回值为：
+    *    "/data/user/0/com.topdon.artidiag/app_libs/TopDon/Diagnosis/Public/AUTOVIN"
+    *    *********************************************************************
+    * 
+    *    注意：当此车型退出后，不再需要的so还存在运行目录里，由APK进行维护删除
+    *
+    -----------------------------------------------------------------------------*/
+    static std::string const Copy2RunPathEx(const std::string& strVehType, const std::string& strVehArea, const std::string& strVehName, const std::string& strSoSrc, const std::string& strSoDst);
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取平板的序列号
+
+    参数说明： 无
+
+    返 回 值：返回平板的序列号, 例如：“ST0013BA100044”
+    -----------------------------------------------------------------------------*/
+    static std::string const GetTabletSN();
+
+
+    /*-----------------------------------------------------------------------------
+        功    能： 获取平板的6字节校验码
+
+        参数说明： 无
+
+        返 回 值：返回平板的校验码, 例如：“123456”
+    -----------------------------------------------------------------------------*/
+    static std::string const GetTabletKey();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前应用的宿主机是手机还是平板
+
+    参数说明： 无
+
+    返 回 值： HT_IS_TABLET     表示当前应用的主机是平板
+               HT_IS_PHONE      表示当前应用的主机是手机
+               
+    注  意：   例如，AD200可能在手机或者iPad上运行，如果在手机上运行，返回HT_IS_TABLET
+               如果在iPad上运行，返回HT_IS_PHONE
+    -----------------------------------------------------------------------------*/
+    static eHostType const GetHostType();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前app应用的产品名称
+
+    参数说明： 无
+
+    返 回 值： PD_NAME_AD900              表示当前产品名为AD900
+               PD_NAME_AD200              表示当前产品名为AD200
+               PD_NAME_TOPKEY             表示当前产品名为TOPKEY
+               PD_NAME_NINJA1000PRO       表示当前产品名为Ninja1000 Pro
+    -----------------------------------------------------------------------------*/
+    static eProductName const GetAppProductName();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前app应用的使用场景
+
+    参数说明： 无
+
+    返 回 值： AS_EXTERNAL_USE         表示正式面向用户的使用场景，即正常用户使用场景
+               AS_INTERNAL_USE         表示打开了Debug使用场景的后门
+    -----------------------------------------------------------------------------*/
+    static eAppScenarios const GetAppScenarios();
+
+
+    /*----------------------------------------------------------------------------------------------
+    功    能： 获取当前诊断的入口类型
+               GetDiagEntryType 接口返回值只支持64位，因功能掩码已超64个，不建议使用
+               GetDiagEntryType 已被 GetDiagEntryTypeEx 代替
+               GetDiagEntryTypeEx 接口返回值是一个bool型数组，功能掩码个数不受限制
+
+    参数说明： 无
+
+    返 回 值： GetDiagEntryType返回DET_ALLFUN  表示当前是通过，点击正常诊断下车标进入的车型
+               GetDiagEntryType返回DET_MT_OIL_RESET  表示机油归零的功能掩码
+               
+               GetDiagEntryTypeEx返回的是一个bool型数组，数组下标表示对应的功能掩码位置，数组下标
+               对应的值表示对应的功能掩码值，true代表"1"，false代表"0"
+               
+               GetDiagEntryTypeEx 返回值举例
+               返回的数组大小为66，数组的每个元素都是true，则支持所有功能
+               如果下标为DET_MT_OIL_RESET的值为false，即第6个（小标从0数）值为false，即不支持
+               "Oil Reset"功能
+    ----------------------------------------------------------------------------------------------*/
+    [[deprecated("is deprecated, please use CArtiGlobal::GetDiagEntryTypeEx() instead.")]]
+    static eDiagEntryType const GetDiagEntryType();
+    static std::vector<bool> const GetDiagEntryTypeEx();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取菜单屏蔽掩码，用于获取当前产品（App）是否支持哪些类型系统菜单（功能）
+
+               车型代码通过此接口获取可支持的系统菜单掩码，再配合接口GetDiagEntryType
+               获取入口类型支持的功能掩码，对不可展示的菜单进行过滤（不展示），形成不
+               同的产品搭配要求
+
+    参数说明： 无
+
+    返 回 值： eDiagMenuMask      支持的系统掩码，"位"值为"1"表示支持，"0"表示不支持
+
+               例如，DMM_ECM_CLASS，即0x01，表示支持“动力系统类”
+               例如，0x03，表示支持“动力系统类”且支持“传动系列类”
+               DMM_ALL_SYSTEM_SUPPORT，表示支持所有系统类
+    -----------------------------------------------------------------------------*/
+    static eDiagMenuMask const GetDiagMenuMask(); 
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取刷隐藏功能菜单掩码，用于获取后台是否支持哪些功能菜单
+
+               车型代码通过此接口获取可支持的功能菜单掩码
+
+    参数说明： 无
+
+    返 回 值： eHiddenMenuMask      支持的功能掩码，"位"值为"1"表示支持，"0"表示不支持
+    -----------------------------------------------------------------------------*/
+    static eHiddenMenuMask const GetHiddenMenuMask();
+
+
+    /*-------------------------------------------------------------------------------
+    功    能： 获取当前OBD车型或者其它车型的入口类型（小车探、CarPal、CarPal Guru）
+
+    参数说明： 无
+
+    返 回 值： 
+               OET_TOPVCI_DATASTREAM      首页“数据流”方式进入
+               OET_TOPVCI_ACTIVE_TEST     首页“部件测试”方式进入
+               OET_TOPVCI_HUD             首页“抬头显示”方式进入
+               OET_TOPVCI_OBD_REVIEW      首页“年检预审”方式进入
+               OET_TOPVCI_OBD_SCAN_SYS    表示需要增加一键扫描OBD故障码系统
+
+               OET_CARPAL_OBD_ENGINE_CHECK     CarPal首页发动机检测
+               OET_CARPAL_IM_PROTOCOL          CarPal首页IM预排放
+
+               OET_CARPAL_GURU_HIDDEN          CarPal Guru 首页刷隐藏
+               OET_CARPAL_GURU_DATASTREAM      CarPal Guru 首页数据流
+               OET_CARPAL_GURU_ACTIVE_TEST     CarPal Guru 首页动作测试
+
+               OET_APP_NOT_SUPPORT             当前App不支持此入口功能（stdshow返回此值）
+    -----------------------------------------------------------------------------------*/
+    static eObdEntryType const GetObdEntryType();
+
+
+    /*-----------------------------------------------------------------------------
+    功    能： 获取当前AUTOVIN的入口类型（AUTOVIN需求）
+
+    参数说明： 无
+
+    返 回 值：
+               AVET_DIAG              从首页的诊断入口进入的AUTOVIN,   1 << 0
+               AVET_IMMO              从首页的防盗入口进入的AUTOVIN,   1 << 1
+               AVET_MOTOR             从首页的摩托车入口进入的AUTOVIN,   1 << 2
+               AVET_APP_NOT_SUPPORT   当前App不支持此入口功能接口
+    -----------------------------------------------------------------------------*/
+    static eAutoVinEntryType const GetAutoVinEntryType();
+
+
+    /*-----------------------------------------------------------------------------
+     *    功    能：网络连接是否存在，并且可以建立连接并传递数据
+     *
+     *    参数说明：无
+     *
+     *    返 回 值：true     网络连接存在，并且可以建立连接并传递数据
+     *              false    网络没有连接
+     -----------------------------------------------------------------------------*/
+    static bool IsNetworkAvailable();
+
+
+    /*-----------------------------------------------------------------------------
+     *    功    能：单位制转换，将相应的单位值转换成显示给用户的单位值
+     *
+     *    参数说明：stUnitItem uiSource          需要转换的单位和值
+     *
+     *    返 回 值：转换后的单位和值
+     * 
+     *              1234 千米 [km] = 766.7721 英里 [mi]
+     *              例如：输入 ("km", "1234")
+     *                    返回 ("mi.", "766.7721")
+     -----------------------------------------------------------------------------*/
+    static stUnitItem UnitsConversion(const stUnitItem& uiSource);
+
+
+    /*-----------------------------------------------------------------------------
+     *    功    能：获取当前的单位制模式（公制还是英制）
+     *
+     *    参数说明：无
+     *
+     *    返 回 值：eUnitType
+     *                        UT_METRIC_MODE   表示App中，当前选择的是公制单位
+     *                        UT_ENGLISH_MODE  表示App中，当前选择的是英制单位
+     * 
+     *              DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+     -----------------------------------------------------------------------------*/
+    static eUnitType GetCurUnitMode();
+
+
+    /*-----------------------------------------------------------------------------
+     *    功    能：获取当前车辆信息（服务器解析VIN的结果）ID
+     *              车辆信息由APK根据当前车辆VIN从服务器请求到的VIN解析结果信息
+     *
+     *     参数说明：eGviValue    获取信息类型的宏值
+     * 
+     *               GET_VIN_BRAND               = 0,     品牌ID值
+     *               GET_VIN_MODEL               = 1,     车型ID值
+     *               GET_VIN_MANUFACTURER_NAME   = 2,     厂家名称
+     *               GET_VIN_YEAR                = 3,     年份
+     *               GET_VIN_CLASSIS             = 4,     底盘号
+     *               GET_VIN_MANUFACTURER_TYPE   = 5,     厂家类型
+     *               GET_VIN_VEHICLE_TYPE        = 6,     车辆类型
+     *               GET_VIN_FULE_TYPE           = 7,     燃油类型
+     *               GET_VIN_ENERGY_TYPE         = 8,     能源类型
+     *               GET_VIN_COUNTRY             = 9,     国家
+     *               GET_VIN_AREA                = 10,    区域
+     * 
+     * 
+     *    返 回 值：服务器返回的VIN码信息ID值（十六进制串）
+     *    注    意：此接口返回的都是ID
+     -----------------------------------------------------------------------------*/
+    static std::string const GetServerVinInfo(eGetVinInfoType eGviValue);
+
+
+    /*-----------------------------------------------------------------------------
+     *    功    能：获取当前车辆信息（服务器解析VIN的结果），不是ID
+     *              车辆信息由APK根据当前车辆VIN从服务器请求到的VIN解析结果信息
+     *
+     *     参数说明：eGviValue    获取信息类型的宏值
+     *
+     *               GET_VIN_BRAND               = 0,     品牌
+     *               GET_VIN_MODEL               = 1,     车型
+     *               GET_VIN_MANUFACTURER_NAME   = 2,     厂家名称
+     *               GET_VIN_YEAR                = 3,     年份
+     *               GET_VIN_CLASSIS             = 4,     底盘号
+     *               GET_VIN_MANUFACTURER_TYPE   = 5,     厂家类型
+     *               GET_VIN_VEHICLE_TYPE        = 6,     车辆类型
+     *               GET_VIN_FULE_TYPE           = 7,     燃油类型
+     *               GET_VIN_ENERGY_TYPE         = 8,     能源类型
+     *               GET_VIN_COUNTRY             = 9,     国家
+     *               GET_VIN_AREA                = 10,    区域
+     *
+     *
+     *    返 回 值：服务器返回的VIN码信息
+     * 
+     *    注    意：此接口返回的都是值，不是ID
+     -----------------------------------------------------------------------------*/
+    static std::vector<std::string> const GetServerVinInfoValue(eGetVinInfoType eGviValue);
+
+
+    /*----------------------------------------------------------------------------------------
+     *    功    能：获取App已下载到的文件路径(绝对路径)
+     *
+     *     参数说明：eDlScenariosType eType    指定下载类型
+     * 
+     *               例如，DS_HIDDEN_FUN_ZIP_DIR 指定功能ID的刷隐藏软件小包下载
+     *
+     *               SwCode  对应的软件编码，如果为空或空串，由App定对应的软件编码
+     * 
+     *               FunId   当eType为DS_HIDDEN_FUN_ZIP时，FunId为对应的功能ID
+     *
+     *
+     *    返 回 值：服务器返回已经下载到的文件目录路径，绝对路径，目录
+     * 
+     *              例如：当eType为DS_HIDDEN_FUN_ZIP_DIR时，安卓Apk下载到的文件路径（App已解压）目录
+     *              "/storage/emulated/0/Android/data/com.topdon.diag.carpal/files/TopDon/
+     *               CarPal/Download/hidden"
+     *
+     *    注    意：
+     ----------------------------------------------------------------------------------------*/
+    static std::string const GetDownloadFilePath(eDlScenariosType eType, const std::string& SwCode, const std::string& FunId);
+
+
+    /*-----------------------------------------------------------------------------
+     *   功   能： 远程调用算法服务接口
+     *             算法的输入与输出在CAlgorithmData中
+     *
+     *   参数说明：pAlgoData    算法数据对象指针
+     *             TimeOutMs    接口阻塞返回的最大超时时间，单位ms
+     *                          默认为90秒，即如果1分半钟内(90秒)，数据无返回接口
+     *                          将返回-6，失败
+     *
+     *   返 回 值：远程调用的返回码
+     *             如果远程算法服务接口调用成功，返回0
+     *
+     *             如果pAlgoData或者GetPackedData为空，返回-1
+     *             如果pAlgoData->GetPackedDataLength()为0，返回-2
+     *             如果此时网络没有连接，返回-3
+     *             如果此时用户没有登录服务器，返回-4
+     *             如果此时Token失效，返回-5
+     *
+     *             此接口为阻塞接口，直至服务器返回数据（如果在TimeOutMs时间内，接口形
+     *             参默认为1分半钟内(90秒)，APK都没有数据返回将返回-6，失败）
+     * 
+     *             如果SetKeyData设置失败，返回-7
+     *             如果RpcSend发送超时或者失败，返回-8
+     *             其它错误，当前统一返回-9
+     *
+     -----------------------------------------------------------------------------*/
+    static uint32_t RpcSendRecv(CAlgorithmData *pAlgoData, uint32_t TimeOutMs = 90 * 1000);
+
+
+    /*------------------------------------------------------------------------------------
+     *   功   能： FCA服务器认证请求（Authentication初始化）
+     *
+     *   参数说明：Req          请求FCA服务器的本地数据结构体，包含SGW的识别码
+     *             Ans          FCA服务器返回的初始化信息，即AuthDiag证书
+     * 
+     *             struct stFcaAdInitReqEx
+     *             {
+     *                 std::string strSgwUUID;   // SGW(Secure Gateway) 的UUID（Base64）
+     *                 std::string strSgwSN;     // SGW 的序列号
+     *                 std::string strVin;       // 车辆车架号
+     * 
+     *                 std::string strEcuSN;     // 需要解锁的ECU序列号，ECU如果是SGW则跟strSgwSN一致
+     *                                           // 北美可为空，欧洲必填，例如 "TF1170919C15240"
+     * 
+     *                 std::string strEcuCanId;  // 需要解锁的ECU的CANID，北美可为空，欧洲必填
+     *                                           // 例如 "18DA10F1"是ECM，"18DA1020"是BSM
+     * 
+     *                 std::string strEcuPolicyType; // 需要解锁的ECU的策略类型，
+     *                                               // 北美可为空，欧洲必填，例如"1"
+     * 
+     *             };
+     * 
+     *             struct stFcaAdInitAns
+     *             {
+     *                 std::string strCode;      // 公司服务器返回的错误代码 "code"
+     *                 std::string strMsg;       // 公司服务器返回的描述 "msg"
+     *
+     *                 std::string strOemInit;   // FCA返回，OEM特定的初始化缓冲区
+     *                                           // 对于FCA，这是AuthDiag证书（Base64）
+     *
+     *                 std::string strSessionID; // FCA返回（Base64）
+     *             };
+     *
+     *   返 回 值：FCA服务器认证请求的返回码
+     *             如果FCA服务器认证请求调用成功，返回0
+     *
+     *             如果此时网络没有连接，返回-3
+     *             如果此时用户没有登录服务器，返回-4
+     *             如果此时Token失效，返回-5
+     *             其它错误，当前统一返回-9
+     *
+     *             此接口为阻塞接口，直至服务器返回数据（如果在TimeOutMs时间内，接口形
+     *             参默认为1分半钟内(90秒)，APK都没有数据返回将返回-6，失败）
+     ------------------------------------------------------------------------------------*/
+    static uint32_t FcaAuthDiagInit(const stFcaAdInitReq& Req, stFcaAdInitAns &Ans, uint32_t TimeOutMs = 90 * 1000);
+    static uint32_t FcaAuthDiagInit(const stFcaAdInitReqEx& Req, stFcaAdInitAns& Ans, uint32_t TimeOutMs = 90 * 1000);
+
+
+    /*------------------------------------------------------------------------------------
+     *   功   能： 向FCA服务器转发SGW的 Challenge 随机码
+     *
+     *   参数说明：Req          Challenge 随机码的本地数据结构体
+     *             Ans          FCA服务器返回的Challenge响应
+     *
+     *             struct stFcaAdChallReq
+     *             {
+     *                 std::string strSessionID; // FcaAuthDiagInit返回的SessionID（Base64）
+     *                 std::string strChallenge; // ECU Challenge（Base64）
+     *             };
+     *
+     *             struct stFcaAdChallAns
+     *             {
+     *                 std::string strCode;      // 公司服务器返回的错误代码 "code"
+     *                 std::string strMsg;       // 公司服务器返回的描述 "msg"
+     *
+     *                 std::string strChallenge; // SGW Challenge Response（Base64）
+     *             };
+     *
+     *   返 回 值：FCA服务器认证请求的返回码
+     *             如果FCA服务器认证请求调用成功，返回0
+     *
+     *             如果此时网络没有连接，返回-3
+     *             如果此时用户没有登录服务器，返回-4
+     *             如果此时Token失效，返回-5
+     *             其它错误，当前统一返回-9
+     *
+     *             此接口为阻塞接口，直至服务器返回数据（如果在TimeOutMs时间内，接口形
+     *             参默认为1分半钟内(90秒)，APK都没有数据返回将返回-6，失败）
+     ------------------------------------------------------------------------------------*/
+    static uint32_t FcaAuthDiagRequest(const stFcaAdChallReq& Req, stFcaAdChallAns& Ans, uint32_t TimeOutMs = 90 * 1000);
+
+
+    /*------------------------------------------------------------------------------------
+     *   功   能： 向FCA服务器转发 SGW解锁的 TrackResponse 结果追踪（可理解为欧洲FCA的SGW解锁埋点）
+     *
+     *   参数说明：Req          TrackResponse 结果追踪的本地数据结构体
+     *             Ans          FCA服务器返回的TrackResponse响应
+     *
+     *             struct stFcaAdTrackReq
+     *             {
+     *                 std::string strSessionID;   // FcaAuthDiagInit返回的SessionID（Base64）
+     *                 std::string strEcuResult;   // ECU 解锁的结果（Boolean），例如"True"
+     *                 std::string strEcuResponse; // ECU Response（Base64），例如6712...，或者7F27...
+     *             };
+     *
+     *             struct stFcaAdTrackAns
+     *             {
+     *                 std::string strCode;    // 公司服务器返回的错误代码 "code"，例如"200"
+     *                 std::string strMsg;     // 公司服务器返回的描述 "msg"，例如"User authentication failed!"
+     *
+     *                 std::string strSuccess; // In case of success, true（Base64），例如"true"
+     *             };
+     *
+     *   返 回 值：FCA服务器结果追踪请求的返回码
+     *             如果FCA服务器结果追踪请求调用成功，返回0
+     *
+     *             如果此时网络没有连接，返回-3
+     *             如果此时用户没有登录服务器，返回-4
+     *             如果此时Token失效，返回-5
+     *             其它错误，当前统一返回-9
+     *
+     *             此接口为阻塞接口，直至服务器返回数据（如果在TimeOutMs时间内，接口形
+     *             参默认为1分半钟内(90秒)，APK都没有数据返回将返回-6，失败）
+     ------------------------------------------------------------------------------------*/
+    static uint32_t FcaAuthDiagTrackResp(const stFcaAdTrackReq& Req, stFcaAdTrackAns& Ans, uint32_t TimeOutMs = 90 * 1000);
+    
+
+    /*------------------------------------------------------------------------------------
+     *   功   能： 获取当前的FCA登录界面上用户选择的区域
+     *
+     *   参数说明：无
+     *
+     *   返 回 值：eLoginRegionType
+     *
+     *             LGT_SELECT_AMERICA     表示App的FCA登录中，当前选择的区域是美洲
+     *             LGT_SELECT_EUROPE      表示App的FCA登录中，当前选择的区域是欧洲
+     *             LGT_SELECT_OTHER       表示App的FCA登录中，当前选择的区域是其它
+     * 
+     *             DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+     ------------------------------------------------------------------------------------*/
+    static eLoginRegionType FcaGetLoginRegion();
+};
+#endif

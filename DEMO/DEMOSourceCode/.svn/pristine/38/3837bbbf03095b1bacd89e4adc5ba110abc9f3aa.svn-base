@@ -1,0 +1,199 @@
+/*******************************************************************************
+* Copyright (C), 2020, Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 动作测试
+* 功能描述 : 动作测试举例
+* 创 建 人 : panjun        20210123
+* 审 核 人 : 
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#include "DemoActive.h"
+#include "ArtiActive.h"
+#include "Expression.h"
+#include "DataFile.h"
+#include "ProFile.h"
+#include "Expression.h"
+#include "StdShowMaco.h"
+#include "PublicInterface.h"
+#include "ArtiMenu.h"
+#include "ArtiMsgBox.h"
+#include "DemoEnterSys.h"
+#include "DemoActive.h"
+#include "ArtiGlobal.h"
+
+namespace Topdon_AD900_Demo {
+
+	CActive::CActive()
+	{
+
+	}
+
+	CActive::~CActive()
+	{
+
+	}
+
+	void CActive::SetSysEnterPointer(CEnterSys* pSysEnter)
+	{
+		m_pSysEnter = pSysEnter;
+	}
+
+	ErrorCode_t CActive::ActiveTest()
+	{
+		ErrorCode_t		ectRet = ErrorCodeType::STATUS_NOERROR;
+		CDataFile		datafile;
+		CProFile		profile;
+		string			strTemp;
+		vector<string>	vecstrItem;
+		CArtiMenu		uiMenu;
+		uint32_t		uRet;
+		uint32_t		uActMode;
+		vector<string>	vecstrActName;
+
+		if (!datafile.Open("Vehicle.dat"))
+		{
+			artiShowMsgBox("error", "error", DF_MB_OK);
+			return ectRet;
+		}
+		strTemp = datafile.GetText("ActiveTest");
+		if (strTemp.size() > 0)
+		{
+			profile.Set(strTemp);
+		}
+		else
+		{
+			artiShowMsgBox("error", "error", DF_MB_OK);
+			return ectRet;
+		}
+
+		vecstrItem = profile.GetStringGroup("ActiveTest", "Item");
+		uiMenu.InitTitle(artiGetText("500000060005"));
+		for (uint32_t i = 0; i < vecstrItem.size(); i++)
+		{
+			strTemp = "5000000A";
+			strTemp += vecstrItem[i];
+			uiMenu.AddItem(artiGetText(strTemp));
+			vecstrActName.push_back(artiGetText(strTemp));
+		}
+
+		while (1)
+		{
+			uRet = uiMenu.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+			uActMode = profile.GetHex(vecstrItem[uRet & 0xff], "ActiveMode");
+			switch (uActMode)
+			{
+			case 1:
+				ActiveTest1(vecstrActName[uRet & 0xff], vecstrItem[uRet & 0xff], profile);
+				break;
+			case 2:
+				ActiveTest1(vecstrActName[uRet & 0xff], vecstrItem[uRet & 0xff], profile);
+				break;
+			default:
+				break;
+			}
+		}
+
+		return ectRet;
+	}
+
+	ErrorCode_t CActive::ActiveTest1(string strTitle, string strItem, CProFile& profile)
+	{
+		ErrorCode_t		ectRet = ErrorCodeType::STATUS_NOERROR;
+		vector<string>	vecstrBtnId;
+		vector<string>	vecstrLiveList;
+		CArtiActive		uiAct;
+		string			strTemp;
+		vector<string>	vecstrBtn;
+		uint32_t		uRet;
+		vector<string>	vecstrUnit;
+
+		vecstrBtnId = profile.GetStringGroup(strItem, "Button");
+		vecstrLiveList = profile.GetStringGroup(strItem, "DataList");
+
+		uiAct.InitTitle(strTitle);
+
+		uiAct.AddItem(strTitle);
+		for (uint32_t i = 0; i < vecstrBtnId.size(); i++)
+		{
+			strTemp = "50000010";
+
+			strTemp += vecstrBtnId[i];
+			strTemp = artiGetText(strTemp);
+			vecstrBtn.push_back(strTemp);
+			uiAct.AddButton(strTemp);
+		}
+
+		for (uint32_t i = 0; i < vecstrLiveList.size(); i++)
+		{
+			strTemp = "50000008";
+			string		strUnit = "50000009";;
+			stUnitItem	unitTem;
+
+
+			strTemp += vecstrLiveList[i];
+			strUnit += vecstrLiveList[i];
+			strTemp = artiGetText(strTemp);
+			strUnit = artiGetText(strUnit);
+			unitTem.strValue = "";
+			unitTem.strUnit = strUnit;
+			unitTem = CArtiGlobal::UnitsConversion(unitTem);
+			vecstrUnit.emplace_back(strUnit);
+			uiAct.AddItem(strTemp, "N/A", false, unitTem.strUnit);
+		}
+
+		while (1)
+		{
+			uRet = uiAct.Show();
+			if (uRet == DF_ID_BACK)
+			{
+				break;
+			}
+
+			for (uint32_t i = 0; i < vecstrLiveList.size(); i++)
+			{
+				string			strExp = "50000008";
+				string			strValue;
+				CBinary			binRecv("\x10\x32\x32\x05", 4);
+				uint8_t			uValue = 0;
+				stUnitItem		unitTem;
+
+
+				uValue = rand();
+				binRecv.SetAt(2, uValue);
+
+				strExp += vecstrLiveList[i];
+				strValue = Calc_Script(strExp, binRecv, 2);
+				unitTem.strValue = strValue;
+				unitTem.strUnit = vecstrUnit[i];
+				unitTem = CArtiGlobal::UnitsConversion(unitTem);
+				CEcuInterface::Log("unit:",vecstrUnit[i].c_str(), "\nchange unit:",unitTem.strUnit.c_str());
+
+				uiAct.SetValue(i + 1, unitTem.strValue);
+				uiAct.SetUnit(i + 1, unitTem.strUnit);
+			}
+			CEnterSys::Delay(300);
+			if (uRet != DF_ID_NOKEY)
+			{
+				uiAct.SetValue(0, vecstrBtn[uRet & 0xff]);
+				for (uint32_t i = 0; i < vecstrBtnId.size(); i++)
+				{
+					if (i == (uRet & 0xff))
+					{
+						uiAct.SetButtonStatus(i, (uint32_t)true);
+					}
+					else
+					{
+						uiAct.SetButtonStatus(i, (uint32_t)false);
+					}
+				}
+			}
+		}
+		return ectRet;
+	}
+}

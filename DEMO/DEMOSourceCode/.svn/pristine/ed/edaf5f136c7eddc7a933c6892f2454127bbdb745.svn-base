@@ -1,0 +1,499 @@
+/*******************************************************************************
+* Copyright (C), 2022, Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : std 接口测试用例
+* 功能描述 : std 接口测试用例
+* 创 建 人 : liqunshang 20220101
+* 修 订 人 : 
+* 审 核 人 : 
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+
+#ifndef _APITEST_H_
+#define _APITEST_H_
+#include "StdInclude.h"
+#include "DemoVehicleStruct.h"
+#include "DataFile.h"
+#include "ArtiActive.h"
+#include "ArtiEcuInfo.h"
+#include "ArtiFileDialog.h"
+#include "ArtiFreeze.h"
+#include "ArtiGlobal.h"
+#include "ArtiInput.h"
+#include "ArtiList.h"
+#include "ArtiLiveData.h"
+#include "ArtiMenu.h"
+#include "ArtiMsgBox.h"
+#include "ArtiReport.h"
+#include "ArtiSystem.h"
+#include "ArtiTrouble.h"
+#include "ArtiWeb.h"
+#include "AlgorithmData.h"
+#include "DemoEnterSys.h"
+#include "EcuInterface.h"
+#include "ArtiFloatMini.h"
+#include "DiagEntryType.h"
+#ifndef ___IS_IOS___
+#define __TProgTest__
+#include "TproMaco.h"
+#include "Tprog.h"
+
+#endif
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void MultiSysTest();
+	void MultiStdAPITest(uint32_t uThread = 0);
+
+	uint32_t  ShowMsgBoxDemo(const std::string& strTitle, const std::string& strContent, uint32_t uButton = DF_MB_OK, uint16_t uAlignType = DT_CENTER, int32_t  iTimer = -1, uint32_t thId = 0);
+
+	class CAPITest
+	{
+	public:
+
+		char buff[100] = { 0 };
+		string threshold;
+
+		uint32_t m_uThread   = 0;
+		uint32_t uBtnNo      = 0;
+		uint32_t uRetBtn     = DF_ID_NOKEY;
+		uint32_t uBtnOffSize = DF_ID_FREEBTN_0;
+
+		CStdCommMaco::ErrorCodeType retErrCode = CStdCommMaco::ErrorCodeType::STATUS_NOERROR;
+
+	public:
+		~CAPITest() {}
+		CAPITest() 
+		{
+			InitMap();
+		}
+		CAPITest(uint32_t uThread)
+		{ 
+			m_uThread = uThread;
+			InitMap();
+		}
+		void SetThread(uint32_t uThread) { m_uThread = uThread; }
+
+		// 等于0退车 其他不退车
+		uint8_t ShowMenu();
+
+	public:
+		void InitMap(); 
+
+		map<CStdCommMaco::ObdPinType, string> mapObdPinType;
+		map<CStdCommMaco::ProtocolType, string> mapProtocolType;
+		map<CStdCommMaco::ObdProtocolType, string> mapObdProtocolType;
+		map<CStdCommMaco::PinPropertyType, string> mapPinPropertyType;
+		map<CStdCommMaco::PinStatusType, string> mapPinStatusType;
+		map<CStdCommMaco::BitFormatType, string> mapBitFormatType;
+		map<CStdCommMaco::PinVoltageType, string> mapPinVoltageType;
+		map<CStdCommMaco::FilterType, string> mapFilterType;
+		map<CStdCommMaco::FilterPduType, string> mapFilterPduType;
+		map<CStdCommMaco::LinkKeepType, string> mapLinkKeepType;
+		map<CStdCommMaco::FlowCtrlType, string> mapFlowCtrlType;
+		map<CStdCommMaco::CanFormatType, string> mapCanFormatType;
+		map<CStdCommMaco::AddressEnterParaType, string> mapAddressEnterParaType;
+		map<CStdCommMaco::EnterWayType, string> mapEnterWayType;
+
+		map<CStdCommMaco::RcxxHandlingMode, string> mapRcxxHandlingMode;
+		map<CStdCommMaco::RcxxHandlingType, string> mapRcxxHandlingType;
+		map<CStdCommMaco::ClearBufferMode, string> mapClearBufferMode;
+		map<CStdCommMaco::FrameCsType, string> mapFrameCsType;
+		map<CStdCommMaco::FrameFormatType, string> mapFrameFormatType;
+// 		map<CStdCommMaco::DoipModuleType, string> mapDoipModuleType;
+
+		map<bool, string> mapTrueAndFalse;
+		map<uint32_t, string> mapUint32ToString;
+		map<uint32_t, string> mapBaudRate;
+		map<uint32_t, string> mapPinVoltageMv;
+		map<uint32_t, string> mapFilterLength;
+		map<uint32_t, string> mapSequenceNumber;
+		map<uint32_t, string> mapFlowControlTimes;
+		map<uint32_t, string> mapFlowControlBlockSize;
+		map<uint32_t, string> mapRxCanId;
+		map<uint32_t, string> mapEnable;
+
+		map<uint8_t, string> mapNodeAddress;
+		map<uint8_t, string> mapEcuAddress;
+		map<uint8_t, string> mapToolAddress;
+		map<uint8_t, string> mapFramePad;
+
+		map<uint8_t, string> mapAddressCode;
+		map<uint32_t, string> mapAddSendBps;
+
+		map<uint32_t, string> mapWaitTimeBeforSendAddress;
+		map<uint32_t, string> mapSyncByte0x55OverTime;
+		map<uint32_t, string> mapReceiveKwOverTime;
+		map<uint32_t, string> mapKw2ReverseWaitTime;
+		map<uint32_t, string> mapReceiveReverseAddressOverTime;
+
+		map<uint32_t, string> mapVoltageTime;
+		map<uint8_t, string> mapTpTargetAddress;
+		map<uint8_t, string> mapAppLayerID;
+
+		map<uint32_t, string> mapEnterSysId;
+		map<uint32_t, string> mapEnterFilterId;
+		map<uint32_t, string> mapTargetAddr;
+
+		map<uint8_t, string> mapEnterAddressCode;
+		map<uint8_t, string> mapSystemId;
+
+		map<uint32_t, string> mapTimeMs;
+		map<uint32_t, string> mapActiveEnable;
+
+		map<eDiagEntryTypeEx, string> mapeDiagEntryType;
+
+#if defined WIN32 | defined (WIN64)
+		map<CTprogMaco::MainFuncType, string> mapMainFuncType;
+#endif
+
+		map<uint32_t, string> mapTprogAddress;
+		map<uint32_t, string> mapTprogLength;
+
+		map<uint32_t, string>	mapDFButton;
+		map<uint32_t, uint32_t> mapDFTextID;
+
+		map<uint32_t, string>	mapAlignType;
+		map<uint32_t, string>	mapPopupType;
+		map<uint32_t, string>	mapPopupDirection;
+
+		map<vector<uint32_t>, string>	mapColWidth;
+
+		map<uint32_t, string>	mapRowNum; //行
+		map<uint32_t, string>	mapListNum;//列
+
+		map<eFontSize, string>	mapFontSize;
+		map<eBoldType, string>	mapBoldType;
+
+		map<vector<string>, string> mapPath;
+		map<vector<string>, string> mapTips;
+		map<uint16_t, string> mapType;
+
+	public:
+		/**********************************************************
+		*    功  能：显示接口测试
+		*    参  数：无
+		*    返回值：等于0退车 其他不退车
+		**********************************************************/
+		uint8_t ShowTest();
+	
+	public:
+		/**********************************************************
+		*    功  能：通讯接口测试
+		*    参  数：无
+		*    返回值：
+		**********************************************************/
+		void CommTest();
+		void EcuInterfaceTest();
+		void EcuInterfaceTest_API();
+		void EcuInterfaceTest_VciCommunication();
+
+		void EcuInterfaceTest_MultiInterface();
+		void EcuInterfaceTest_MultiInterface_PT_CAN(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_CAN, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_CANFD(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_CANFD, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_TP20(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_TP20, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_TP16(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_TP16, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_VOLVO_CAN(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_VOLVO_CAN, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_GMLAN_CAN(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_GMLAN_CAN, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_KWP(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_KWP, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_VPW(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_VPW, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_PWM(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_PWM, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_ISO(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_ISO, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_1281(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_1281, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_ALDL(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_ALDL, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_KW81(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_KW81, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_KW82(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_KW82, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_SCI(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_SCI, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_NGC(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_NGC, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_NISSAN_OLD(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_NISSAN_OLD, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_BMW_DOIP(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_BMW_DOIP, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_RAW_CAN(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_RAW_CAN, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+		void EcuInterfaceTest_MultiInterface_PT_RAW_CANFD(CStdCommMaco::ProtocolType eProtocolType = CStdCommMaco::ProtocolType::PT_RAW_CANFD, CStdCommMaco::BitFormatType eBitFormat = CStdCommMaco::BitFormatType::BFT_1_8_1_N);
+
+		// EcuInterface测试项
+		void EcuInterfaceTest_SetProtocolType();
+		void EcuInterfaceTest_SetIoPin();									//  [3/3/2022 qunshang.li]
+		void EcuInterfaceTest_SetBaudRate();								//  [3/8/2022 qunshang.li]
+		void EcuInterfaceTest_SetLinkKeep();								//  [3/9/2022 qunshang.li]
+		void EcuInterfaceTest_SetLinkKeep1();								//  [3/9/2022 qunshang.li]
+		void EcuInterfaceTest_SetCommLineVoltage();							//  [3/8/2022 qunshang.li]
+		void EcuInterfaceTest_SetCommTime();								//  [3/9/2022 qunshang.li]
+		void EcuInterfaceTest_SetPinVoltage();								//  [3/8/2022 qunshang.li]
+		void EcuInterfaceTest_SetJ1850FunctionalAddressFilter();
+		void EcuInterfaceTest_SetJ1850NodeAddress();
+		void EcuInterfaceTest_SetCanExtendedAddress();
+		void EcuInterfaceTest_SetFilterId();
+		void EcuInterfaceTest_SetFilterIdRange();
+		void EcuInterfaceTest_SetFilterPDU();
+		void EcuInterfaceTest_SetCanFramePad();
+		void EcuInterfaceTest_ClearFilter();
+		void EcuInterfaceTest_SetFlowControlId();
+		void EcuInterfaceTest_SetFlowControlMode();
+		void EcuInterfaceTest_SetFlowControlSendDelay();
+		void EcuInterfaceTest_SetCanFirstConsecutiveFrameValue();
+		void EcuInterfaceTest_SetSingleMsgCanFormatId();
+		void EcuInterfaceTest_EnableSegmentedSendSingleCanFrame();
+		void EcuInterfaceTest_AddressCodeEnter();
+		void EcuInterfaceTest_QuickEnter();
+		void EcuInterfaceTest_TP20Enter();
+		void EcuInterfaceTest_TP16Enter();
+		void EcuInterfaceTest_TP20Broadcast();
+		void EcuInterfaceTest_SetRCXXHandling();
+		void EcuInterfaceTest_SetClearBuffer();
+		void EcuInterfaceTest_SendReceive();
+		void EcuInterfaceTest_SendReceive1();
+		void EcuInterfaceTest_SendReceive2();
+		void EcuInterfaceTest_GetPinStatus();
+		void EcuInterfaceTest_ActiveDoipPin();
+		void EcuInterfaceTest_SelectDoipOption();
+		void EcuInterfaceTest_GetDoipModule();
+		void EcuInterfaceTest_Log();
+		void EcuInterfaceTest_GetVersion();			//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_GetVciTypeName();		//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_GetVciSN();
+		void EcuInterfaceTest_GetVciKey();
+		void EcuInterfaceTest_GetVciMcuId();
+		void EcuInterfaceTest_IsVciConnected();		//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_GetCommType();		//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_VciReset();			//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_VciVehicleLedOn();	//  [3/2/2022 qunshang.li]
+		void EcuInterfaceTest_VciBuzzOn();			//  [3/2/2022 qunshang.li]
+		void TestLiveDataFlush();			//  [10/4/2024 pj]
+		void LiveDataFlush(CEnterSys EnterSys);			//  [10/4/2024 pj]
+
+	public:
+		template<class T1, class T2>
+		void GetParamValue(T1& Value, T2& Str, map<T1, T2> mapParam);
+
+		template<class T1, class T2>
+		void GetParamValue2(T1& Str, T2& Value, map<T1, T2> mapParam);
+
+		template<class T1, class T2>
+		void GetParamValueWithCheckBox(T1& Value, T2& Str, map<T1, T2> mapParam);
+
+	public:
+		// 获取 SetLinkKeep() 接口参数 [3/4/2022 qunshang.li]
+		void GetKeepFrame(CSendFrame& KeepFrame, string& strText);
+		void GetResponesd(CRecvFrame& Responesd, string& strText);
+		
+		// 获取 SetCommLineVoltage() 接口参数 [3/4/2022 qunshang.li]
+		void GetvctHihgLow(vector<uint16_t>& vctHihgLow, string& strText);
+
+		// 获取 SetCommTime() 接口参数 [3/4/2022 qunshang.li]
+		void GetCommTime(vector<uint32_t>& vctCommTime, string& strText);
+
+		// 获取 SetJ1850FunctionalAddressFilter() 接口参数 [3/4/2022 qunshang.li]
+		void GetFunctionalAddress(vector<uint8_t>& vctFunctionalAddress, string& strText);
+
+		// 获取 SetFilterId() 接口参数 [3/4/2022 qunshang.li]
+		void GetFilterMask(CBinary& FilterMask, string& strText);
+		void GetFilterPattern(CBinary& FilterPattern, string& strText);
+		
+		// 获取 SetFilterIdRange() 接口参数 [3/4/2022 qunshang.li]
+		void GetFilterBegin(CBinary& FilterBegin, string& strText);
+		void GetFilterEnd(CBinary& FilterEnd, string& strText);
+
+		// 获取 SetFlowControlId() 接口参数 [3/4/2022 qunshang.li]
+		void GetRecvFrameId(CBinary& RecvFrameId, string& strText);
+
+		// 获取 QuickEnter() 接口参数 [3/4/2022 qunshang.li]
+		void GetSendFrame(CSendFrame& SendFrame, string& strText);
+
+	public:
+		void GlobalTest();
+
+		void BlueToothTest();
+		void BlueToothTest_Can();
+		void BlueToothTest_Can_Type2();
+		void BlueToothTest_Kwp();
+
+
+	public:
+		void UnitTest();
+		void UnitTest_Type1(bool bMetric = false);
+		void UnitTest_Type2();
+
+		void UnitTest_Other();
+		void UnitTest_Type1_Other(bool bMetric = false);
+		void UnitTest_Type2_Other();
+
+
+	public:
+		void ImmoTest();
+		void AppCrashTest();
+
+	public:
+		//void MultiSysTest();// 增加多系统诊断测试 [6/14/2022 qunshang.li]
+		//void MultiStdAPITest(uint32_t uThread = 0);
+
+	public:
+		// T-Darts开发参考开发文档《T-prog(T-darts)控制端软件设计参考.chm》 [6/30/2022 qunshang.li]
+		
+#ifdef __TProgTest__
+		void TProgTest();
+		void TProgTest_Chip_46();
+		void TProgTest_MFT_SYS();
+		void TProgTest_MFT_EEPROM();
+		void TProgTest_MFT_MCU();
+		void TProgTest_MFT_FREQ();
+		void TProgTest_MFT_RFID();
+		void TProgTest_GetCommType();
+
+		uint32_t TProgTest_Init(CTProg &TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_GetSize(CTProg &TProg, CTprogMaco::MainFuncType eMainType);
+		
+		uint32_t TProgTest_CheckConnStatus(CTProg &TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_Read(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_Write(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_Erase(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_GetSatus(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_ChechkIsLock(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		uint32_t TProgTest_Crack(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+		
+		uint32_t TProgTest_Close(CTProg& TProg, CTprogMaco::MainFuncType eMainType);
+
+		void GettagInit(CTprogMaco::tagInit& TagInit, string& strText);
+		void GetTrogBinWrite(CBinary& binWrite, string& strText);
+#endif
+
+	public:
+		string PrintRecvFrame(const CRecvFrame& rf);
+		string GetStringFromFrame(const CRecvFrame& rf);
+		string ExeSendRecvLoop(CEcuInterface& ecu, const std::vector<CSendFrame>& vctSendFrame, std::size_t Counts, uint32_t P2_us);
+
+	private:
+
+	};
+
+	template<class T1, class T2>
+	void Topdon_AD900_Demo::CAPITest::GetParamValueWithCheckBox(T1& Value, T2& strText, map<T1, T2> mapParam)
+	{
+#if __Multi_System_Test__
+		CArtiList uiList(m_uThread);
+#else
+		CArtiList uiList;
+#endif
+		uiList.InitTitle("Select Value", CArtiList::ITEM_WITH_CHECKBOX_MULTI);
+		uiList.SetColWidth(vector<int32_t>{100});
+		uiList.SetBlockStatus(true);
+		uiList.AddButtonEx(artiGetText("FF060000001D"));
+
+		vector<T1> vctParam;
+		for (auto it = mapParam.begin(); it != mapParam.end(); it++)
+		{
+			uiList.AddItem(it->second); vctParam.push_back(it->first);
+		}
+
+		uint32_t uRetBtn = DF_ID_NOKEY;
+		while (1)
+		{
+			Delay(100);
+			uRetBtn = uiList.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_FREEBTN_0 == uRetBtn)
+			{
+				vector<uint16_t> vctSelect = uiList.GetSelectedRowEx();
+				if (vctSelect.size() > 0)
+				{
+					Value = (T1)0;
+					strText = "";
+					for (uint32_t i = 0; i < vctSelect.size(); i++)
+					{
+						Value = Value | vctParam[vctSelect[i]];
+						strText = strText + mapParam[vctParam[vctSelect[i]]];
+						if (i != (vctSelect.size() - 1))
+						{
+							strText = strText + "|";
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+
+	template<class T1, class T2>
+	void Topdon_AD900_Demo::CAPITest::GetParamValue(T1& Value, T2& strText, map<T1, T2> mapParam)
+	{
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle("Select Value");
+		vector<T1> vctParam;
+
+		for (auto it = mapParam.begin(); it != mapParam.end(); it++)
+		{
+			uiMenu.AddItem(it->second); 
+			vctParam.push_back(it->first);
+		}
+
+		uint32_t uRetBtn = DF_ID_NOKEY;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (uRetBtn < vctParam.size())
+				{
+					Value = vctParam[uRetBtn];
+					strText = mapParam[Value];
+				}
+				break;
+			}
+		}
+	}
+
+	template<class T1, class T2>
+	void Topdon_AD900_Demo::CAPITest::GetParamValue2(T1& strText, T2& Value, map<T1, T2> mapParam)
+	{
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle("Select Value");
+		vector<T1> vctText;
+
+		for (auto it = mapParam.begin(); it != mapParam.end(); it++)
+		{
+			uiMenu.AddItem(it->first); 
+			vctText.push_back(it->first);
+		}
+
+		uint32_t uRetBtn = DF_ID_NOKEY;
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (uRetBtn < vctText.size())
+				{
+					strText = vctText[uRetBtn];
+					Value = mapParam[strText];
+				}
+				break;
+			}
+		}
+	}
+}
+#endif

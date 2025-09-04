@@ -1,0 +1,56 @@
+#pragma once
+#include "DemoAPITest.h"
+#include <vector>
+
+namespace Topdon_AD900_Demo {
+	class CArtiGlobalTest : public CAPITest
+	{
+	public:
+
+		/**********************************************************
+		*    功  能：显示接口测试
+		*    参  数：无
+		*    返回值：等于0退车 其他不退车
+		**********************************************************/
+		uint8_t ShowMenu();
+
+		void ArtiGlobalTest_GetVersion();
+		void ArtiGlobalTest_GetAppVersion();
+		void ArtiGlobalTest_GetLanguage();
+		void ArtiGlobalTest_GetVehPath();
+		void ArtiGlobalTest_GetVehUserDataPath();
+		void ArtiGlobalTest_GetVehName();
+		void ArtiGlobalTest_GetVIN();
+		void ArtiGlobalTest_SetVIN();
+		void ArtiGlobalTest_SetVehInfo();
+		void ArtiGlobalTest_SetSysName();
+		void ArtiGlobalTest_SetThreadVehiInfo();
+		void ArtiGlobalTest_Copy2RunPath();
+		void ArtiGlobalTest_Copy2RunPathEX();
+		void ArtiGlobalTest_GetTabletSN();
+		void ArtiGlobalTest_GetTabletKey();
+		void ArtiGlobalTest_IsNetworkAvailable();
+		void ArtiGlobalTest_RpcSendRecv();
+		void ArtiGlobalTest_GetVehPathEx();
+		void ArtiGlobalTest_GetDiagEntryType();
+		void ArtiGlobalTest_GetDiagMenuMask();
+		int32_t ArtiGlobalTest_FcaAuthDiagInit();
+		void ArtiGlobalTest_FcaAuthDiagRequest();
+
+		/**********************************************************
+		*    功  能：显示接口测试
+		*    参  数：无
+		*    返回值：等于0退车 其他不退车
+		**********************************************************/
+		uint8_t ArtiGlobalTest_SetCurVehNotSupport();
+
+		void ArtiGlobalTest_SetEventTracking();
+		void ArtiGlobalTest_GetCurUnitMode();
+		void ArtiGlobalTest_FcaGetLoginRegion();
+		void ArtiGlobalTest_GetAutoVinEntryType();
+
+	protected:
+	private:
+	};
+
+}

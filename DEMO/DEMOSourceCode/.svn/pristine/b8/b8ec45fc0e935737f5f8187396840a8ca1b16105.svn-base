@@ -1,0 +1,15 @@
+#pragma once
+#include "DemoAPITest.h"
+
+namespace Topdon_AD900_Demo {
+
+	class CHotFunction: public CAPITest
+	{
+	public:
+		void ShowMainMenu();
+
+	protected:
+	private:
+	};
+
+}

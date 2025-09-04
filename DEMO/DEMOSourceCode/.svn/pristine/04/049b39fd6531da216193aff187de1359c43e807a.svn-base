@@ -1,0 +1,69 @@
+#include "DemoArtiFloatMiniTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiFloatMiniTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle("ArtiFloatMiniTest");
+		uiMenu.AddItem("NewInstance");		        vctMenuID.push_back(0);
+		uiMenu.AddItem("DeleteInstance");			    vctMenuID.push_back(1);
+		uiMenu.AddItem("Display");			vctMenuID.push_back(2);
+		uiMenu.AddItem("Hidden");				vctMenuID.push_back(3);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					TestArtiFloatMini();
+				}
+			}
+		}
+	}
+
+	void CArtiFloatMiniTest::TestArtiFloatMini()
+	{
+		CArtiFloatMini	FloatMini;
+		CArtiMenu		uiMenu;
+
+		uiMenu.InitTitle("Test ArtiFloatMini");
+		uiMenu.AddItem("Test");
+
+		while (1)
+		{
+			uint32_t uRet = uiMenu.Show();
+			if (uRet ==DF_ID_BACK)
+			{
+				break;
+			}
+			FloatMini.NewInstance(CArtiFloatMini::eFloatType::FT_TIMER_TYPE);
+			FloatMini.Display(0,"Float");
+			artiShowMsgBox("Test Hide", "Mini Hide", DF_MB_OK);
+			FloatMini.Hidden(0);
+			artiShowMsgBox("Test Display", "Mini Display", DF_MB_OK);
+			FloatMini.Display(0, "Float");
+			artiShowMsgBox("Test Delete", "Delete Mini", DF_MB_OK);
+			FloatMini.DeleteInstance(0);
+		}
+	}
+
+
+
+
+
+}

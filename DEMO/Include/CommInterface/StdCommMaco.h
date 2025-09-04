@@ -1,0 +1,837 @@
+﻿/*******************************************************************************
+* Copyright (C), 2020, Lenkor Tech. Co., Ltd. All rights reserved.
+* 文件说明 : 文档类标识
+* 功能描述 : 发送帧数据管理接口类
+* 创 建 人 : sujiya        20201031
+* 修 订 人 : hanlin        20201202
+* 审 核 人 : binchaolin    20201203
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+* 
+*******************************************************************************/
+#ifndef _STD_COMM_MACO_H_
+#define _STD_COMM_MACO_H_
+
+#if defined (_WIN64)
+
+#include <vcruntime.h>
+#if (__cplusplus >= 201703L) || (_HAS_CXX17 > 0)
+// 使用了c++17，消除： C2872: “byte”: 不明确的符号
+#ifdef _HAS_STD_BYTE
+#undef _HAS_STD_BYTE
+#endif
+#define _HAS_STD_BYTE 0
+#endif
+
+#endif
+
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
+#define ENABLE_TOPDON_PUBLIC_STDCOMM_NS 1
+
+namespace CStdCommMaco
+{
+    enum class ProtocolType :uint8_t
+    {//协议定义
+        PT_CAN             = 0x01, // 即 ISO15765_2
+        PT_CANFD           = 0x02, // 即 ISO15765_2
+        PT_TP20            = 0x03,
+        PT_TP16            = 0x04,
+        PT_VOLVO_CAN       = 0x05,
+        PT_GMLAN_CAN       = 0x06,
+        PT_KWP             = 0x07,
+        PT_VPW             = 0x08,
+        PT_PWM             = 0x09,
+        PT_ISO             = 0x0A, // 即 NORMAL 协议
+        PT_1281            = 0x0B,
+        PT_ALDL            = 0x0C,
+        PT_KW81            = 0x0D,
+        PT_KW82            = 0x0E,
+        PT_SCI             = 0x0F,
+        PT_NGC             = 0x10, // J2190_SCI
+        PT_NISSAN_OLD      = 0x11, // 日产福逻辑
+        PT_FT_CAN          = 0x12, // 菲亚特, 容错CAN, 50K或者125K
+        PT_J1708           = 0x13, // SAEJ1708
+
+        PT_BMW_DOIP        = 0x20, // 宝马DOIP
+        PT_DOIP            = 0x21, // DOIP
+
+        PT_RAW_CAN         = 0x81, // 原始CAN, 即 ISO_11898_2_DWCAN
+        PT_RAW_CANFD       = 0x82, // 原始CANFD
+        PT_ANALOG_VBAT     = 0x83, // 电池电压批量采集
+
+        INVALID            = 0xFF
+    };
+
+    enum class ObdProtocolType :uint8_t
+    {//Eobd用到的协议类型定义
+        PT_OBD_BEGIN       = 0x01,
+        PT_OBD_CANSTD_500K = 0x01,//500K标准CAN
+        PT_OBD_CANEX_500K  = 0x02,//500K扩展CAN
+        PT_OBD_CANSTD_250K = 0x03,//250K标准CAN
+        PT_OBD_CANEX_250K  = 0x04,//250K扩展CAN
+        PT_OBD_VPW         = 0x05,//VPW协议
+        PT_OBD_PWM         = 0x06,//PWM协议
+        PT_OBD_ISO         = 0x07,//ISO9141-2协议
+        PT_OBD_KWPS        = 0x08,//KWP慢速协议
+        PT_OBD_KWPF        = 0x09,//KWP快速协议
+        PT_OBD_END         = 0x0A,
+
+        INVALID            = 0xFF
+    };
+
+    enum class ObdPinType:uint32_t
+    {//引脚定义
+        PIN_OBD_NONE       = 0x00,
+        PIN_OBD_01         = 0x01,
+        PIN_OBD_02         = 0x02,
+        PIN_OBD_03         = 0x03,
+        PIN_OBD_04         = 0x04,
+        PIN_OBD_05         = 0x05,
+        PIN_OBD_06         = 0x06,
+        PIN_OBD_07         = 0x07,
+        PIN_OBD_08         = 0x08,
+        PIN_OBD_09         = 0x09,
+        PIN_OBD_10         = 0x0A,
+        PIN_OBD_11         = 0x0B,
+        PIN_OBD_12         = 0x0C,
+        PIN_OBD_13         = 0x0D,
+        PIN_OBD_14         = 0x0E,
+        PIN_OBD_15         = 0x0F,
+        PIN_OBD_16         = 0x10,
+
+        PIN_Benz38_01      = 0x21,
+        PIN_Benz38_02      = 0x22,
+        PIN_Benz38_03      = 0x23,
+        PIN_Benz38_04      = 0x24,
+        PIN_Benz38_05      = 0x25,
+        PIN_Benz38_06      = 0x26,
+        PIN_Benz38_07      = 0x27,
+        PIN_Benz38_08      = 0x28,
+        PIN_Benz38_09      = 0x29,
+        PIN_Benz38_10      = 0x30,
+        PIN_Benz38_11      = 0x31,
+        PIN_Benz38_12      = 0x32,
+        PIN_Benz38_13      = 0x33,
+        PIN_Benz38_14      = 0x34,
+        PIN_Benz38_15      = 0x35,
+        PIN_Benz38_16      = 0x36,
+        PIN_Benz38_17      = 0x37,
+        PIN_Benz38_18      = 0x38,
+        PIN_Benz38_19      = 0x39,
+        PIN_Benz38_20      = 0x40,
+        PIN_Benz38_21      = 0x41,
+        PIN_Benz38_22      = 0x42,
+        PIN_Benz38_23      = 0x43,
+        PIN_Benz38_24      = 0x44,
+        PIN_Benz38_25      = 0x45,
+        PIN_Benz38_26      = 0x46,
+        PIN_Benz38_27      = 0x47,
+        PIN_Benz38_28      = 0x48,
+        PIN_Benz38_29      = 0x49,
+        PIN_Benz38_30      = 0x50,
+        PIN_Benz38_31      = 0x51,
+        PIN_Benz38_32      = 0x52,
+        PIN_Benz38_33      = 0x53,
+        PIN_Benz38_34      = 0x54,
+        PIN_Benz38_35      = 0x55,
+        PIN_Benz38_36      = 0x56,
+        PIN_Benz38_37      = 0x57,
+        PIN_Benz38_38      = 0x58,
+
+        PIN_Bmw20_01       = 0x61,
+        PIN_Bmw20_02       = 0x62,
+        PIN_Bmw20_03       = 0x63,
+        PIN_Bmw20_04       = 0x64,
+        PIN_Bmw20_05       = 0x65,
+        PIN_Bmw20_06       = 0x66,
+        PIN_Bmw20_07       = 0x67,
+        PIN_Bmw20_08       = 0x68,
+        PIN_Bmw20_09       = 0x69,
+        PIN_Bmw20_10       = 0x70,
+        PIN_Bmw20_11       = 0x71,
+        PIN_Bmw20_12       = 0x72,
+        PIN_Bmw20_13       = 0x73,
+        PIN_Bmw20_14       = 0x74,
+        PIN_Bmw20_15       = 0x75,
+        PIN_Bmw20_16       = 0x76,
+        PIN_Bmw20_17       = 0x77,
+        PIN_Bmw20_18       = 0x78,
+        PIN_Bmw20_19       = 0x79,
+        PIN_Bmw20_20       = 0x80,
+
+        INVALID            = 0xFF
+    };
+
+    /*      通信引脚属性值定义          */
+    enum class PinPropertyType : uint32_t
+    {
+        PPT_SAME_SIGNAL_K_AND_L_LINE                    = (1 << 0),         //L线与K线信号相同, 此信号相同只是在初始化模式中
+        PPT_INPUT_POSITIVE_LOGIC                        = (1 << 1),         //输入正逻辑
+        PPT_OUTPUT_POSITIVE_LOGIC                       = (1 << 2),         //输出正逻辑
+        PPT_OUTPUT_REVERSE                              = (1 << 3),         //输出取反
+        PPT_INPUT_PULLUP_RESISTANCE                     = (1 << 4),         //输入上拉电阻
+        PPT_FET_CK                                      = (1 << 5),         //大电流下拉或晶振
+        PPT_MINUS_LOGIC                                 = (1 << 6),         //输入输出负逻辑，单线通信
+        PPT_K_PULL_UP_1K2_RESISTER                      = (1 << 7),         //K线上拉1.2K欧姆，默认下位机自己决定（510欧姆）
+
+        PPT_CHRYSLER_SCI_TX_VOLTAGE                     = (1 << 8),         //克莱斯勒SCI协议在数据发送完成后会拉高电压到20伏（编程电压）
+                                                                            //Enables the SAE J2610 programming voltage
+                                                                            //Apply 20V after message transmit as specified in SAEJ2610
+
+        PPT_SAME_SIGNAL_K_AND_L_LINE_EXTRA              = (1 << 24),        //L线与K线信号相同，例如PIN3和PIN7短接(老Porsche Cayenne 9PA)
+    
+        PPT_K_USE_K1_ROUTE                              = (1 << 25),        //K线使用K1通道，K1,K2优先级依次降低，指定了K1，则选择K1，都没有指定，下位机自己选择
+        PPT_K_USE_K2_ROUTE                              = (1 << 26),        //K线使用K2通道，指定了K1，同时也指定了K2，则选择K1；没有指定K1，指定K2，则选择K2
+        PPT_CAN_USE_SW_BUSB                             = (1 << 29),        //CAN使用SWCAN-BUSB
+
+        PPT_INVALID = 0xFFFFFFFF
+    };
+
+    inline PinPropertyType operator | (PinPropertyType lhs, PinPropertyType rhs)
+    {
+        using T = std::underlying_type_t <PinPropertyType>;
+        return static_cast<PinPropertyType>(static_cast<T>(lhs) | static_cast<T>(rhs));
+    }
+
+    inline PinPropertyType operator & (PinPropertyType lhs, PinPropertyType rhs)
+    {
+        using T = std::underlying_type_t <PinPropertyType>;
+        return static_cast<PinPropertyType>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+    enum class PinStatusType
+    {//引脚状态类型定义
+        PST_VALTAGE         = 0x01,//引脚电压值，(具体的电压值)
+        PST_LEVEL           = 0x02,//引脚电平值，(高电平/低电平)
+
+        INVALID             = 0xFF
+    };
+
+    enum class BitFormatType :uint8_t
+    {//位格式类型定义
+        BFT_1_8_1_N         = 0x01,//1个起始位+8个数据位+1个结束位+无校验
+        BFT_1_8_1_O         = 0x02,//1个起始位+8个数据位+1个结束位+奇校验
+        BFT_1_8_1_E         = 0x03,//1个起始位+8个数据位+1个结束位+偶校验
+        BFT_1_8_1_S         = 0x04,//1个起始位+8个数据位+1个结束位+恒0校验
+        BFT_1_8_1_M         = 0x05,//1个起始位+8个数据位+1个结束位+恒1校验
+    
+        INVALID             = 0xFF
+    };
+
+
+    enum class PinVoltageType :uint8_t
+    {//引脚电压定义
+        PinVol_5V          = 0x01,//通讯引脚电压为5V
+        PinVol_12V         = 0x02,//通讯引脚电压为12V
+        PinVol_24V         = 0x03,//通讯引脚电压为24V
+        PinVol_VPW         = 0x04,//
+        PinVol_PWM         = 0x05,//
+
+        INVALID            = 0xFF
+    };
+
+    enum class FilterType :uint8_t
+    {//过滤类型定义
+        FT_PASS_ENABLE     = 0x01,  // 指定过滤通过
+        FT_PASS_DISABLE    = 0x02,  // 指定过滤不通过（通信层阻止过滤），俗称“软过滤”
+
+        FT_VCI_BLOCK       = 0x03,  // 指定过滤不通过（VCI阻止过滤器），俗称“硬过滤”
+                                    // 对比 FT_PASS_DISABLE 更偏底层（硬件层）过滤
+
+        INVALID            = 0xFF
+    };
+
+    enum class FilterPduType :uint8_t
+    {//过滤PDU类型定义
+        // 默认模式
+        FPT_PDU_DISABLE         = 0x01,     // 指定不过滤任何PDU数据，即不校验诊断应用数据，从SID（服务ID）开始至PID（参数ID）
+                                            // 通信层默认为此类型，不进行任何PDU数据的校验过滤
+
+        // SID模式
+        FPT_SID_ONLY_ENABLE     = 0x02,     // 指定过滤PDU数据，但是只校验SID（服务ID）一个字节，SID校验规则为 ReqSID + 0x40 = AnsSID
+                                            // 例如 请求帧的 SID = 3E, 则响应的SID必须为 SID = 7E，如果为6E，则丢弃不返回给应用
+
+        // PID模式
+        FPT_SID_PID_ENABLE      = 0x03,     // 指定过滤PDU数据，校验SID一个字节和PID（参数ID）一个字节
+                                            // 只收跟发送帧一样的的SID和PID，例如 发【10 03】，收【50 03 ..】
+                                            // 例如 请求数据为：【1A 9B】, SID = 1A, PID = 9B，如果回复帧为：【5A 9A 31 32 33 34 ..】
+                                            // 因响应的PID = 9A不符合发送帧的PID（9B），则被丢弃不返回给应用
+
+        // 2个字节及2个字节以上的PID模式
+        FPT_SID_PID_MORE_ENABLE = 0x04,     // 指定过滤PDU数据，校验SID一个字节和N个字节的PID，PID的个数由SetFilterData的第二个形参指定
+                                            // 如果SetFilterData的第二个形参值为1，则与FPT_SID_PID_ENABLE一样
+                                            // 如果SetFilterData的第二个形参值为2，则校验2个字节的PID，例如【22 F1 90】对应【62 F1 90】
+
+        INVALID = 0xFF
+    };
+
+    enum class LinkKeepType :uint8_t
+    {//链路保持类型定义
+        
+        /* 总是从最近的数据帧（不包括链路发送帧）开始计时，以保证链路帧与上一个数据帧（不一定是链路帧）的间隔为指定间隔 */
+        /* 如果开启了两条链路保持，则两条链路保持互不干扰彼此的计时 */
+        LKT_INTERVAL       = 0x01, // 间隔时长发送，仅针对Req计时，即发送一帧数据帧开始计时
+                                   // 从最近的数据帧开始计时，但不包括接收数据帧，仅针对发送的数据帧
+
+        /* 不管其它的数据帧的发送与接收，总以链路帧的固定周期发送 */
+        LKT_FIXED          = 0x02, // 固定时长发送，只要时间到，立即发送
+
+        // 上一个数据帧指的是发送帧和接收帧，如果有过滤，不包括被过滤外的帧
+        LKT_INTERVAL_EX    = 0x03, // 间隔时长发送，在 LKT_INTERVAL 的基础上，接收数据帧也包括在内
+                                   // 即从最近的数据帧计时的数据帧，是包括接收和发送的
+
+        /* 不管其它的数据帧的发送与接收，总以链路帧的固定周期发送，但在接收续发帧（2X）的时候例外 */
+        LKT_FIXED_EX       = 0x04, // 固定时长发送，只要时间到，立即发送
+                                   // 但在接收续发帧的时候不会插入链路保持，即使固定时长已到也不发，等接收完续发帧后再发送
+
+        INVALID            = 0xFF
+    };
+
+    enum class PhyBusHoldMode :uint8_t
+    {// 物理总线保持模式定义
+
+        // VCI与车辆OBD16引脚对应协议的物理总线连接，即对应04版本J2534的PassThruConnect
+        // 在EcuInterface对象调用SendReceive调用后将起作用，下位机将执行PassThruConnect
+        // 例如 SendReceive调用后，VCI的CAN_H和CAN_L将连通到对应的06脚14脚
+        
+        // VCI与车辆OBD16引脚对应协议的物理总线断开，即对应04版本J2534的PassThruDisconnect
+        // 物理总线的释放，默认由通信库处理，在没有调用SetPhyChlHoldMode，默认为PBHT_NORMAL_MODE
+        // 因VCI设备同时连接的物理通道有限，物理通道的断开在EcuInterface对象释放后不会立即执行
+        // 当新的EcuInterface进行数据通信时，可能会引起其它EcuInterface对应协议的引脚释放。
+        
+        // 默认此参数为PBHT_NORMAL_MODE，物理引脚断开由通信库内部处理
+        // 例如，当前有2个EcuInterface，分别CAN的6和14、CAN的3和11，如果第3个EcuInterface需
+        // 要CAN的3和8通信，将会断开第2个EcuInterface的CAN，给第3个EcuInterface使用下位机硬件资源
+
+        /* 物理总线的释放（PassThruDisconnect），由通信库处理，默认的方式 */
+        /* 在没有调用SetPhyChlHoldMode下，默认为PBHT_NORMAL_MODE */
+        PBHT_NORMAL_MODE = 0x01, // 默认的物理总线释放方式
+
+        /* 在整个EcuInterface对象生命周期内（除非调用了ReleaseAllPhyChannel），强制保持物理总线常连接 */
+        /* 当前FCA 网关SGW认证需要此功能，需要与网关SGW保持链路保持，否则无法通过网关SGW与其它ECU通信 */
+        PBHT_HOLD_ON_WITH_OBJ_MODE = 0x02, // 保持物理总线常连接
+
+        // 非法
+        INVALID = 0xFF
+    };
+
+    inline PhyBusHoldMode operator & (PhyBusHoldMode lhs, PhyBusHoldMode rhs)
+    {
+        using T = std::underlying_type_t <PhyBusHoldMode>;
+        return static_cast<PhyBusHoldMode>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+    enum class FlowCtrlType :uint8_t
+    {//流控制帧类型定义
+        //自动模式，发送帧ID为流控帧ID
+        FCT_AUTO = 0x01,
+
+        //功能性请求模式，主要用于广播请求时的流控帧类型
+        //例1：广播ID为000007DF，接收帧ID为000007E8，则流控帧ID为000007E0
+        //例2：广播ID为18DB33F1，接收帧ID为18DAF110，则流控帧ID为18DA10F1
+        //例3：
+        /*  当发送ID与接收ID符合相差0x08此种场景时，也可设为此值，例如UDS CAN常
+            用的接收ID规则，接收ID为0x00, 0x00, 0x07, 0x28，发送ID为0x00, 0x00, 0x07, 0x20
+            则流控制ID为0x00, 0x00, 0x07, 0x20
+
+            例如: 以下五组过滤器:
+                发：0x0720，收：0x0728
+                发：0x07E0，收：0x07E8
+                发：0x0716，收：0x071E
+                发：0x0716，收：0x071E
+                发：0x0726，收：0x072E
+        */
+        FCT_FUNCTIONAL = 0x02,
+
+        //普通模式，接收ID和流控ID都需要自己设置
+        //此时调用接口SetFlowCtrlId()来设置
+        FCT_NORMAL = 0x03,
+
+        //交换模式，交换接收帧ID（共5个字节）的低两个字节
+        FCT_EXCHANGE_2BYTES = 0x04,
+
+        // 针对大众 UDS 过滤器，包括了29位
+        // 例如：
+        /*
+        11 位: 除OBD系统外：
+            发：0x732, 收：0x79C
+            发：0x70A, 收：0x774
+
+            6A 的处理只适用于 0x700 开始的ID
+
+            请求ID：0x00000732, 0x00000764, 0x0000071C, 0x00000757, 0x00000710
+            响应ID：0x0000079C, 0x000007CE, 0x00000786, 0x000007C1, 0x0000077A,
+
+            请求ID：0x000007F1
+            响应ID：0x000007F9
+
+        29 位：
+            请求ID：0x17FC00A5, 0x17FC0084
+            响应ID：0x17FE00A5, 0x17FE0084
+        */
+        FCT_VEHICLE_VW      = 0x80,
+
+        INVALID             = 0xFF
+    };
+
+    enum class CanP3MinType : uint8_t
+    {// 是否开启CAN的发送帧间隔使能类型，不包括续发帧的帧间隔（2X）和流控帧的发送（3X）
+     // 这里发送帧间隔指上一帧发送完成开始计时，至下一帧发送的间隔时间，注意不包括续发帧和流控帧的发送（2X和3X）
+
+        // 默认为此值，不开启CAN的发送帧间隔
+        CPMT_DISABLE_P3_MINI = 0,   // 针对CAN协议，不开启P3参数，即 SetCommTime 的 P3 无效
+                                    // 诊断应用可以根据实际场景，通过sleep来实现CAN的发送帧间隔
+
+        CPMT_ENABLE_P3_MINI_TX = 1, // 针对CAN协议，开启P3参数，即 SetCommTime 的 P3 会在VCI底层实现CAN的发送间隔
+                                    // 注意，这里的帧间隔不包括续发帧的帧间隔，即2X之间的间隔不受P3控制
+                                    // 同时流控帧（3X）的发送也不在此参数的控制范围内
+
+        INVALID = 0xFF
+    };
+
+    inline CanP3MinType operator & (CanP3MinType lhs, CanP3MinType rhs)
+    {
+        using T = std::underlying_type_t <CanP3MinType>;
+        return static_cast<CanP3MinType>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+    enum class CanFormatType :uint8_t
+    {
+        // CAN格式类型，仅适用于ISO15765_2协议ID，即协议ID为 "PT_CAN"
+        CFT_FORMAT_NORMAL      = 1,     // 通信层默认的处理方式，ISO15765_2格式
+                                        // 除SetSingleMsgCanFormatId指定的ID外，都以ISO15765_2格式处理
+
+        CFT_FORMAT_RX_RAW      = 3,     // 优先以原始CAN的方式收取，发送默认为ISO15765_2格式
+                                        // 即使SetSingleMsgCanFormatId没有调用，也优先以原始CAN的方式收取
+
+        CFT_FORMAT_TX_RX_RAW   = 4,     // 以原始CAN方式发送，并且优先以原始CAN的方式收取
+                                        // 即使SetSingleMsgCanFormatId没有调用，也优先以原始CAN的方式发送和收取
+
+        CFT_FORMAT_TX_RAW      = 5,     // 以原始CAN的方式发送，接收默认为ISO15765_2格式优先
+                                        // 即使SetSingleMsgCanFormatId没有调用，强制以原始CAN的方式发送数据帧
+
+        INVALID = 0xFF,
+    };
+
+    enum class CanExtendedAddrType : uint8_t
+    {
+        // SetCanExtendedAddress形参，指定SendReceive和链路保持中是否使用扩展地址来处理
+        // CAN扩展地址帧类型，仅适用于ISO15765_2协议ID，即协议ID为 "PT_CAN"
+        CEAT_EXT_ADDR_NORMAL         = 1,        // 通信层默认的处理方式，SendReceive和链路保持都是一样的处理方式
+                                                 // 根据SetCanExtendedAddress指定的扩展地址进行发送与接收
+
+        CEAT_EXT_ADDR_ONLY_SEND_RECV = 2,        // 扩展地址只适用于SendReceive的数据收发，链路保持不适用
+                                                 // 所有的SetLinkKeep指定的链路保持将不使用SetCanExtendedAddress指
+                                                 // 定的扩展地址
+                                                 // 即SetCanExtendedAddress对SetLinkKeep不生效
+
+        INVALID = 0xFF
+    };
+
+    inline CanExtendedAddrType operator & (CanExtendedAddrType lhs, CanExtendedAddrType rhs)
+    {
+        using T = std::underlying_type_t <CanExtendedAddrType>;
+        return static_cast<CanExtendedAddrType>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+
+    enum class CanFdDlcType :uint8_t
+    {
+        // CANFD帧的DLC大小，Data Length Code
+        // The Data Length Code (DLC) specifies how many data bytes a message frame contains
+        // 
+        // J2534-2的参数是FD_ISO15765_TX_DATA_LENGTH
+        // The data phase data size used for ISO15765 single frames, first frames, and consecutive frames.
+        // 
+        // PDU CP_CANFDTxMaxDataLength
+        TX_DL_8_0        = 0,   // Code In Classic CAN
+        TX_DL_8_8        = 8,   // Code In CANFD
+        TX_DL_12         = 9,   // Code In CANFD，每帧（单帧）最长字节为12字节
+        TX_DL_16         = 10,  // Code In CANFD，每帧（单帧）最长字节为16字节
+        TX_DL_20         = 11,  // Code In CANFD，每帧（单帧）最长字节为20字节
+        TX_DL_24         = 12,  // Code In CANFD，每帧（单帧）最长字节为24字节
+        TX_DL_32         = 13,  // Code In CANFD，每帧（单帧）最长字节为32字节
+        TX_DL_48         = 14,  // Code In CANFD，每帧（单帧）最长字节为48字节
+        TX_DL_64         = 15,  // Code In CANFD，每帧（单帧）最长字节为64字节
+
+        INVALID = 0xFF,
+    };
+
+
+    enum class QuickEnterParaType : uint32_t
+    {//快速进入参数类型定义
+        QEPT_RECV_FRAMES_IF_FAILED = (1 << 0), // 即使拉高拉低快速进入失败以后，
+                                               // 也继续继续尝试接收P2时间的响应
+
+        QEPT_NOMAL    = 0,                         // 正常模式，默认值
+        QEPT_AUTO_ALL = 0xFFFFFFFF,
+    };
+
+    inline QuickEnterParaType operator & (QuickEnterParaType lhs, QuickEnterParaType rhs)
+    {
+        using T = std::underlying_type_t <QuickEnterParaType>;
+        return static_cast<QuickEnterParaType>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+
+    enum class AddressEnterParaType : uint32_t
+    {//地址码进入参数类型定义
+        AEPT_SEND_KW1_REVERSED       = (1 << 0),         //关键字1取反发送
+        AEPT_SEND_KW2_REVERSED       = (1 << 1),         //关键字2取反发送
+        AEPT_RECV_2_KWS              = (1 << 2),         //接收2个关键字
+        AEPT_RECV_5_KWS              = (1 << 3),         //接收5个关键字
+        AEPT_RECV_ADDR_REVERSED      = (1 << 4),         //接收地址码取反
+        AEPT_RECV_ONE_FRAME          = (1 << 5),         //接收一帧回复数据
+        AEPT_RECV_MULTI_FRAME        = (1 << 6),         //接收多帧回复数据
+        AEPT_AUTO_BAUDRATE           = (1 << 7),         //自动识别波特率
+        AEPT_L_LINE_ENABLE           = (1 << 8),         //L线使能
+
+        AEPT_ISO_CITROEN             = (1 << 11),        //CITROEN ISO协议，波特率固定为9600
+
+        AEPT_RETRY_ONCE_MORE         = (1 << 12),        // 如果失败，将重试一次地址码进入
+        //AEPT_GET_KW_EVEN_IF_FAILED = (1 << 13),        // 如果失败，收到KW关键字，也将返回关键字
+        AEPT_GET_KW_ONLY             = (1 << 14),        // 地址码进入收到关键字后立即返回，针对KWP1281
+        AEPT_DISABLE_EXTRA_VERSION   = (1 << 15),        // 针对KWP1281系统进入，如果ECU有额外版本，也不发送“00”收取额外版本信息
+
+        AEPT_MASK_KW_REVERSED_TO_ECU = (AEPT_SEND_KW1_REVERSED | AEPT_SEND_KW2_REVERSED),   //掩码-关键字取反发送
+        AEPT_MASK_BYTE_OF_KWS        = (AEPT_RECV_2_KWS        | AEPT_RECV_5_KWS),          //掩码-接收关键字个数
+        AEPT_MASK_RECV_NUM_OF_FRAME  = (AEPT_RECV_ONE_FRAME    | AEPT_RECV_MULTI_FRAME),    //掩码-接收数据帧个数
+        AEPT_MASK_ISO_CITROEN        = (AEPT_ISO_CITROEN | AEPT_RECV_2_KWS \
+                                        | AEPT_AUTO_BAUDRATE | AEPT_RECV_ONE_FRAME),        //掩码-CITROEN ISO协议进入参数
+
+        AEPT_AUTO_ALL                = 0xFFFFFFFF
+    };
+
+    inline AddressEnterParaType operator | (AddressEnterParaType lhs, AddressEnterParaType rhs)
+    {
+        using T = std::underlying_type_t <AddressEnterParaType>;
+        return static_cast<AddressEnterParaType>(static_cast<T>(lhs) | static_cast<T>(rhs));
+    }
+
+    inline AddressEnterParaType operator & (AddressEnterParaType lhs, AddressEnterParaType rhs)
+    {
+        using T = std::underlying_type_t <AddressEnterParaType>;
+        return static_cast<AddressEnterParaType>(static_cast<T>(lhs) & static_cast<T>(rhs));
+    }
+
+    enum class EnterWayType :uint8_t
+    {//进入方式类型定义
+
+        //5波特率进入方式类型1：AddressCode -> 55,KW1,KW2 -> ~KW2 -> ~AddressCode
+        EWT_5BPS_TYPE01 = 0x01,  // J2534 中， FIVE_BAUD_MOD = ISO_STD_INIT； PDU 中， CP_5BaudMode = 0 
+
+        //5波特率进入方式类型2：AddressCode -> 55,KW1,KW2 -> ~KW2 
+        EWT_5BPS_TYPE02 = 0x02,  // J2534 中， FIVE_BAUD_MOD = ISO_INV_KB2； PDU 中， CP_5BaudMode = 1
+
+        //5波特率进入方式类型3：AddressCode -> 55,KW1,KW2 -> ~AddressCode
+        EWT_5BPS_TYPE03 = 0x03,  // J2534 中， FIVE_BAUD_MOD = ISO_INV_ADD； PDU 中， CP_5BaudMode = 2 
+
+        //5波特率进入方式类型4：AddressCode -> 55,KW1,KW2
+        EWT_5BPS_TYPE04 = 0x04,  // J2534 中， FIVE_BAUD_MOD = ISO_9141_STD； PDU 中， CP_5BaudMode = 3 
+
+        //5波特率进入方式类型5：AddressCode -> 55,KW1,KW2,KW3,KW4,KW5 -> ~KW2
+        EWT_5BPS_TYPE05 = 0x05,  
+
+        //5波特率进入方式类型6：AddressCode -> 55,KW1,KW2,KW3,KW4,KW5
+        EWT_5BPS_TYPE06 = 0x06,
+
+        INVALID = 0xFF
+    };
+
+    enum class RcxxHandlingMode : uint8_t
+    {// RC21 RC23 RC78的通信库处理模式，即 接口SetRCXXHandling 代表哪一种模式设置
+     // 7F XX 21,  7F XX 23,   7F XX 78 共3种
+
+        // 7F XX 21
+        RHM_MODE_NRC21 = 0x00,         // 表示 Negative Response Code 0x21 的设置 
+
+        // 7F XX 23
+        RHM_MODE_NRC23 = 0x01,         // 表示 Negative Response Code 0x23 的设置
+
+        // 7F XX 78
+        RHM_MODE_NRC78 = 0x02,         // 表示 Negative Response Code 0x78 的设置
+    };
+
+    enum class RcxxHandlingType : uint8_t
+    {//RC21 RC23 RC78的通信库处理模式，即 CP_RCXXHandling
+     // 7F XX 21,  7F XX 23,   7F XX 78 的处理模式
+     // 默认值为 RcxxHandlingType = RHT_UNTIL_TIMEOUT，RCXXCompletionTimeout = P2
+
+        // 不处理
+        RHT_DISABLE = 0x00,         // 通信库不处理，由诊断应用自己处理
+
+        // 连续处理，直到超时时间到 RCXXCompletionTimeout 时间，通信层默认RcxxHandlingType为此值，
+        // 应用如果没有设置 RCXXCompletionTimeout 时间， RCXXCompletionTimeout 默认为
+        // RC21CompletionTimeoutMs 默认为 5000， 即5秒
+        // RC23CompletionTimeoutMs 默认为 5000， 即5秒
+        // RC78CompletionTimeoutMs 默认为 15000，即15秒
+        RHT_UNTIL_TIMEOUT = 0x01,   // RC21 RC23 RC78 的处理模式为1，持续处理
+
+        // 无限制的处理，直到应用程序重新设置为 RHT_DISABLE 不处理，或者车辆返回正响应
+        RHT_UNLIMITED_LOOP = 0x02,   // RC21 RC23 RC78 的处理模式2，无限制的一直处理
+    };
+
+
+    enum class ClearBufferMode : uint8_t
+    {// 清除Buffer的模式，默认不清除任何 Buffer
+     // 应用没有调用SetClearBuffer 情况下，EcuInterface默认为 CBM_CLEAR_DISABLE
+     // 
+     // 每个CEcuInterface有自己的接收通信数据缓存（std::queue），通常情况下，EcuInterface必
+     // 须保证不丢弃任何数据（链路保持的响应数据和7F负响应，除外），除非应用调用了此接口
+
+        // 不做任何清除缓存处理，EcuInterface默认为此值
+        CBM_CLEAR_DISABLE = 0x00,           // EcuInterface默认为此值，不做任何清缓存buffer处理
+
+        // 数据发送到总线后，立即清除EcuInterface的接收缓存，即EcuInterface的接收queue
+        CBM_CLEAR_COMM_RX_QUEUE = 0x01,     // PassThruWriteMsgs后立即清除EcuInterface的接收queue
+
+        // 此模式在CBM_CLEAR_COMM_RX_QUEUE模式基础上增加清除下位机的通信缓存数据
+        // 数据发送到总线前，清除VCI的接收缓存，即PASSTHRU的接收缓存（PassThruConnect的channel缓存）
+        // 注意，多线程诊断下，建议不设置此值，否则会把其它CEcuInterface对象的数据给清除了
+        CBM_CLEAR_VCI_RX_BUFFER = 0x02,      // 此设置清除了VCI的channel缓存，如果应用同时跑多ECU，此时会造成数据丢失
+                                             // 此模式只针对CAN协议生效
+    };
+
+
+    enum class VciSupportType : uint8_t
+    {// 当前连接的VCI是否支持的类型
+
+        // "当前设备硬件是支持DOIP的"的枚举值
+        VST_SUPPORT_DOIP = 0x00,           // 当前设备硬件是否支持DOIP的枚举值，例如 TopScan Master
+
+        // "当前设备硬件是支持4路物理CAN通路同时跑的"的枚举值
+        VST_SUPPORT_4_CAN = 0x01,          // 当前设备硬件是否支持4路物理CAN通路同时跑的枚举值，例如 TopScan Master, RLink Lite
+
+        // "当前设备硬件是支持ELM327的"的枚举值
+        VST_SUPPORT_ELM327 = 0x02,         // 当前设备硬件是支持4路物理CAN通路同时跑的枚举值
+    };
+
+
+    // DoIP payload types
+    enum class DoipMsgType : uint16_t
+    {/* DOIP的消息类型 */
+        DMT_GENR_NEG_ACK                = 0x0000,        ///!< Generic DoIP header negative acknowledgment
+        DMT_VEH_ID_REQ                  = 0x0001,        ///!< Vehicle identification request
+        DMT_VEH_ID_REQ_WITH_EID         = 0x0002,        ///!< Vehicle identification request with specific EID
+        DMT_VEH_ID_REQ_WITH_VIN         = 0x0003,        ///!< Vehicle identification request with specific VIN
+        DMT_VEH_ANNO_ID_RSP             = 0x0004,        ///!< Vehicle announcement identification response
+        DMT_RTG_ACTV_REQ                = 0x0005,        ///!< Routing activation phase request
+        DMT_RTG_ACTV_RSP                = 0x0006,        ///!< Routing activation phase response
+        DMT_ALIVE_CHECK_REQ             = 0x0007,        ///!< Alive check heart-beating request
+        DMT_ALIVE_CHECK_RSP             = 0x0008,        ///!< Alive check heart-beating response
+        DMT_DOIP_ENTITY_STAT_REQ        = 0x4001,        ///!< DoIP entity (i.e., node or gateway) status request
+        DMT_DOIP_ENTITY_STAT_RSP        = 0x4002,        ///!< DoIP entity status response
+        DMT_DIAG_PWR_MODE_INFO_REQ      = 0x4003,        ///!< Diagnostic power mode information request
+        DMT_DIAG_PWR_MODE_INFO_RSP      = 0x4004,        ///!< Diagnostic power mode information response
+        DMT_DIAG_MSG                    = 0x8001,        ///!< Diagnostic message (e.g., UDS)
+        DMT_DIAG_MSG_POS_ACK            = 0x8002,        ///!< Diagnostic message positive acknowledgment 
+        DMT_DIAG_MSG_NEG_ACK            = 0x8003         ///!< Diagnostic message negative acknowledgment
+    };
+
+    enum class TcpEnterMode : uint8_t
+    {// TCP连接模式
+     // 默认情况下，TCP建立连接后，立马发routing activation request
+     // 
+
+        // TCP建立连接后，立马发routing activation request
+        TEM_ENABLE_ROUTING_ACT = 0x00,           // 
+
+
+        TEM_DISABLE_ROUTING_ACT = 0x01,
+    };
+
+    enum class DeActiveDoipMode : uint8_t
+    {// 设置失活DOIP引脚的模式
+     // 默认情况下，是DAO_DISABLE_DOIP_PIN_NORMAL，激活DOIP引脚后（8脚上拉），
+     // 在EcuInterface对象释放时，即在EcuInterface对象的析构函数中，会失活DOIP引脚（取消8脚上拉）
+
+        // 在CEcuInterface对象的析构函数中，会失活DOIP引脚（取消8脚上拉）
+        // 应用程序也可以通过ActiveDoipPin主动失活DOIP引脚（取消8脚上拉）
+        DAO_DISABLE_DOIP_PIN_NORMAL = 0x00,  // 默认情况下为此模式，如果只有一个EcuInterface对象在跑，且不主动调用ActiveDoipPin，可设置此模式
+
+        // 在CEcuInterface对象的析构函数中，不会失活DOIP引脚（取消8脚上拉），保持原来状态
+        // 应用程序也可以通过ActiveDoipPin主动失活DOIP引脚（取消8脚上拉）
+        DAO_CANCLE_DOIP_PIN_DISABLE = 0x01,  // 在多个CEcuInterface对象同时跑的时候，设置此模式
+    };
+
+    /*
+    * DOIP 模块信息结构体
+    */
+    // 例如
+    /*
+        LA=0x1716
+        IP=169.254.16.223
+        EID=02:26:55:12:34:56
+        VIN=SADCA2BX6JA32398
+        GroupID=02:26:55:12:34:56
+    */
+    typedef struct tagDoipModule
+    {
+        std::string  IP;                 // 字符串 IPv4地址或者是IPv6地址，IPv4地址例如"169.254.16.223"
+                                         // IPv6地址例如"FC00:0000:130F:0000:0000:09C0:876A:130B"，如果无IPv6，则空
+        std::string  EntityID;           // 字符串 例如 "02:26:55:12:34:56"
+        std::string  GroupeID;           // 字符串 例如 "02:26:55:12:34:56"
+
+        uint16_t  LogicalAddress = 0;    // 2字节  实体的逻辑地址，通常情况下即网关的逻辑地址，例如 0x1716
+        uint8_t   FurtherAction  = 0;    // Further Action Required
+        uint8_t   SyncStatus     = 0;    // VIN/GID SyncStatus
+
+        std::vector<uint8_t> VIN;        // 数组  车辆车架号
+    }DOIPMODULE, *PDOIPMODULE;
+
+
+    enum class FrameCsType :uint8_t
+    {//帧字节数据校验类型定义
+        CS_NONE           = 0x00,//无校验
+        CS_ADD            = 0x01,//单字节累加和校验
+        CS_ADD_HL         = 0x02,//双字节累加和校验，高字节在前，低字节在后
+        CS_ADD_LH         = 0x03,//双字节累加和校验，低字节在前，高字节在后
+        CS_ADD_REVERSED   = 0x04,//累加和取反校验
+        CS_ADD_COMPLEMENT = 0x05,//累加和取补校验
+        CS_XOR            = 0x06,//异或校验
+        CS_CRC_8          = 0x07,//单字节循环冗余校验
+        CS_CRC_16         = 0x08,//双字节循环冗余校验
+        CS_KWP1281        = 0x09,//恒03
+
+        INVALID           = 0xFF
+    };
+
+    enum class FrameFormatType :uint8_t
+    {//帧格式类型定义
+        FFT_NONE         = 0x00,
+        FFT_CAN          = 0x01,
+        FFT_VPW_EOBD     = 0x02,
+        FFT_PWM_EOBD     = 0x03,
+        FFT_ISO9141_2    = 0x04,
+        FFT_KWP_CX       = 0x05,
+        FFT_KWP_C0       = 0x06,
+        FFT_KWP_8X       = 0x07,
+        FFT_KWP_80       = 0x08,
+        FFT_KWP_0X       = 0x09,
+        FFT_KWP_00       = 0x0A,
+        FFT_PWM_FORD     = 0x0B,
+        FFT_FORD_ISO     = 0x0C,
+        FFT_VPW_GM       = 0x0D,
+        FFT_ALDL         = 0x0E,
+        FFT_KW81         = 0x0F,
+        FFT_KW82         = 0x10,
+        FFT_VPW_CHRYSLER = 0x11,
+        FFT_DSI          = 0x12,
+        FFT_DSII         = 0x13,
+        FFT_KWP1281      = 0x14,
+        FFT_VOLVO        = 0x15,
+        FFT_PSA          = 0x16,
+        FFT_RENAULT_ISO  = 0x17,
+        FFT_HONDA        = 0x18,
+        FFT_NISSAN_OLD   = 0x19,
+        FFT_DAIHATSU_ISO = 0x1A,
+        FFT_SMS_ISO      = 0x1B,
+        FFT_MB_ISO       = 0x1C,
+        FFT_NORMAL       = 0x1D,
+        FFT_ISO9141_2_KW94 = 0x1E,
+        FFT_DOIP         = 0x1F,
+
+        INVALID = 0xFF
+    };
+
+    /*template <enum class T>
+    T operator | (T lhs, T rhs)
+    {
+        using _Type = std::underlying_type_t <T>;
+        return static_cast<T>(static_cast<_Type>(lhs) | static_cast<_Type>(rhs));
+    }*/
+
+    // 通信相关错误码，即 J2534 错误码
+    enum ErrorCodeType
+    {
+        STATUS_NOERROR             = 0x00, 
+        ERR_NOT_SUPPORTED          = 0x01, 
+        ERR_INVALID_CHANNEL_ID     = 0x02, 
+        ERR_INVALID_PROTOCOL_ID    = 0x03, 
+        ERR_NULL_PARAMETER         = 0x04, 
+        ERR_INVALID_IOCTL_VALUE    = 0x05, 
+        ERR_INVALID_FLAGS          = 0x06, 
+        ERR_FAILED                 = 0x07, 
+        ERR_DEVICE_NOT_CONNECTED   = 0x08, 
+        ERR_TIMEOUT                = 0x09, 
+        ERR_INVALID_MSG            = 0x0A, 
+        ERR_INVALID_TIME_INTERVAL  = 0x0B, 
+        ERR_EXCEEDED_LIMIT         = 0x0C, 
+        ERR_INVALID_MSG_ID         = 0x0D, 
+        ERR_DEVICE_IN_USE          = 0x0E, 
+        ERR_INVALID_IOCTL_ID       = 0x0F, 
+        ERR_BUFFER_EMPTY           = 0x10, 
+        ERR_BUFFER_FULL            = 0x11, 
+        ERR_BUFFER_OVERFLOW        = 0x12, 
+        ERR_PIN_INVALID            = 0x13, 
+        ERR_CHANNEL_IN_USE         = 0x14, 
+        ERR_MSG_PROTOCOL_ID        = 0x15, 
+        ERR_INVALID_FILTER_ID      = 0x16, 
+        ERR_NO_FLOW_CONTROL        = 0x17, 
+        ERR_NOT_UNIQUE             = 0x18, 
+        ERR_INVALID_BAUDRATE       = 0x19, 
+        ERR_INVALID_DEVICE_ID      = 0x1A,
+        ERR_DEVICE_NOT_OPEN        = 0x1B,
+        ERR_NULL_REQUIRED          = 0x1C,
+
+        ERR_FILTER_TYPE_NOT_SUPPORTED   = 0x1D,
+        ERR_INVALID_IOCTL_PARAM_ID      = 0x1E,
+        ERR_VOLTAGE_IN_USE              = 0x1F,
+        ERR_PIN_IN_USE                  = 0x20,
+        ERR_INIT_FAILED                 = 0x21,
+        ERR_OPEN_FAILED                 = 0x22,
+        ERR_BUFFER_TOO_SMALL            = 0x23,
+        ERR_LOG_CHAN_NOT_ALLOWED        = 0x24,
+        ERR_SELECT_TYPE_NOT_SUPPORTED   = 0x25,
+        ERR_CONCURRENT_API_CALL         = 0x26,
+
+        ERR_ADDRESS_NOT_CLAIMED          = 0x00010000,
+        ERR_NO_CONNECTION_ESTABLISHED    = 0x00010001,
+        ERR_RESOURCE_IN_USE              = 0x00010002,
+        ERR_MODULE_NOT_AUTHORIZED        = 0x00010003,
+
+        ERR_DLL_NOT_OPEN                 = 0x00010004,
+        ERR_DEVICES_API_IS_NULL          = 0x00010005,
+        ERR_SHARE_PTR_IS_NULL            = 0x00010006,
+        ERR_CHANNEL_ID_NOT_CONNECT       = 0x00010007,
+        ERR_VBAT_VOLT_TOO_LOW            = 0x00010008,  // 发命令等接口，电池电压偏低，小于6伏直接返回
+        ERR_NOT_UNIQUE_INTERNEL          = 0x00010009,
+        ERR_TX_TIMEOUT                   = 0x0001000A,
+        ERR_NOT_NEED_SET_CONFIG          = 0x0001000B,
+
+        ERR_ETH_SOCKET_NOT_CONNECTED     = 0x8001000C,  // 以太网socket未连接
+    };
+};
+
+
+typedef struct tagCommTime
+{//通讯时间间隔p1~p5
+    uint32_t p1;
+    uint32_t p2;
+    uint32_t p3;
+    uint32_t p4;
+    uint32_t p5;
+}COMMTIME, *PCOMMTIME;
+
+typedef struct tagAddrCommTime
+{//地址码进入时间间隔w0~w4
+    uint32_t w0;
+    uint32_t w1;
+    uint32_t w2;
+    uint32_t w3;
+    uint32_t w4;
+}ADDRCOMMTIME, *PADDRCOMMTIME;
+
+#if !defined (DISABLE_USING_STDCOMMMACO)
+using ErrorCode_t = CStdCommMaco::ErrorCodeType;
+using ErrorCodeType = CStdCommMaco::ErrorCodeType;
+#endif
+
+#endif
+
+

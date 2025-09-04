@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\EcuInterface.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\StdCommMaco.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\Tprog.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\CommInterface\TproMaco.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiActive.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiCoilReader.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiEcuInfo.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFileDialog.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFloatMini.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFreeze.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiFreqWave.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiGlobal.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiInput.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiList.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiLiveData.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMenu.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMiniMsgBox.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiMsgBox.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiObdReview.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiPicture.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiPopup.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiReport.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiSystem.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiTopTap.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiTrouble.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\ArtiWeb.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\StdShowMaco.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\DisplayInterface\VehAutoAuth.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInclude.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\AlgorithmData.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Binary.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\BinaryGroup.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\DataFile.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Expression.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameCs.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameFormat.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\FrameNegative.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Mathematics.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\Md5.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MemDataFile.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MultiRecvFrame.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\MultiSendFrame.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\ProFile.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\PublicInterface.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\RecvFrame.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\RecvFrameEx.h" />
+    <ClInclude Include="..\..\..\..\..\PUBLIC\trunk\Include\StdInterface\SendFrame.h" />
+    <ClInclude Include="..\DemoActive.h" />
+    <ClInclude Include="..\DemoAPITest.h" />
+    <ClInclude Include="..\DemoAppLayer.h" />
+    <ClInclude Include="..\Demo.h" />
+    <ClInclude Include="..\DemoArtiActiveTest.h" />
+    <ClInclude Include="..\DemoArtiCoilReaderTest.h" />
+    <ClInclude Include="..\DemoArtiEcuInfoTest.h" />
+    <ClInclude Include="..\DemoArtiFileDialogTest.h" />
+    <ClInclude Include="..\DemoArtiFloatMiniTest.h" />
+    <ClInclude Include="..\DemoArtiFreezeTest.h" />
+    <ClInclude Include="..\DemoArtiFreqWaveTest.h" />
+    <ClInclude Include="..\DemoArtiGlobalTest.h" />
+    <ClInclude Include="..\DemoArtiInputTest.h" />
+    <ClInclude Include="..\DemoArtiListTest.h" />
+    <ClInclude Include="..\DemoArtiLiveDataTest.h" />
+    <ClInclude Include="..\DemoArtiMenuTest.h" />
+    <ClInclude Include="..\DemoArtiMiniMsgBoxTest.h" />
+    <ClInclude Include="..\DemoArtiMsgBoxTest.h" />
+    <ClInclude Include="..\DemoArtiObdReviewTest.h" />
+    <ClInclude Include="..\DemoArtiPictureTest.h" />
+    <ClInclude Include="..\DemoArtiPopupTest.h" />
+    <ClInclude Include="..\DemoArtiReportTest.h" />
+    <ClInclude Include="..\DemoArtiSystemTest.h" />
+    <ClInclude Include="..\DemoArtiTroubleTest.h" />
+    <ClInclude Include="..\DemoArtiWebTest.h" />
+    <ClInclude Include="..\DemoEcuTest.h" />
+    <ClInclude Include="..\DemoImmoTest.h" />
+    <ClInclude Include="..\DemoMaco.h" />
+    <ClInclude Include="..\DemoEnterSys.h" />
+    <ClInclude Include="..\DemoInfomation.h" />
+    <ClInclude Include="..\DemoLiveData.h" />
+    <ClInclude Include="..\DemoMulitSysInfo.h" />
+    <ClInclude Include="..\DemoNetCan.h" />
+    <ClInclude Include="..\DemoNetKwp2000.h" />
+    <ClInclude Include="..\DemoNetLayer.h" />
+    <ClInclude Include="..\DemoNetNormal.h" />
+    <ClInclude Include="..\DemoNetSaeJ1850.h" />
+    <ClInclude Include="..\DemoNetTp20.h" />
+    <ClInclude Include="..\DemoPublicAPI.h" />
+    <ClInclude Include="..\DemoTroubleCode.h" />
+    <ClInclude Include="..\DemoUnlockGW.h" />
+    <ClInclude Include="..\DemoVehAutoAuthTest.h" />
+    <ClInclude Include="..\DemoVehicleStruct.h" />
+    <ClInclude Include="..\DemoHotFunction.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\DemoActive.cpp" />
+    <ClCompile Include="..\DemoAPITest.cpp" />
+    <ClCompile Include="..\DemoAppLayer.cpp" />
+    <ClCompile Include="..\Demo.cpp" />
+    <ClCompile Include="..\DemoArtiActiveTest.cpp" />
+    <ClCompile Include="..\DemoArtiCoilReaderTest.cpp" />
+    <ClCompile Include="..\DemoArtiEcuInfoTest.cpp" />
+    <ClCompile Include="..\DemoArtiFileDialogTest.cpp" />
+    <ClCompile Include="..\DemoArtiFloatMiniTest.cpp" />
+    <ClCompile Include="..\DemoArtiFreezeTest.cpp" />
+    <ClCompile Include="..\DemoArtiFreqWaveTest.cpp" />
+    <ClCompile Include="..\DemoArtiGlobalTest.cpp" />
+    <ClCompile Include="..\DemoArtiInputTest.cpp" />
+    <ClCompile Include="..\DemoArtiListTest.cpp" />
+    <ClCompile Include="..\DemoArtiLiveDataTest.cpp" />
+    <ClCompile Include="..\DemoArtiMenuTest.cpp" />
+    <ClCompile Include="..\DemoArtiMiniMsgBoxTest.cpp" />
+    <ClCompile Include="..\DemoArtiMsgBoxTest.cpp" />
+    <ClCompile Include="..\DemoArtiObdReviewTest.cpp" />
+    <ClCompile Include="..\DemoArtiPictureTest.cpp" />
+    <ClCompile Include="..\DemoArtiPopupTest.cpp" />
+    <ClCompile Include="..\DemoArtiReportTest.cpp" />
+    <ClCompile Include="..\DemoArtiSystemTest.cpp" />
+    <ClCompile Include="..\DemoArtiTroubleTest.cpp" />
+    <ClCompile Include="..\DemoArtiWebTest.cpp" />
+    <ClCompile Include="..\DemoEcuTest.cpp" />
+    <ClCompile Include="..\DemoEnterSys.cpp" />
+    <ClCompile Include="..\DemoImmoTest.cpp" />
+    <ClCompile Include="..\DemoInfomation.cpp" />
+    <ClCompile Include="..\DemoLiveData.cpp" />
+    <ClCompile Include="..\Demomain.cpp" />
+    <ClCompile Include="..\DemoNetCan.cpp" />
+    <ClCompile Include="..\DemoNetKwp2000.cpp" />
+    <ClCompile Include="..\DemoNetLayer.cpp" />
+    <ClCompile Include="..\DemoNetNormal.cpp" />
+    <ClCompile Include="..\DemoNetSaeJ1850.cpp" />
+    <ClCompile Include="..\DemoNetTp20.cpp" />
+    <ClCompile Include="..\DemoPublicAPI.cpp" />
+    <ClCompile Include="..\DemoTroubleCode.cpp" />
+    <ClCompile Include="..\DemoHotFunction.cpp" />
+    <ClCompile Include="..\DemoUnlockGW.cpp" />
+    <ClCompile Include="..\DemoVehAutoAuthTest.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{32AA4F14-59CC-406A-B0BE-005B6BBFECFA}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>ArtiDiag900</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\..\..\..\Public\trunk\Release\Windows\Debug\TopDon\Diagnosis\Car\Europe\DEMO\</OutDir>
+    <TargetName>Diag</TargetName>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(NETFXKitsDir)Lib\um\x86</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\..\..\..\PUBLIC\trunk\Release\Windows\Debug64\Car\Public\DEMO\</OutDir>
+    <TargetName>Diag</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\..\..\..\Public\trunk\Release\Windows\Release\TopDon\Diagnosis\Car\Europe\DEMO\</OutDir>
+    <TargetName>Diag</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)..\..\..\..\..\Public\trunk\Release\Windows\Release64\Car\Europe\DEMO\</OutDir>
+    <TargetName>Diag</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>Vehicle=Demo;WIN32;_DEBUG;INCLUDE_ENABLE_USING_STD_NAMESPACE;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\..\Public\trunk\include;..\..\..\..\..\Public\trunk\include\CommInterface;..\..\..\..\..\Public\trunk\include\DisplayInterface;..\..\..\..\..\Public\trunk\include\StdInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>
+      </AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>Std.lib;StdComm.lib;StdShow.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\..\..\..\Public\trunk\Release\Windows\Debug\TopDon\Diagnosis</AdditionalLibraryDirectories>
+      <ModuleDefinitionFile>ArtiDiag900.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>Vehicle=Demo;WIN64;_DEBUG;ARTIDIAG900_EXPORTS;_WINDOWS;_USRDLL;INCLUDE_ENABLE_USING_STD_NAMESPACE;MULTI_SYSTEM;%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\..\Public\trunk\include;..\..\..\..\..\Public\trunk\include\CommInterface;..\..\..\..\..\Public\trunk\include\DisplayInterface;..\..\..\..\..\Public\trunk\include\StdInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\..\..\Public\trunk\Release\Windows\Debug64\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Std.lib;StdComm.lib;StdShow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ArtiDiag900.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>Vehicle=Demo;WIN32;NDEBUG;ARTIDIAG900_EXPORTS;_WINDOWS;_USRDLL;INCLUDE_ENABLE_USING_STD_NAMESPACE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\Src;..\..\..\..\..\Public\trunk\include;..\..\..\..\..\Public\trunk\include\CommInterface;..\..\..\..\..\Public\trunk\include\DisplayInterface;..\..\..\..\..\Public\trunk\include\StdInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\..\..\Public\trunk\Release\Windows\Release\TopDon\Diagnosis</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Std.lib;StdComm.lib;StdShow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ArtiDiag900.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>Vehicle=Demo;WIN64;NDEBUG;ARTIDIAG900_EXPORTS;_WINDOWS;_USRDLL;INCLUDE_ENABLE_USING_STD_NAMESPACE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>..\..\..\..\..\Public\trunk\include;..\..\..\..\..\Public\trunk\include\CommInterface;..\..\..\..\..\Public\trunk\include\DisplayInterface;..\..\..\..\..\Public\trunk\include\StdInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>..\..\..\..\..\Public\trunk\Release\Windows\Release64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Std.lib;StdComm.lib;StdShow.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ModuleDefinitionFile>ArtiDiag900.def</ModuleDefinitionFile>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

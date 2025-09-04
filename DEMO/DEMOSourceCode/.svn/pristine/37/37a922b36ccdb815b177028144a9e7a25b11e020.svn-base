@@ -1,0 +1,722 @@
+#include "DemoArtiInputTest.h"
+#include "DemoMaco.h"
+#include "DemoPublicAPI.h"
+
+namespace Topdon_AD900_Demo {
+
+	void CArtiInputTest::ShowMenu()
+	{
+		vector<uint32_t> vctMenuID;
+
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000001"));
+		uiMenu.AddItem("InitOneInputBox");	   vctMenuID.push_back(0);
+		uiMenu.AddItem("GetOneInputBox");      vctMenuID.push_back(1);
+		uiMenu.AddItem("AddButton");		   vctMenuID.push_back(2);
+		uiMenu.AddItem("InitManyInputBox");    vctMenuID.push_back(3);
+		uiMenu.AddItem("GetManyInputBox");	   vctMenuID.push_back(4);
+		uiMenu.AddItem("InitOneComboBox");	   vctMenuID.push_back(5);
+		uiMenu.AddItem("GetOneComboBox");	   vctMenuID.push_back(6);
+		uiMenu.AddItem("InitManyComboBox");	   vctMenuID.push_back(7);
+		uiMenu.AddItem("GetManyComboBox");	   vctMenuID.push_back(8);
+		uiMenu.AddItem("SetTipsPosition");	   vctMenuID.push_back(9);
+		uiMenu.AddItem("GetManyComboBoxNum");	   vctMenuID.push_back(10);
+		uiMenu.AddItem("SetVisibleButtonQR");	   vctMenuID.push_back(11);
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (uRetBtn < vctMenuID.size())
+			{
+				if (0 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_InitOneInputBox();
+				}
+				else if (1 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_GetOneInputBox();
+				}
+				else if (2 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_AddButton();
+				}
+				else if (3 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_InitManyInputBox();
+				}
+				else if (4 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_GetManyInputBox();
+				}
+				else if (5 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_InitOneComboBox();
+				}
+				else if (6 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_GetOneComboBox();
+				}
+				else if (7 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_InitManyComboBox();
+				}
+				else if (8 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_GetManyComboBox();
+				}
+				else if (9 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_SetTipsPosition();
+				}
+				else if (10 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_GetManyComboBoxNum();
+				}
+				else if (11 == vctMenuID[uRetBtn])
+				{
+					ArtiInputTest_SetVisibleButtonQR();
+				}
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_InitOneInputBox()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));
+		uiMenu.AddItem(artiGetText("FF0500000002"));//"Title、Tips和Default均为空文本"
+		uiMenu.AddItem(artiGetText("FF0500000003"));//"Title、Tips和Default均为单行文本"
+		uiMenu.AddItem(artiGetText("FF0500000004"));//"Title、Tips和Default均为多行文本"
+		uiMenu.AddItem(artiGetText("FF0500000005"));//"Mask测试"
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if ((0 == uRetBtn) || (1 == uRetBtn) || (2 == uRetBtn))
+				{
+#if __Multi_System_Test__
+					CArtiInput uiInput(m_uThread);
+#else
+					CArtiInput uiInput;
+#endif
+					if (0 == uRetBtn)
+					{
+						uiInput.InitOneInputBox("", "", "************", "");
+					}
+					else if (1 == uRetBtn)
+					{
+						uiInput.InitOneInputBox(TextSingleLine, TextSingleLine, "************", TextSingleLine);
+					}
+					else if (2 == uRetBtn)
+					{
+						uiInput.InitOneInputBox(TextMulitLineTitle, TextMulitLineHelp, "************", TextMulitLineValue);
+					}
+
+					while (1)
+					{
+						uRetBtn = uiInput.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+					}
+				}
+				else
+				{
+					vector<string> vctMask;
+
+#if __Multi_System_Test__
+					CArtiMenu uiMenuMask(m_uThread);
+#else
+					CArtiMenu uiMenuMask;
+#endif
+
+					uiMenuMask.InitTitle(artiGetText("FF0500000005"));//"Mask测试"
+					uiMenuMask.AddItem("Mask=**********");	vctMask.push_back("**********");
+					uiMenuMask.AddItem("Mask=0000000000");	vctMask.push_back("0000000000");
+					uiMenuMask.AddItem("Mask=FFFFFFFFFF");	vctMask.push_back("FFFFFFFFFF");
+					uiMenuMask.AddItem("Mask=##########");	vctMask.push_back("##########");
+					uiMenuMask.AddItem("Mask=VVVVVVVVVV");	vctMask.push_back("VVVVVVVVVV");
+					uiMenuMask.AddItem("Mask=AAAAAAAAAA");	vctMask.push_back("AAAAAAAAAA");
+					uiMenuMask.AddItem("Mask=BBBBBBBBBB");	vctMask.push_back("BBBBBBBBBB");
+					//uiMenuMask.AddItem("Mask=*0F#VAB");  	vctMask.push_back("*0F#VAB");
+
+					while (1)
+					{
+						uRetBtn = uiMenuMask.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+						else
+						{
+#if __Multi_System_Test__
+							CArtiInput uiInput(m_uThread);
+#else
+							CArtiInput uiInput;
+#endif
+							uiInput.InitOneInputBox("Title", "Mask=" + vctMask[uRetBtn], vctMask[uRetBtn], vctMask[uRetBtn]);
+							while (1)
+							{
+								uRetBtn = uiInput.Show();
+								if (DF_ID_BACK == uRetBtn)
+								{
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_GetOneInputBox()
+	{
+		vector<string> vctMask;
+#if __Multi_System_Test__
+		CArtiMenu uiMenuMask(m_uThread);
+#else
+		CArtiMenu uiMenuMask;
+#endif
+		uiMenuMask.InitTitle(artiGetText("FF0500000006"));//"选择Mask"
+		uiMenuMask.AddItem(artiGetText("FF0500000007"));	        vctMask.push_back("");//"Mask=空"
+		uiMenuMask.AddItem("Mask=**********");	vctMask.push_back("**********");
+		uiMenuMask.AddItem("Mask=0000000000");	vctMask.push_back("0000000000");
+		uiMenuMask.AddItem("Mask=FFFFFFFFFF");	vctMask.push_back("FFFFFFFFFF");
+		uiMenuMask.AddItem("Mask=##########");	vctMask.push_back("##########");
+		uiMenuMask.AddItem("Mask=VVVVVVVVVV");	vctMask.push_back("VVVVVVVVVV");
+		uiMenuMask.AddItem("Mask=AAAAAAAAAA");	vctMask.push_back("AAAAAAAAAA");
+		uiMenuMask.AddItem("Mask=BBBBBBBBBB");	vctMask.push_back("BBBBBBBBBB");
+		uiMenuMask.AddItem("Mask=*0F#VAB");  	vctMask.push_back("*0F#VAB");
+
+		while (1)
+		{
+			uRetBtn = uiMenuMask.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+#if __Multi_System_Test__
+				CArtiInput uiInput(m_uThread);
+#else
+				CArtiInput uiInput;
+#endif
+				/*
+				* "输入框标题"
+				* "输入框提示[Mask="
+				*/
+				uiInput.InitOneInputBox(artiGetText("FF0500000008"), artiGetText("FF0500000009") + vctMask[uRetBtn] + "]", vctMask[uRetBtn], vctMask[uRetBtn]);
+				while (1)
+				{
+					uRetBtn = uiInput.Show();
+					if (DF_ID_BACK == uRetBtn)
+					{
+						break;
+					}
+					else
+					{
+						string strRetVal = uiInput.GetOneInputBox();
+						ShowMsgBoxDemo(artiGetText("FF050000000A"), strRetVal, DF_MB_OK, DT_LEFT, -1, m_uThread);
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_AddButton()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));	//"选择测试项"
+		uiMenu.AddItem(artiGetText("FF0000000003"));	//"文本为空"
+		uiMenu.AddItem(artiGetText("FF0000000004"));	//"文本为单行文本"
+		uiMenu.AddItem(artiGetText("FF0000000005"));	//"文本为多行文本"
+		uiMenu.AddItem(artiGetText("FF050000000B"));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (0 == uRetBtn || 1 == uRetBtn || 2 == uRetBtn)
+				{
+					string strBtnText = "";
+					if (0 == uRetBtn)
+					{
+						strBtnText = "";
+					}
+					else if (2 == uRetBtn)
+					{
+						strBtnText = TextMulitLineValue;
+					}
+					else
+					{
+						strBtnText = artiGetText("FF050000000C");
+					}
+
+#if __Multi_System_Test__
+					CArtiInput uiInput(m_uThread);
+#else
+					CArtiInput uiInput;
+#endif
+					uiInput.InitOneInputBox(artiGetText("FF0500000008"), artiGetText("FF050000000D"), "**********", "");
+					while (1)
+					{
+						uRetBtn = uiInput.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+						else if (DF_ID_OK == uRetBtn)
+						{
+							uiInput.AddButton(strBtnText);
+						}
+					}
+				}
+				else
+				{
+					uint32_t uBtnCnt = 0;
+#if __Multi_System_Test__
+					CArtiInput uiInput(m_uThread);
+#else
+					CArtiInput uiInput;
+#endif
+					uiInput.InitOneInputBox(artiGetText("FF0500000008"), artiGetText("FF050000000E"), "**********", "");
+					while (1)
+					{
+						uRetBtn = uiInput.Show();
+						if (DF_ID_BACK == uRetBtn)
+						{
+							break;
+						}
+						else if (DF_ID_OK == uRetBtn)
+						{
+							for (uint32_t i = 0; i < 5; i++)
+							{
+								memset(buff, 0, sizeof(buff));
+								SPRINTF_S(buff, "%d", uBtnCnt++);
+								uiInput.AddButton(artiGetText("FF0000000025") + buff);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_InitManyInputBox()
+	{
+#if __Multi_System_Test__
+		CArtiMenu uiMenu(m_uThread);
+#else
+		CArtiMenu uiMenu;
+#endif
+		uiMenu.InitTitle(artiGetText("FF0000000002"));
+		uiMenu.AddItem(artiGetText("FF050000000F"));
+		uiMenu.AddItem(artiGetText("FF0500000005"));
+
+		while (1)
+		{
+			uRetBtn = uiMenu.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else
+			{
+				if (0 == uRetBtn)
+				{
+					vector<string> vctTips;
+					vector<string> vctMasks;
+					vector<string> vctDefaults;
+
+					vctTips.push_back("");	vctMasks.push_back(""); vctDefaults.push_back("");
+					vctTips.push_back(artiGetText("FF0500000010"));	vctMasks.push_back("**********"); vctDefaults.push_back("**********");
+					vctTips.push_back(artiGetText("FF0500000011") + TextMulitLineValue);	vctMasks.push_back("**************************************************"); vctDefaults.push_back("**************************************************");
+
+#if __Multi_System_Test__
+					CArtiInput uiInput(m_uThread);
+#else
+					CArtiInput uiInput;
+#endif
+					uiInput.InitManyInputBox(artiGetText("FF0500000012"), vctTips, vctMasks, vctDefaults);
+
+					while (1)
+					{
+						uRetBtn = uiInput.Show();
+						if (DF_ID_BACK == uRetBtn || DF_ID_OK == uRetBtn)
+						{
+							break;
+						}
+					}
+				}
+				else
+				{
+					vector<string> vctTips;
+					vector<string> vctMasks;
+					vector<string> vctDefaults;
+
+					vctTips.push_back("");	vctMasks.push_back(""); vctDefaults.push_back("");
+					vctTips.push_back(artiGetText("FF0500000013"));	vctMasks.push_back("**********"); vctDefaults.push_back("**********");
+					vctTips.push_back(artiGetText("FF0500000014"));	vctMasks.push_back("0000000000"); vctDefaults.push_back("0000000000");
+					vctTips.push_back(artiGetText("FF0500000015"));	vctMasks.push_back("FFFFFFFFFF"); vctDefaults.push_back("FFFFFFFFFF");
+					vctTips.push_back(artiGetText("FF0500000016"));	vctMasks.push_back("##########"); vctDefaults.push_back("##########");
+					vctTips.push_back(artiGetText("FF0500000017"));	vctMasks.push_back("VVVVVVVVVV"); vctDefaults.push_back("VVVVVVVVVV");
+					vctTips.push_back(artiGetText("FF0500000018"));	vctMasks.push_back("AAAAAAAAAA"); vctDefaults.push_back("AAAAAAAAAA");
+					vctTips.push_back(artiGetText("FF0500000019"));	vctMasks.push_back("BBBBBBBBBB"); vctDefaults.push_back("BBBBBBBBBB");
+					vctTips.push_back(artiGetText("FF050000001A"));	vctMasks.push_back("*0F#VAB"); vctDefaults.push_back("*0F#VAB");
+					string	strTemp;
+					string	strMask;
+
+					strTemp = TextMulitLineValue;
+					for (uint32_t iTemp=0; iTemp<strTemp.size(); iTemp++)
+					{
+						strMask += "*";
+					}
+					vctTips.push_back(strTemp);	vctMasks.push_back(strMask); vctDefaults.push_back(strTemp);
+
+
+
+#if __Multi_System_Test__
+					CArtiInput uiInput(m_uThread);
+#else
+					CArtiInput uiInput;
+#endif
+					uiInput.InitManyInputBox(artiGetText("FF0500000012"), vctTips, vctMasks, vctDefaults);
+
+					while (1)
+					{
+						uRetBtn = uiInput.Show();
+						if (DF_ID_BACK == uRetBtn || DF_ID_OK == uRetBtn)
+						{
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_GetManyInputBox()
+	{
+		vector<string> vctTips;
+		vector<string> vctMasks;
+		vector<string> vctDefaults;
+
+		vctTips.push_back("");	vctMasks.push_back(""); vctDefaults.push_back("");
+		vctTips.push_back(artiGetText("FF0500000013"));	vctMasks.push_back("**********"); vctDefaults.push_back("**********");
+		vctTips.push_back(artiGetText("FF0500000014"));	vctMasks.push_back("0000000000"); vctDefaults.push_back("0000000000");
+		vctTips.push_back(artiGetText("FF0500000015"));	vctMasks.push_back("FFFFFFFFFF"); vctDefaults.push_back("FFFFFFFFFF");
+		vctTips.push_back(artiGetText("FF0500000016"));	vctMasks.push_back("##########"); vctDefaults.push_back("##########");
+		vctTips.push_back(artiGetText("FF0500000017"));	vctMasks.push_back("VVVVVVVVVV"); vctDefaults.push_back("VVVVVVVVVV");
+		vctTips.push_back(artiGetText("FF0500000018"));	vctMasks.push_back("AAAAAAAAAA"); vctDefaults.push_back("AAAAAAAAAA");
+		vctTips.push_back(artiGetText("FF0500000019"));	vctMasks.push_back("BBBBBBBBBB"); vctDefaults.push_back("BBBBBBBBBB");
+		//vctTips.push_back(artiGetText("FF050000001A"));	vctMasks.push_back("*0F#VAB"); vctDefaults.push_back("*0F#VAB");
+
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		uiInput.InitManyInputBox(artiGetText("FF0500000012"), vctTips, vctMasks, vctDefaults);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				string strRetVal = "";
+				vector<string> vctStrRetVal;
+				vctStrRetVal = uiInput.GetManyInputBox();
+
+				for (uint32_t i = 0; i < vctStrRetVal.size(); i++)
+				{
+					strRetVal = strRetVal + "\n" + vctStrRetVal[i];
+				}
+				ShowMsgBoxDemo(artiGetText("FF050000001B"), strRetVal, DF_MB_OK, DT_LEFT, -1, m_uThread);
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_InitOneComboBox()
+	{
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "InitOneComboBox";
+		string strTips = "Tips";
+		string strDefault = "TestValue0";
+		vector<string> vctValue = { "TestValue0", "TestValue1", "TestValue2" };
+
+		uiInput.InitOneComboBox(strTitle, strTips, vctValue, strDefault);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn || DF_ID_OK == uRetBtn)
+			{
+				break;
+			}
+		}
+	}
+
+ 	void CArtiInputTest::ArtiInputTest_SetTipsPosition()
+ 	{
+ #if __Multi_System_Test__
+ 		CArtiInput uiInput(m_uThread);
+ #else
+ 		CArtiInput uiInput;
+ #endif
+ 		CArtiMenu	uiMenu;
+ 
+ 		uiMenu.InitTitle("Test SetTipsPoition");
+ 		uiMenu.AddItem("SetTipsPosition:Top OneComboBox");
+ 		uiMenu.AddItem("SetTipsPosition:Left OneComboBox");
+ 		uiMenu.AddItem("SetTipsPosition:Top ManyComboBox");
+ 		uiMenu.AddItem("SetTipsPosition:Left ManyComboBox");
+ 
+ 		while (1)
+ 		{
+ 			uint32_t uRet = uiMenu.Show();
+ 			if (DF_ID_BACK == uRet)
+ 			{
+ 				break;
+ 			}
+ 			if ((uRet & 0xff) == 0 || (uRet & 0xff) == 1)
+ 			{
+ 				string strTitle = "SetTipsPoition";
+ 				string strTips = "Tips111111111111111111111111111111111111111122";
+ 				string strDefault = "TestValue0";
+ 				vector<string> vctValue = { "TestValue011111111111111111111111", "TestValue1111111111111111111111", "TestValue211111111111111111" };
+ 
+ 				uiInput.InitOneComboBox(strTitle, strTips, vctValue, strDefault);
+ 			}
+ 			else if ((uRet & 0xff) == 2 || (uRet & 0xff) == 3)
+ 			{
+ 				string strTitle = "InitManyComboBox";
+ 				vector<string> vctTips = { "ComboBox_0111111111111", "ComboBox_122222222222222" , "ComboBox_233333333333" };
+ 				vector<vector<string>> vctValue = { {"TestValue0", "TestValue1", TextMulitLineValue},
+ 											{"TestValue0111111111111", "TestValue12222222222222", TextMulitLineValue},
+ 											{"TestValue0222222222222", "TestValue1333333344444444", TextMulitLineValue} };
+ 				vector<string> vctDefault = vctValue[0];
+ 
+ 				uiInput.InitManyComboBox(strTitle, vctTips, vctValue, vctDefault);
+ 			}
+ 			if ((uRet & 0xff) == 0 || (uRet & 0xff) == 2)
+ 			{
+ 				uiInput.SetTipsPosition(TIPS_IS_TOP);
+ 			}
+ 			else if ((uRet & 0xff) == 1 || (uRet & 0xff) == 3)
+ 			{
+ 				uiInput.SetTipsPosition(TIPS_IS_LEFT);
+ 			}
+ 			while (1)
+ 			{
+ 				uRetBtn = uiInput.Show();
+ 				if (DF_ID_BACK == uRetBtn || DF_ID_OK == uRetBtn)
+ 				{
+ 					break;
+ 				}
+ 			}
+ 		}
+ 	}
+	void CArtiInputTest::ArtiInputTest_GetOneComboBox()
+	{
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "InitOneComboBox";
+		string strTips = "Tips";
+		string strDefault = "TestValue0";
+		vector<string> vctValue = { "TestValue0", "TestValue1", "TestValue2" };
+
+		uiInput.InitOneComboBox(strTitle, strTips, vctValue, strDefault);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				ShowMsgBoxDemo("GetOneComboBox", uiInput.GetOneComboBox(), DF_MB_OK, DT_LEFT, -1, m_uThread);
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_InitManyComboBox()
+	{
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "InitManyComboBox";
+		vector<string> vctTips = { "ComboBox_0", "ComboBox_1" , "ComboBox_2" };
+		vector<vector<string>> vctValue = { {"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue} };
+		vector<string> vctDefault = vctValue[0];
+
+		uiInput.InitManyComboBox(strTitle, vctTips, vctValue, vctDefault);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				//	ShowMsgBoxDemo("GetOneComboBox", uiInput.GetOneComboBox(), DF_MB_OK, DT_LEFT, -1, m_uThread);
+				break;
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_GetManyComboBox()
+	{
+
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "InitManyComboBox";
+		vector<string> vctTips = { "ComboBox_0", "ComboBox_1" , "ComboBox_2" };
+		vector<vector<string>> vctValue = { {"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue} };
+		vector<string> vctDefault = vctValue[0];
+
+		uiInput.InitManyComboBox(strTitle, vctTips, vctValue, vctDefault);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				string strValue = "";
+				for (uint8_t i = 0; i < uiInput.GetManyComboBox().size(); i++)
+				{
+					strValue = strValue + uiInput.GetManyComboBox()[i] + "\n";
+				}
+				ShowMsgBoxDemo("GetManyComboBox", strValue, DF_MB_OK, DT_LEFT, -1, m_uThread);
+				break;
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_GetManyComboBoxNum()
+	{
+
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "InitManyComboBox";
+		vector<string> vctTips = { "ComboBox_0", "ComboBox_1" , "ComboBox_2" };
+		vector<vector<string>> vctValue = { {"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue},
+									{"TestValue0", "TestValue1", TextMulitLineValue} };
+		vector<string> vctDefault = vctValue[0];
+
+		uiInput.InitManyComboBox(strTitle, vctTips, vctValue, vctDefault);
+
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				string strValue = "";
+				vector<uint16_t> vctint;
+
+				vctint = uiInput.GetManyComboBoxNum();
+				for (uint8_t i = 0; i < vctint.size(); i++)
+				{
+					strValue += uint32ToString(vctint[i]) + "\n";
+				}
+				ShowMsgBoxDemo("Select Result", strValue, DF_MB_OK, DT_LEFT, -1, m_uThread);
+				break;
+			}
+		}
+	}
+
+	void CArtiInputTest::ArtiInputTest_SetVisibleButtonQR()
+	{
+#if __Multi_System_Test__
+		CArtiInput uiInput(m_uThread);
+#else
+		CArtiInput uiInput;
+#endif
+		string strTitle = "SetVisibleButtonQR";
+		string strTips = "Tips";
+		string strDefault = "TestValue0";
+		vector<string> vctValue = { "TestValue0", "TestValue1", "TestValue2" };
+
+		uiInput.InitOneComboBox(strTitle, strTips, vctValue, strDefault);
+
+		uiInput.SetVisibleButtonQR(true);
+		while (1)
+		{
+			uRetBtn = uiInput.Show();
+			if (DF_ID_BACK == uRetBtn)
+			{
+				break;
+			}
+			else if (DF_ID_OK == uRetBtn)
+			{
+				ShowMsgBoxDemo("GetOneComboBox", uiInput.GetOneComboBox(), DF_MB_OK, DT_LEFT, -1, m_uThread);
+			}
+		}
+	}
+
+}

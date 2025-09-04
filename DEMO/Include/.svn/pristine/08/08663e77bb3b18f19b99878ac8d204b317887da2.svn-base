@@ -1,0 +1,445 @@
+/*******************************************************************************
+* Copyright (C), 2024~ , TOPDON Technology Co., Ltd. All rights reserved.
+* 文件说明 : 文档类标识
+* 功能描述 : CarPal Guru 刷隐藏 功能执行 控件
+* 创 建 人 : sujiya 20201216
+* 实 现 人 :
+* 审 核 人 : binchaolin
+* 文件版本 : V1.00
+* 修订记录 : 版本      修订人      修订日期      修订内容
+*
+*
+*******************************************************************************/
+#ifndef __ARTI_HIDDEN_H__
+#define __ARTI_HIDDEN_H__
+
+#include "StdInclude.h"
+#include "StdShowMaco.h"
+
+
+
+// CarPal Guru 刷隐藏 功能执行 控件
+// 
+// 功能执行的功能值设置分四类
+// 1、开关型功能，即二选一的开关“按钮”
+// 2、选择型功能，多选一的选择型功能
+// 3、可滑动调节型功能，即进度条选择
+// 4、可输入型功能，即输入框，可输入数值
+// 5、复合型功能设置，包含以上4种类型的多种组合
+// 
+// 界面有2个固定按钮，一个“确定执行设置”按钮，一个“恢复数据”
+// 其中“确定执行设置”按钮一直有效，“恢复数据”默认隐藏，诊断应用可设置为不隐藏
+//
+class _STD_SHOW_DLL_API_ CArtiHidden
+{
+public:
+    // 功能设置类型
+    enum eHiddenFunType
+    {
+        FHT_SWITCH_TYPE      = 0,    // 开关型功能，即二选一的开关“按钮”
+        FHT_SELECT_TYPE      = 1,    // 选择型功能，多选一的选择型功能
+        FHT_SLIDE_TYPE       = 2,    // 可滑动调节型功能，即进度条选择
+        FHT_INPUT_TYPE       = 3,    // 可输入型功能，即输入框，可输入数值
+
+        FHT_COMPOSITE_TYPE   = 0x10, // 组合型类型，即可能包含以上任意多种
+    };
+
+    // 可滑动调节型功能的数值类型
+    enum eSlideValueType
+    {
+        SVT_IS_PERSENT      = 0,    // 可滑动调节型功能的数值是百分比，例如0%~100%
+        SVT_IS_NUMERICAL    = 1,    // 可滑动调节型功能的数值是数值，例如0~100
+    };
+
+public:
+    CArtiHidden();
+
+#ifdef MULTI_SYSTEM
+    CArtiHidden(uint32_t thId);
+#endif // MULTI_SYSTEM
+
+
+    ~CArtiHidden();
+
+
+
+    /****************************************************************************************
+    *    功  能：初始化刷隐藏功能执行控件，同时设置标题文本，设置功能类型
+    *
+    *    参  数：strTitle    标题文本
+    *            strFunName  功能名称
+    *            strFunId    功能ID
+    *            Type        功能设置类型
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *            
+    *            初始化成功返回1
+    *            其它返回值，暂无意义
+    * 
+    *    说  明：调用此接口后，相当于重新初始化，其它接口需再次调用才会生效
+    ****************************************************************************************/
+    uint32_t InitTitle(const string& strTitle, const string& strFunName, const string& strFunId, eHiddenFunType Type);
+
+
+
+    /****************************************************************************************
+    *    功  能：在界面顶部设置功能执行的文本提示
+    *
+    *    参  数：strTipsContent   对应的文本提示内容
+    *                             如果strTipsContent为空串，则不显示提示标题
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *            设置成功返回1
+    *            其它返回值，暂无意义
+    *
+    *    说  明：如果没有设置（没有调用此接口），则不显示提示内容
+    *            如果strTipsContent为空串，则取消之前的接口设置，即没有顶部文本提示
+    ****************************************************************************************/
+    uint32_t SetTipsOnTop(const string& strTipsContent);
+
+
+    /****************************************************************************************
+    *    功  能：设置“恢复数据”按钮的状态，默认不可见
+    *
+    *    参  数：bIsVisible  true 为可见并且可点击，false 为不可见
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *            其它返回值，暂无意义
+    *
+    *    说  明：如果没有设置（没有调用此接口），则“恢复数据”按钮不可见
+    ******************************************************************************************/
+    uint32_t SetRestoreButtonVisible(bool bIsVisible);
+
+
+    /****************************************************************************************
+    *    功  能：增加功能设置项，类型为"FHT_SWITCH_TYPE"，针对开关型执行功能（二选一）
+    *            FHT_SWITCH_TYPE，此接口设置两者的功能值名称及当前对应的功能值
+    * 
+    *            只有类型为，FHT_SWITCH_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：strTitle      功能设置项的标题
+    *            strOn         逻辑“开”的功能值字符串，例如“开启”，“显示”
+    *            strOff        逻辑“关”的功能值字符串，例如“关闭”，“隐藏”
+    *            bSelectedOn   默认选中的状态
+    *                                        true  为选中逻辑“开”strOn
+    *                                        false 为选中逻辑“关”strOff
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *            添加成功返回，此功能设置项的偏移，从0开始计数
+    *            例如，AddSwitchValue，返回0
+    *                  AddSelectedValue，返回1
+    *                  AddSwitchValue， 返回2
+    * 
+    *            如果添加失败，返回-1
+    * 
+    *            例如InitTitle设置类型FHT_SELECT_TYPE，先调用AddSelectedValue成功，
+    *            再调用AddSwitchValue，将返回-1
+    * 
+    *            例如InitTitle没有设置FHT_COMPOSITE_TYPE复合类型，重复AddSwitchValue，返回-1
+    * 
+    *            例如InitTitle设置类型FHT_SELECT_TYPE，调用AddSwitchValue返回-1
+    * 
+    *    说  明：如果没有调用此接口且类型为FHT_SWITCH_TYPE，则开关型执行功能的名称空串
+    *            如果类型不是FHT_SWITCH_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，返回-1
+    *            如果调用了此接口AddSwitchValue后，又调用InitTitle重新修改了类型，
+    *            则之前的AddSwitchValue失效
+    ****************************************************************************************/
+    uint32_t AddSwitchValue(const string& strTitle, const string& strOn, const string& strOff, bool bSelectedOn);
+
+
+
+    /****************************************************************************************
+    *    功  能：增加功能设置项，类型为"FHT_SELECT_TYPE"，针对选择型功能，多选一的选择型功能
+    *            FHT_SELECT_TYPE，此接口同时设置各选择项的值，及对应的已选择项
+    * 
+    *            只有类型为，FHT_SELECT_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：strTitle    功能设置项的标题
+    *            vctValue    各选择项值的数组，数组有多少个元素就有多少个选择项
+    *            Selected    默认已选择的偏移（当前值），从0开始
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *            添加成功返回，此功能设置项的偏移，从0开始计数
+    *            例如，AddSwitchValue，返回0
+    *                  AddSelectedValue，返回1
+    *                  AddSwitchValue， 返回2
+    * 
+    *            如果添加失败，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，先调用AddSwitchValue成功，
+    *            再调用AddSelectedValue，将返回-1
+    *
+    *            例如InitTitle没有设置FHT_COMPOSITE_TYPE复合类型，重复AddSelectedValue，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，调用AddSelectedValue返回-1
+    *
+    *    说  明：如果没有调用此接口且类型为FHT_SELECT_TYPE，则无各选择项展示
+    *            如果类型不是FHT_SELECT_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，返回-1
+    *            如果调用了此接口AddSelectedValue后，又调用InitTitle重新修改了类型，
+    *            则之前的AddSelectedValue失效
+    ****************************************************************************************/
+    uint32_t AddSelectedValue(const string& strTitle, const std::vector<std::string>& vctValue, uint32_t Selected);
+
+
+
+    /****************************************************************************************
+    *    功  能：增加功能设置项，类型为"FHT_SLIDE_TYPE"，针对可滑动调节型功能，即进度条选择，
+    *            FHT_SLIDE_TYPE，此接口同时设置滑动类型，及相关的范围值，及对应的当前值
+    * 
+    *            只有类型为，FHT_SLIDE_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：strTitle    功能设置项的标题
+    *            typeSlide   滑动类型，例如百分比，数字等
+    *            minValue    可滑动的最小值
+    *            maxValue    可滑动的最大值
+    *            curValue    当前值
+    *            strUnit     当前值对应的单位，如果空串，则不需要显示单位
+    *            pointCnts   小数点保留位数，通常情况下为2位
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    * 
+    *            添加成功返回，此功能设置项的偏移，从0开始计数
+    *            例如，AddSwitchValue，返回0
+    *                  AddSelectedValue，返回1
+    *                  AddSlideValue， 返回2
+    *
+    *            如果添加失败，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，先调用AddSwitchValue成功，
+    *            再调用AddSlideValue，将返回-1
+    *
+    *            例如InitTitle没有设置FHT_COMPOSITE_TYPE复合类型，重复AddSlideValue，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，调用AddSlideValue返回-1
+    *
+    *    说  明：如果没有调用此接口且类型为FHT_SLIDE_TYPE，则进度条无任何值展示
+    *            如果类型不是FHT_SLIDE_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，返回-1
+    *            如果调用了此接口AddSlideValue后，又调用InitTitle重新修改了类型，
+    *            则之前的AddSlideValue失效
+    ****************************************************************************************/
+    uint32_t AddSlideValue(const string& strTitle, eSlideValueType typeSlide, float minValue, float maxValue, float curValue, const string& strUnit = "", uint32_t pointCnts = 2);
+
+
+
+    /****************************************************************************************
+    *    功  能：增加功能设置项，类型为"FHT_INPUT_TYPE"，针对可输入型功能，即输入框，
+    *            可输入数值，FHT_INPUT_TYPE，接口同时设置输入框的掩码及对应的提示语
+    * 
+    *            只有类型为，FHT_INPUT_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：strTitle    功能设置项的标题
+    *            strTips     输入框默认的提示语，例如灰色显示
+    *            strMask     输入掩码，掩码类型跟CArtiInput的掩码类型一致
+    * 
+    *                        输入框掩码说明：掩码决定了需要输入的内容限制和输入长度限制
+    *                            *：表示可输入任意可显示字符
+    *                            0：表示可输入0~9之间的字符
+    *                            F：表示可输入0~9，A~F之间的用来表示16进制的字符
+    *                            #：表示可输入0~9，+，-，*，/字符
+    *                            A：表示可输入A~Z之间的大写字母
+    *                            B：表示可输入0~9之间的字符和A~Z之间的大写字母
+    * 
+    *            strCurrent  当前值，用于提示用
+    * 
+    *            strUnit     单位，当前值对应的单位，如果空串，则不需要显示单位
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *            添加成功返回，此功能设置项的偏移，从0开始计数
+    *            例如，AddSwitchValue，返回0
+    *                  AddSelectedValue，返回1
+    *                  AddSlideValue， 返回2
+    *                  AddInputBox，返回3
+    *
+    *            如果添加失败，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，先调用AddSwitchValue成功，
+    *            再调用AddInputBox，将返回-1
+    *
+    *            例如InitTitle没有设置FHT_COMPOSITE_TYPE复合类型，重复AddInputBox，返回-1
+    *
+    *            例如InitTitle设置类型FHT_SWITCH_TYPE，调用AddInputBox返回-1
+    *
+    *    说  明：如果没有调用此接口且类型为FHT_INPUT_TYPE，则无输入框展示
+    *            如果类型不是FHT_INPUT_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，返回-1
+    *            如果调用了此接口AddInputBox后，又调用InitTitle重新修改了类型，
+    *            则之前的AddInputBox失效
+    ****************************************************************************************/
+    uint32_t AddInputBox(const string& strTitle, const string& strTips, const string& strMask, const string& strCurrent, const string& strUnit = "");
+
+
+
+    /***************************************************************************
+    *    功  能：添加功能介绍，图片和提示文本
+    *
+    *    参  数：strPicturePath 指定图片路径
+    *                           如果strPicturePath指定图片路径串为非法路径（空串
+    *                           或文件不存在），返回失败DF_ID_PICTURE_NONE
+    *
+    *            strTopTips     功能介绍的提示文本，位于图片顶部
+    *                           如果strTopTips为空，代表图片顶部没有文本介绍
+    * 
+    *            strBottomTips  功能介绍的提示文本，位于图片底部
+    *                           如果strBottomTips为空，代表图片底部没有文本介绍
+    *
+    *    返回值：图片索引ID，如果添加失败（路径非法），返回 DF_ID_PICTURE_NONE
+    *            可能的返回值：
+    *                         DF_ID_PICTURE_0
+    * 
+    *    说 明： 当前只支持一张图片说明（不支持2张及2张以上）
+    ***************************************************************************/
+    uint32_t AddFuncDescribe(const std::string& strPictPath, const std::string& strTopTips, const std::string& strBottomTips);
+
+
+
+    /****************************************************************************************
+    *    功  能：针对开关型执行功能（二选一），FHT_SWITCH_TYPE，或者FHT_COMPOSITE_TYPE，
+    *            获取开关选择值
+    * 
+    *            只有类型为，FHT_SWITCH_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    * 
+    *    参  数：Index     对应AddSwitchValue返回的偏移
+    *
+    *    返回值：对应的开关选择值
+    * 
+    *            如果不存在对应的Index，返回空串
+    *            如果存在Index，但是Index却不是AddSwitchValue返回的，返回空串
+    * 
+    *            例如设置了FHT_COMPOSITE_TYPE却没有调用AddSwitchValue，调用GetSwitchValue返回空串
+    *
+    *    说  明：如果类型不是FHT_SWITCH_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，将返回空串
+    *            如果调用了接口AddSwitchValue后，又调用InitTitle重新修改了类型，
+    *            则GetSwitchValue同样将返回空串
+    ****************************************************************************************/
+    const std::string GetSwitchValue(uint32_t Index);
+
+
+
+    /****************************************************************************************
+    *    功  能：针对选择型功能，多选一的选择型功能，FHT_SELECT_TYPE，或者FHT_COMPOSITE_TYPE，
+    *            获取选择值
+    * 
+    *            只有类型为，FHT_SELECT_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：Index     对应AddSelectedValue返回的偏移
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *            
+    *            选择值的偏移，从0计
+    *            如果不存在对应的Index，返回-1
+    *            如果存在Index，但是Index却不是AddSelectedValue返回的，返回-1
+    *
+    *            例如设置了FHT_COMPOSITE_TYPE却没有调用AddSelectedValue，调用GetSwitchValue返回-1
+    *
+    *    说  明：如果类型不是FHT_SELECT_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，将返回-1
+    *            如果调用了接口AddSelectedValue后，又调用InitTitle重新修改了类型，
+    *            则GetSelectedValue同样将返回-1
+    ****************************************************************************************/
+    uint32_t GetSelectedValue(uint32_t Index);
+
+
+
+    /****************************************************************************************
+    *    功  能：针对可滑动调节型功能，即进度条选择，FHT_SLIDE_TYPE，或者FHT_COMPOSITE_TYPE，
+    *            获取滑动进度条的选择值
+    * 
+    *            只有类型为，FHT_SLIDE_TYPE 或者 FHT_COMPOSITE_TYPE，调用此接口才生效
+    *            App需检查类型和接口是否匹配
+    *
+    *    参  数：Index     对应AddSlideValue返回的偏移
+    *
+    *    返回值：滑动进度条的选择值
+    *            如果类型是SVT_IS_PERSENT百分比，返回串不带%，即50%返回50
+    * 
+    *            如果不存在对应的Index，返回空串
+    *            如果存在Index，但是Index却不是AddSlideValue返回的，返回空串
+    *
+    *            例如设置了FHT_COMPOSITE_TYPE却没有调用AddSlideValue，调用GetSlideValue返回空串
+    *
+    *    说  明：如果类型不是FHT_SLIDE_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，将返回空串
+    *            如果调用了接口AddSlideValue后，又调用InitTitle重新修改了类型，
+    *            则GetSlideValue同样将返回空串
+    ****************************************************************************************/
+    const std::string GetSlideValue(uint32_t Index);
+
+
+
+    /****************************************************************************************
+    *    功  能：针对可输入型功能，即输入框，可输入数值，FHT_INPUT_TYPE类型，
+    *            或者FHT_COMPOSITE_TYPE，获取输入框内容
+    *
+    *    参  数：Index     对应AddInputBox返回的偏移
+    *
+    *    返回值：输入框的内容值
+    * 
+    *            如果不存在对应的Index，返回空串
+    *            如果存在Index，但是Index却不是AddInputBox返回的，返回空串
+    *
+    *            例如设置了FHT_COMPOSITE_TYPE却没有调用AddInputBox，调用GetInputBox返回空串
+    *
+    *    说  明：如果类型不是FHT_INPUT_TYPE或者FHT_COMPOSITE_TYPE，又调用了此接口，将返回空串
+    *            如果调用了接口AddInputBox后，又调用InitTitle重新修改了类型，
+    *            则GetInputBox同样将返回空串
+    ****************************************************************************************/
+    const std::string GetInputBox(uint32_t Index);
+
+
+    /****************************************************************************************
+    *    功  能：设置当前刷隐藏功能的结果，默认为没有执行状态
+    *
+    *    参  数：HiddenStatus   当前刷隐藏功能的结果状态
+    *                           APP的结果吐司提示界面，根据此状态值是否展示，成功或者失败需展示
+    *                           没有执行状态无需吐司提示
+
+    *                           HNS_FUNC_HIDDEN_DEFAULT   0,  刷隐藏未进行，Show 无吐司提示
+    *                           HNS_FUNC_HIDDEN_OK        1,  功能设置完成，Show 有吐司提示
+    *                           HNS_FUNC_HIDDEN_FAILED    2,  功能设置失败，Show 有吐司提示
+    *
+    *    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+    *            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+    *
+    *    说  明：如果没有调用过此接口，默认为HNS_FUNC_HIDDEN_DEFAULT，Show 无吐司提示
+    ****************************************************************************************/
+    const uint32_t SetHidderResult(uint32_t HiddenStatus);
+
+
+    /***************************************************************************************
+    *    功  能：显示功能执行界面，吐司提示根据SetHidderResult接口定
+    * 
+    *    参  数：无
+    * 
+    *    返回值：uint32_t 组件界面按键返回值
+    *            指示用户是点击了"确定执行设置"按钮
+    *    
+    *     可能存在以下返回：
+    *                      DF_ID_HIDDEN_BACK           点击了“后退”
+    *                      DF_ID_HIDDEN_OK             点击了“确定执行设置”
+    *                      DF_ID_HIDDEN_RESTORE_DATA   点击了“恢复数据”
+    * 
+    *    说  明：此接口为阻塞接口
+    ****************************************************************************************/
+    uint32_t Show();
+
+private:
+    void*        m_pData;
+};
+
+#endif // __ARTI_HIDDEN_H__

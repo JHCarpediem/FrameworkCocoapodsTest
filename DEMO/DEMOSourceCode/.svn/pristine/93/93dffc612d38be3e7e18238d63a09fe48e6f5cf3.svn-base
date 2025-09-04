@@ -1,0 +1,17 @@
+#pragma once
+#include "DemoAPITest.h"
+#include <vector>
+
+namespace Topdon_AD900_Demo {
+	class CArtiFloatMiniTest : public CAPITest
+	{
+	public:
+		void ShowMenu();
+		void TestArtiFloatMini();
+		void TestArtiFloatMini2();
+
+	protected:
+	private:
+	};
+
+}
