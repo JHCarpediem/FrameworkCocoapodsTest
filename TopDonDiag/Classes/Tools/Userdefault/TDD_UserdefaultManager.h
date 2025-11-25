@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 #define  KTDDUDAUTHAccount          @"KTDDUDAUTHAccount"
 ///auth area
 #define  KTDDUDAUTHArea             @"KTDDUDAUTHArea"
+///autoAuth password
+#define  KTDDUDAutoAUTHPassword             @"KTDDUDAutoAUTHPassword"
 
 ///FCA account
 #define  KTDDUDFCAAccount           @"KTDDUDFCAAccount"
@@ -52,6 +54,11 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSInteger )getAuthArea:(NSInteger)type unlockType:(NSInteger)unlockType;
 + (void)setAuthArea:(NSInteger )area type:(NSInteger)type;
 + (void)setAuthArea:(NSInteger )area type:(NSInteger)type unlockType:(NSInteger)unlockType;
+
++ (NSString *)getAuthPassword:(NSInteger)type;
++ (NSString *)getAuthPassword:(NSInteger)type unlockType:(NSInteger)unlockType;
++ (void)setAuthPassword:(NSString *)password type:(NSInteger)type;
++ (void)setAuthPassword:(NSString *)password type:(NSInteger)type unlockType:(NSInteger)unlockType;
 @end
 
 NS_ASSUME_NONNULL_END

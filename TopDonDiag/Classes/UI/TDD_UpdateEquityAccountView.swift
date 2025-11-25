@@ -173,7 +173,7 @@ import TDUIProvider
     
     lazy var popView : UIView = {
         let view = UIView()
-        view.backgroundColor = .cardBg()
+        view.backgroundColor = .loadingViewBg()
         view.layer.cornerRadius = 2.5
         return view
     } ()

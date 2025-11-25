@@ -23,7 +23,7 @@ typedef enum
 {
     WIFI_INIT_DEFAULT    = 1,        //未初始化
     WIFI_INIT_ING        = 2,        //初始化中
-    WIFI_INIT_SUCCESS    = 3,        //初始成功
+    WIFI_INIT_COMPLETE    = 3,       //初始完成
     WIFI_INIT_FAIL                   //初始化失败
 
 }eWIFIInitializeStatus;
@@ -40,6 +40,23 @@ typedef enum
     ///蓝牙版本获取失败
     VCI_VALUE_ERROR_BT_VERSION      = 8,
 }eVCIValueErrorType;
+
+///VCI初始化已完成(成功或者重试次数完成) 类型(可包含多个)
+typedef enum
+{
+    ///vciSN获取完成
+    VCI_VALUE_COMPLETE_VCI_SN          = 1,
+    ///VCI型号获取完成
+    VCI_VALUE_COMPLETE_DEVCIE_TYPE     = 2,
+    ///VCI版本获取完成
+    VCI_VALUE_COMPLETE_FW_VERSION      = 4,
+    ///蓝牙版本获取完成
+    VCI_VALUE_COMPLETE_BT_VERSION      = 8,
+    ///蓝牙版本获取完成
+    VCI_VALUE_COMPLETE_WIFI_SUPPORT      = 16,
+    ///蓝牙版本获取完成
+    VCI_VALUE_COMPLETE_VOLTA      = 32,
+}eVCIValueCompleteType;
 
 ///WIFI初始化Error 类型(可包含多个)
 typedef enum

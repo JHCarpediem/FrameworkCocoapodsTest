@@ -25,7 +25,6 @@
 - (void)setViewType:(NSInteger)viewType {
     _viewType = viewType;
     self.strTitle = viewType == 1 ? TDDLocalized.detail_info : TDDLocalized.app_sign_in;
-    
     if (viewType == 1) {
         if (self.uType == SST_FUNC_FCA_AUTH || self.uType == SST_FUNC_NISSAN_AUTH) {
             if ([TDD_DiagnosisTools isAutoAuthNa] == 1) {
@@ -37,7 +36,6 @@
             self.unlockType = 1;
         }
     }
-    
     NSString *uTypeStr = @"";
     if (_unlockType > 0) {
         uTypeStr = [NSString stringWithFormat:@"%u_%ld",_uType,_unlockType];
@@ -56,9 +54,17 @@
         accountStr = [TDD_UserdefaultManager getAuthAccount:_uType unlockType:_unlockType];
     }
     //重置输入框的缓存
-    NSString *passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getSaveAuthPassword];
     [[TDD_ArtiGlobalModel sharedArtiGlobalModel].authAccountDict setValue:accountStr?:@"" forKey:uTypeStr];
-    [[TDD_ArtiGlobalModel sharedArtiGlobalModel].authPasswordDict setValue:passwordStr?:@"" forKey:uTypeStr];
+    NSString *passwordStr = @"";
+    if (_unlockType != 0) {
+        //非 autoAuth 有密码缓存
+        passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getSaveAuthPassword];
+        [[TDD_ArtiGlobalModel sharedArtiGlobalModel].authPasswordDict setValue:passwordStr?:@"" forKey:uTypeStr];
+    }else {
+        //autoAuth 有本地存储记住密码的密文
+        passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+    }
+    
     BOOL canLogin = (![NSString tdd_isEmpty:accountStr] && ![NSString tdd_isEmpty:passwordStr]);
     
     //重置按钮
@@ -94,7 +100,7 @@
     if (buttonID == DF_ID_YES) {
         if (_viewType == 2) {
             //登录页面
-            if ([NSString tdd_isEmpty:[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount]] || [NSString tdd_isEmpty:[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthPassword]]){
+            if ([NSString tdd_isEmpty:[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount]] || ([NSString tdd_isEmpty:[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getSaveAuthPassword]] && [NSString tdd_isEmpty:[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthPassword]])){
                 [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.tip_input_email_or_psd_empty];
                 return NO;
             }
@@ -118,7 +124,7 @@
                         [self ArtiButtonClick:DF_ID_BACK];
                     }];
                 }
-                if (self.uType == SST_FUNC_FCA_AUTH && self.unlockType == 0) {
+                if (self.uType == SST_FUNC_FCA_AUTH && (self.unlockType == 0 || self.unlockType == 2 )) {
                     //FCA  autoAuth
                     [TDD_HTipManage deallocView];
                     if (isSuccess) {
@@ -130,9 +136,9 @@
                     }
                 }else {
                     if (isSuccess) {
-                        if (self.uType == SST_FUNC_RENAULT_AUTH || self.uType == SST_FUNC_NISSAN_AUTH || self.uType == SST_FUNC_VW_SFD_AUTH || (self.uType == SST_FUNC_FCA_AUTH && self.unlockType == 1)) {
+                        if (self.uType == SST_FUNC_RENAULT_AUTH || (self.uType == SST_FUNC_NISSAN_AUTH && self.unlockType == 1) || self.uType == SST_FUNC_VW_SFD_AUTH || (self.uType == SST_FUNC_FCA_AUTH && self.unlockType == 1)) {
                             if (self.uType == SST_FUNC_VW_SFD_AUTH) {
-                                if ([TDD_DiagnosisManage sharedManage].manageDelegate) {
+                                if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel].delegate respondsToSelector:@selector(ArtiGlobalNetwork:param:completeHandle:)]) {
                                     NSString *accountStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount];
                                     [[TDD_ArtiGlobalModel sharedArtiGlobalModel].delegate ArtiGlobalNetwork:TDD_ArtiModelEventType_ShowSFDUserInfo param:@{@"email":accountStr?:@""} completeHandle:^(id  _Nonnull result) {
                                         NSNumber *successNum = result;
@@ -141,6 +147,9 @@
                                             [self loginSuccessToCheckRight:buttonID];
                                         }
                                     }];
+                                }else {
+                                    //登录成功请求权限
+                                    [self loginSuccessToCheckRight:buttonID];
                                 }
                             }else {
                                 //登录成功请求权限
@@ -180,7 +189,6 @@
                     uTypeStr = [NSString tdd_strFromInterger:_uType];
                 }
                 [[TDD_ArtiGlobalModel sharedArtiGlobalModel].authAccountDict setValue:accountStr forKey:uTypeStr];
-
             }
             [[NSNotificationCenter defaultCenter] postNotificationName:KTDDNotificationArtiShow object:self userInfo:nil];
             return NO;
@@ -257,7 +265,7 @@
     return YES;
 }
 
-//雷诺登录成功请求次数
+//登录成功请求次数
 - (void)loginSuccessToCheckRight:(uint32_t )buttonID {
     @kWeakObj(self)
     [self requestSGWRight:nil complete:^(id  _Nonnull result) {
@@ -298,6 +306,9 @@
     //密码
     NSString *passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthPassword];
 
+    if ([NSString tdd_isEmpty:passwordStr]) {
+        passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getSaveAuthPassword];
+    }
     if ([NSString tdd_isEmpty:accountStr] || [NSString tdd_isEmpty:passwordStr]){
         [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.tip_input_email_or_psd_empty];
         complete(NO,-1);
@@ -322,16 +333,16 @@
         complete(NO,-1);
         return;
     }
-    
+    NSInteger authUnlockType =  [TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType;
     NSMutableDictionary *param = @{}.mutableCopy;
     if (type == SST_FUNC_FCA_AUTH) {
         
-        if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 0) {
+        if (authUnlockType == 0) {
             //北美 autoAuth
             [param setValue:@(1) forKey:@"source"];
             [param setValue:@(1) forKey:@"brand"];
             [param setValue:@(1) forKey:@"authType"];
-        }else if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 1) {
+        }else if (authUnlockType == 1) {
             //TopDon
             [param setValue:@(2) forKey:@"source"];
             [param setValue:@(5) forKey:@"brand"];
@@ -339,9 +350,9 @@
         }
         else {
             // 欧洲 FCA
+            [param setValue:@(2) forKey:@"source"];
             [param setValue:@(1) forKey:@"brand"];
             [param setValue:@(1) forKey:@"authType"];
-            [param setValue:@(2) forKey:@"source"];
         }
         
     }else if (type == SST_FUNC_RENAULT_AUTH) {
@@ -349,19 +360,20 @@
         [param setValue:@(2) forKey:@"brand"];
         [param setValue:@(2) forKey:@"authType"];
     }else if (type == SST_FUNC_NISSAN_AUTH) {
-        if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 0) {
+        if (authUnlockType == 0) {
             //北美 autoAuth
             [param setValue:@(1) forKey:@"source"];
             [param setValue:@(6) forKey:@"brand"];
             [param setValue:@(1) forKey:@"authType"];
-        }else if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 1) {
+        }else if (authUnlockType == 1) {
             //TopDon
             [param setValue:@(2) forKey:@"source"];
             [param setValue:@(3) forKey:@"brand"];
             [param setValue:@(2) forKey:@"authType"];
         }
     }else if (type == SST_FUNC_VW_SFD_AUTH) {
-        [param setValue:@(2) forKey:@"source"];
+        //大众 source 后台没用， 统一改为0
+        [param setValue:@(0) forKey:@"source"];
         [param setValue:@(4) forKey:@"brand"];
         [param setValue:@(2) forKey:@"authType"];
     }
@@ -370,7 +382,7 @@
         complete(NO,-1);
         return;
     }
-
+    
     //二次验证 token
     [param setValue:[TDD_DiagnosisTools userTwoFATokenToken:accountStr]?:@"" forKey:@"twoFactorAuthToken"];
     NSString *originalAccountStr = accountStr;
@@ -381,11 +393,26 @@
     }
     [param setValue:accountStr?:@"" forKey:@"username"];
     HLog(@"requestFcaLogin username: - %@",accountStr);
+    
+    NSString *localEncryptPWD = @"";
 
+    
     if (![NSString tdd_isEmpty:passwordStr]){
-        if ([[TDD_DiagnosisManage sharedManage].manageDelegate respondsToSelector:@selector(AESEncrypt:)]){
-            passwordStr = [[TDD_DiagnosisManage sharedManage].manageDelegate AESEncrypt:passwordStr];
+
+        //非密文需要加密
+        if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD && (authUnlockType == 0 || authUnlockType == 2)) {
+            //本地密文要先解密再加密
+            localEncryptPWD = passwordStr;
+            NSString *localPWD = [TDD_DiagnosisTools AESLocalDecryption:passwordStr];
+            passwordStr = [TDD_DiagnosisTools AESEncrypt:localPWD];
+            
+        }else {
+            ///本地加密
+            localEncryptPWD = [TDD_DiagnosisTools AESLocalEncrypt:passwordStr];
+            passwordStr = [TDD_DiagnosisTools AESEncrypt:passwordStr];
+            
         }
+        
     }
     [param setValue:passwordStr?:@"" forKey:@"password"];
     HLog(@"requestFcaLogin password: - %@",passwordStr);
@@ -427,13 +454,23 @@
             //本地化区域和账号
             //[[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveGatewayArea];
             [[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveGatewayAccount];
-            //缓存密码
-            [[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveAuthPassword];
+            if (authUnlockType == 0 || authUnlockType == 2) {
+                //autoAuth 不缓存密码，根据记住密码来处理
+                if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].isRemeberAutoAuthPassword) {
+                    ///把本地加密的密码存起来
+                    [[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveAutoAuthPassword:localEncryptPWD];
+                }else {
+                    [[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveAutoAuthPassword:@""];
+                }
+            }else {
+                //缓存密码
+                [[TDD_ArtiGlobalModel sharedArtiGlobalModel] saveAuthPassword];
+            }
+
             //登录成功更新切换账号的缓存位登录成功账号
             if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 1) {
                 [TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount];
             }
-
             success = YES;
             
             complete(success,1);
@@ -468,7 +505,6 @@
                         if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 1) {
                             [TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount];
                         }
-
                         success = YES;
                     }
                     [TDD_ArtiGlobalModel sharedArtiGlobalModel].authToken = token;

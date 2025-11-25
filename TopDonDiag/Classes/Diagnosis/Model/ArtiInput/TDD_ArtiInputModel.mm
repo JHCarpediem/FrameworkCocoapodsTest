@@ -28,6 +28,7 @@
     CRegInput::InitOneInputBox(ArtiInputInitOneInputBox);
     CRegInput::GetOneInputBox(ArtiInputGetOneInputBox);
     CRegInput::AddButton(ArtiInputAddButton);
+    CRegInput::AddButtonEx(ArtiInputAddButtonEx);
     CRegInput::InitManyInputBox(ArtiInputInitManyInputBox);
     CRegInput::GetManyInputBox(ArtiInputGetManyInputBox);
     CRegInput::InitOneComboBox(ArtiInputInitOneComboBox);
@@ -38,6 +39,8 @@
     CRegInput::InitMixedInputComboBox(ArtiInputInitMixedInputComboBox);
     CRegInput::GetMixedInputComboBox(ArtiInputGetMixedInputComboBox);
     CRegInput::GetMixedComboBoxNum(ArtiInputGetMixedComboBoxNum);
+    CRegInput::SetInputBoxInnerTips(ArtiInputSetInputBoxInnerTips);
+    CRegInput::SetManyInputBoxInnerTips(ArtiInputSetManyInputBoxInnerTips);
     CRegInput::Show(ArtiInputShow);
     
     // 大众 SFD 解锁
@@ -82,6 +85,11 @@ std::string const ArtiInputGetOneInputBox(uint32_t id)
 void ArtiInputAddButton(uint32_t id, const std::string& strButtonText)
 {
     [TDD_ArtiInputModel AddButtonWithId:id strButtonText:[TDD_CTools CStrToNSString:strButtonText]];
+}
+
+uint32_t ArtiInputAddButtonEx(uint32_t id, const std::string& strButtonText)
+{
+    return [TDD_ArtiInputModel AddButtonExWithId:id strButtonText:[TDD_CTools CStrToNSString:strButtonText]];
 }
 
 bool ArtiInputInitManyInputBox(uint32_t id, const std::string& strTitle, const std::vector<std::string>& vctContents, const std::vector<std::string>& vctMasks, const std::vector<std::string>& vctDefaults)
@@ -172,6 +180,18 @@ std::vector<uint16_t> ArtiInputGetMixedComboBoxNum(uint32_t id)
     return [TDD_CTools NSArrayToInt16CVector:arr];
 }
 
+uint32_t ArtiInputSetInputBoxInnerTips(uint32_t id, const std::string& strInnerTips)
+{
+    return [TDD_ArtiInputModel SetInputBoxInnerTipsWithId:id strInnerTips:[TDD_CTools CStrToNSString:strInnerTips]];
+    
+}
+
+uint32_t ArtiInputSetManyInputBoxInnerTips(uint32_t id, const std::vector<std::string>& vctInnerTips)
+{
+    
+    return [TDD_ArtiInputModel SetManyInputBoxInnerTipsWithId:id strInnerTips:[TDD_CTools CVectorToStringNSArray:vctInnerTips]];
+}
+
 uint32_t ArtiInputShow(uint32_t id)
 {
     return [TDD_ArtiInputModel ShowWithId:id];
@@ -235,7 +255,7 @@ uint32_t ArtiInputShow(uint32_t id)
         
         model = (TDD_ArtiInputModel *)[self getModelWithID:ID];
     }
-    
+
     model.strTitle = strTitle;
     
     ArtiInputItemModel * itemModel = [[ArtiInputItemModel alloc] init];
@@ -271,7 +291,7 @@ uint32_t ArtiInputShow(uint32_t id)
     }
 
     [model.itemArr addObject:itemModel];
-    
+
     return YES;
     
 }
@@ -302,9 +322,17 @@ uint32_t ArtiInputShow(uint32_t id)
 }
 
 /**********************************************************
-*    功  能：添加按钮
-*    参  数：strButtonText 按钮文本
-*    返回值：无
+*    功  能：自由添加按钮
+*
+*    参  数：strButtonText 按钮名称
+*
+*    返回值：按钮的ID，此ID用于DelButton接口的参数
+*            可能的返回值：
+*                         DF_ID_FREEBTN_0
+*                         DF_ID_FREEBTN_1
+*                         DF_ID_FREEBTN_2
+*                         DF_ID_FREEBTN_3
+*                         DF_ID_FREEBTN_XX
 **********************************************************/
 + (void)AddButtonWithId:(uint32_t)ID strButtonText:(NSString *)strButtonText
 {
@@ -323,6 +351,26 @@ uint32_t ArtiInputShow(uint32_t id)
     [model.buttonArr addObject:buttonModel];
     
     model.isReloadButton = YES;
+}
+
++ (uint32_t)AddButtonExWithId:(uint32_t)ID strButtonText:(NSString *)strButtonText
+{
+
+    TDD_ArtiInputModel * model = (TDD_ArtiInputModel *)[self getModelWithID:ID];
+    
+    TDD_ArtiButtonModel * buttonModel = [[TDD_ArtiButtonModel alloc] init];
+    
+    buttonModel.uButtonId = DF_ID_FREEBTN_0 + (uint32_t)model.buttonArr.count - 2;
+    
+    buttonModel.strButtonText = strButtonText;
+    
+    buttonModel.bIsEnable = YES;
+    
+    [model.buttonArr addObject:buttonModel];
+    
+    model.isReloadButton = YES;
+    HLog(@"%@ - 添加按钮EX - ID:%d - strButtonText:%@ - return:%d", [self class], ID, strButtonText,buttonModel.uButtonId);
+    return buttonModel.uButtonId;
 }
 
 /**********************************************************
@@ -439,6 +487,11 @@ uint32_t ArtiInputShow(uint32_t id)
     
     itemModel.vctValue = vctValue;
     
+    if ([NSString tdd_isEmpty:strDefault] || ![vctValue containsObject:strDefault]) {
+        strDefault = vctValue.count > 0 ? vctValue.firstObject : @"";
+        HLog(@"%@ - 初始化单个ComboBox下拉框控件 - ID:%d strDefault为空字符串或者vctValue 不包含 stfDefault,strDefault设为 %@",strDefault);
+    }
+    
     itemModel.strDefault = strDefault;
     
     if ([model.strTitle isEqualToString:strTitle] && [itemModel.strTips isEqualToString:strTips] && [itemModel.strDefault isEqualToString:strDefault]) {
@@ -525,7 +578,18 @@ uint32_t ArtiInputShow(uint32_t id)
         }
         
         if (i < vctDefaults.count) {
-            itemModel.strDefault = vctDefaults[i];
+            NSString *strDefault = vctDefaults[i];
+            if (itemModel.vctValue.count > 0) {
+                //strDefault 必须在 vctValue 中包含
+                if ([itemModel.vctValue containsObject:strDefault]) {
+                    itemModel.strDefault = strDefault;
+                }
+            }
+            
+        }
+        //strDefault没在 vctValue 中包含，则取 vctValue 的第一个或者为空
+        if ([NSString tdd_isEmpty:itemModel.strDefault]) {
+            itemModel.strDefault = itemModel.vctValue.count > 0 ? itemModel.vctValue.firstObject : @"";
         }
         
         [model.itemArr addObject:itemModel];
@@ -605,6 +669,34 @@ uint32_t ArtiInputShow(uint32_t id)
     model.isReloadButton = YES;
 
     return 0;
+}
+
++ (uint32_t)SetInputBoxInnerTipsWithId:(uint32_t)ID strInnerTips:(NSString *)strInnerTips {
+    HLog(@"%@ - SetInputBoxInnerTipsWithId - ID:%d - strInnerTips : %@", [self class], ID, strInnerTips);
+    TDD_ArtiInputModel * model = (TDD_ArtiInputModel *)[self getModelWithID:ID];
+    if (model.itemArr.count == 0) {
+        HLog(@"SetInputBoxInnerTipsWithId - 没有item");
+        return 0;
+    }
+    ArtiInputItemModel * itemModel = model.itemArr.firstObject;
+    itemModel.strInnerTips = strInnerTips;
+    return 1;
+}
+
++ (uint32_t)SetManyInputBoxInnerTipsWithId:(uint32_t)ID strInnerTips:(NSArray<NSString*> *)vctInnerTips {
+    HLog(@"%@ - 扫描以及粘贴获取 - ID:%d - vctInnerTips:%@", [self class], ID, vctInnerTips);
+    TDD_ArtiInputModel * model = (TDD_ArtiInputModel *)[self getModelWithID:ID];
+    if (model.itemArr.count == 0) {
+        HLog(@"SetManyInputBoxInnerTipsWithId - 没有item");
+        return 0;
+    }
+    for (int i = 0; i < model.itemArr.count; i++) {
+        ArtiInputItemModel * itemModel = model.itemArr[i];
+        if (vctInnerTips.count > i) {
+            itemModel.strInnerTips = vctInnerTips[i]?:@"";
+        }
+    }
+    return 1;
 }
 
 + (uint32_t)SetVisibleButtonQRExWithId:(uint32_t)ID bScanVisible:(BOOL)bScanVisible bPasteVisible:(BOOL)bPasteVisible
@@ -716,7 +808,17 @@ uint32_t ArtiInputShow(uint32_t id)
                 itemModel.vctValue = vctComboValues[comboxCount];
             }
             if (comboxCount < vctComboDefaults.count) {
-                itemModel.strDefault = vctComboDefaults[comboxCount];
+                NSString *strDefault = vctComboDefaults[comboxCount];
+                if (itemModel.vctValue.count > 0) {
+                    //strDefault 必须在 vctValue 中包含
+                    if ([itemModel.vctValue containsObject:strDefault]) {
+                        itemModel.strDefault = strDefault;
+                    }
+                }
+            }
+            //strDefault没在 vctValue 中包含，则取 vctValue 的第一个或者为空
+            if ([NSString tdd_isEmpty:itemModel.strDefault]) {
+                itemModel.strDefault = itemModel.vctValue.count > 0 ? itemModel.vctValue.firstObject : @"";
             }
             comboxCount++;
         }
@@ -807,6 +909,12 @@ uint32_t ArtiInputShow(uint32_t id)
                 model.isStrTipsTranslated = YES;
             }
         }
+        if ([self.translatedDic.allKeys containsObject:model.strInnerTips]) {
+            if ([self.translatedDic[model.strInnerTips] length] > 0) {
+                model.strTranslatedInnerTips = self.translatedDic[model.strInnerTips];
+                model.isStrTipsInnerTranslated = YES;
+            }
+        }
     }
     
     [super translationCompleted];
@@ -830,7 +938,7 @@ uint32_t ArtiInputShow(uint32_t id)
             NSInteger index = [itemModel.vctValue indexOfObject:str];
             [returnArr addObject:[NSNumber numberWithInteger:index]];
         }else {
-            [returnArr addObject:@(-1)];
+            [returnArr addObject:@(0)];
         }
 
     }
@@ -909,6 +1017,19 @@ uint32_t ArtiInputShow(uint32_t id)
     self.strTranslatedTips = _strTips;
     
     self.isStrTipsTranslated = NO;
+}
+
+- (void)setStrInnerTips:(NSString *)strInnerTips {
+    if ([_strInnerTips isEqualToString:strInnerTips]) {
+        return;
+    }
+    
+    _strInnerTips = strInnerTips;
+    
+    self.strTranslatedInnerTips = _strInnerTips;
+    
+    self.isStrTipsInnerTranslated = NO;
+    
 }
 
 - (NSString *)filterTextMatch:(NSString *)text {

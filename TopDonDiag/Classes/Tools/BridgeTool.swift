@@ -8,7 +8,8 @@
 import Foundation
 import UIKit
 
-public class BridgeTool {
+@objc
+public class BridgeTool: NSObject {
     
     @objc
     public static func tdd_imageNamed(_ imageName: String) -> UIImage? {
@@ -16,6 +17,7 @@ public class BridgeTool {
         let image = UIImage(named: "TopdonDiagnosis.bundle/image/\(imageName)", in: bundle, compatibleWith: nil)
         return image
     }
+    
 }
 
 // MARK: - Info.plist
@@ -52,4 +54,12 @@ public extension BridgeTool {
         return appName ?? "App"
     }
     
+}
+
+extension Bundle {
+    
+    static var resorceBundle: Bundle? {
+        guard let bundlePath = Bundle(for: BridgeTool.self).path(forResource: "TopdonDiagnosis.bundle", ofType: nil) else { return nil }
+        return Bundle(path: bundlePath)
+    }
 }

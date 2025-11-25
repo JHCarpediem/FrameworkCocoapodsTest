@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+NS_ASSUME_NONNULL_BEGIN
 typedef enum : NSUInteger {
     TDD_VXXScrollLabelReSetDirection, //重置
     TDD_VXXScrollLabelLeftDirection, //向左
@@ -34,3 +34,4 @@ typedef enum : NSUInteger {
 -(void)setScrollColor:(UIColor *)color;
 
 @end
+NS_ASSUME_NONNULL_END

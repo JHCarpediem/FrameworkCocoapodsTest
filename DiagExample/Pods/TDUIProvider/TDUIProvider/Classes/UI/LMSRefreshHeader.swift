@@ -9,10 +9,56 @@ import TDBasis
 import MJRefresh
 import TDTheme
 
+#if ISNEUTRAL
 @objc
-public class LMSRefreshHeader: MJRefreshGifHeader {
+open class LMSRefreshHeader: MJRefreshNormalHeader {
     
-    public override func prepare() {
+    open override func prepare() {
+        stateLabel?.textColor = UIProvider.statusBarStyle == .lightContent ? .white : .td.subTitle
+        stateLabel?.font = .systemFont(ofSize: 12).adaptHD
+        if #available(iOS 13.0, *) {
+            loadingView?.style = .medium
+        } else {
+            loadingView?.style = .white
+            // Fallback on earlier versions
+        }
+        
+        loadingView?.color = UIColor.td_title
+        super.prepare()
+        
+        setTitle(UILocalized.lms_pull_to_refresh, for: .idle)
+        setTitle(UILocalized.lms_free_to_refresh, for: .pulling)
+        setTitle(UILocalized.lms_refreshing, for: .refreshing)
+        
+    }
+    
+    
+    func image(from fromIndex: Int, to toIndex: Int) -> [UIImage] {
+        var imgs = [UIImage]()
+        for i in fromIndex...toIndex {
+            let indexStr = String(format: "%02d", i)
+            let imgStr = "refresh_" + indexStr
+            if let image = UIImage(named: imgStr) {
+                imgs.append(image)
+            }
+        }
+        return imgs
+    }
+    
+    open override func placeSubviews() {
+
+        super.placeSubviews()
+        
+        lastUpdatedTimeLabel?.isHidden = true
+        arrowView?.isHidden = true
+    }
+}
+#else
+
+@objc
+open class LMSRefreshHeader: MJRefreshGifHeader {
+    
+    open override func prepare() {
         
         let normalImages = image(from: 20, to: 21)
         let refreshImages = image(from: 0, to: 21)
@@ -49,7 +95,7 @@ public class LMSRefreshHeader: MJRefreshGifHeader {
         return imgs
     }
     
-    public override func placeSubviews() {
+    open override func placeSubviews() {
         guard let stateLabel = stateLabel, let gifView = gifView else {
             super.placeSubviews()
             return
@@ -71,10 +117,11 @@ public class LMSRefreshHeader: MJRefreshGifHeader {
         
     }
 }
+#endif
 
 @objc
-public class LMSRefreshFooter: MJRefreshAutoNormalFooter {
-    public override func prepare() {
+open class LMSRefreshFooter: MJRefreshAutoNormalFooter {
+    open override func prepare() {
         super.prepare()
         
         stateLabel?.font = .systemFont(ofSize: 11).adaptHD
@@ -88,7 +135,7 @@ public class LMSRefreshFooter: MJRefreshAutoNormalFooter {
 }
 
 extension UIScrollView {
-    public func endHeaderRefresh(dataCount: Int? = nil, pageSize: Int? = nil) {
+    open func endHeaderRefresh(dataCount: Int? = nil, pageSize: Int? = nil) {
         self.mj_footer?.resetNoMoreData()
         self.mj_header?.endRefreshing()
         guard let dataCount = dataCount, let pageSize = pageSize else { return }
@@ -98,7 +145,7 @@ extension UIScrollView {
         }
     }
     
-    public func endFooterRefresh(dataCount: Int? = nil, pageSize: Int? = nil) {
+    open func endFooterRefresh(dataCount: Int? = nil, pageSize: Int? = nil) {
         guard let dataCount = dataCount, let pageSize = pageSize else {
             self.mj_footer?.endRefreshing()
             return

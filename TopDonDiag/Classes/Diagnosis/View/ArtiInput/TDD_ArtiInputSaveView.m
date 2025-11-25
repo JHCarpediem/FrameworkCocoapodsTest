@@ -8,6 +8,7 @@
 #import "TDD_ArtiInputSaveView.h"
 #import "TDD_ArtiInputSaveModel.h"
 #import "TDD_ArtiInputSaveCellView.h"
+@import TDUIProvider;
 @interface TDD_ArtiInputSaveView ()<UITableViewDelegate,UITableViewDataSource>
 @property (nonatomic, strong) UITableView * tableView;
 @property (nonatomic, strong) NSArray * dataArr;
@@ -70,13 +71,13 @@
     }];
     
     [whiterView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(tableView).insets(UIEdgeInsetsMake(-2 * _scale, -1 * _scale, -2 * _scale, -1 * _scale));
+        make.edges.equalTo(tableView).insets(UIEdgeInsetsMake(-1 * _scale, -1 * _scale, -1 * _scale, -1 * _scale));
     }];
     
     //设行高为自动计算
     tableView.rowHeight = UITableViewAutomaticDimension;
     //预计行高
-    tableView.estimatedRowHeight = 44 * _scale;
+    tableView.estimatedRowHeight = (IS_IPad ? 58 : 44) * _scale;
     
 //    self.tableView.fd_debugLogEnabled = YES;
     
@@ -114,22 +115,30 @@
     }
     if (self.dataArr.count && !shouldHide) {
         [FLT_APP_WINDOW addSubview:self];
-        CGFloat height = 0;
+        CGFloat height = 2;
+        CGFloat rightSpace = (IS_IPad ? (28 + 16) : (22 + 16)) * _scale;
         for (TDD_ArtiInputSaveModel * saveModel in self.dataArr) {
-          height +=  (20 * _scale + [NSString tdd_getHeightWithText:saveModel.value width:(IphoneWidth - _leftSpace * 2 - 24 * _scale) fontSize:[[UIFont systemFontOfSize:13] tdd_adaptHD]]);
-            if (height >= 250 * _scale) {
-                height = 250 * _scale;
+            CGFloat wSpace = _leftSpace * 2 + 32 * _scale + (itemModel.isDropDownBox ? 0 : rightSpace);
+            UIFont *font = [[UIFont systemFontOfSize:IS_IPad ? 20 : 13 weight:UIFontWeightMedium] tdd_adaptHD];
+            CGFloat textH = ((IS_IPad ? 40 : 24) * _scale + [NSString tdd_getHeightWithText:saveModel.value width:(IphoneWidth - wSpace) fontSize:font]);
+            CGFloat maxHeight = MIN(textH, font.lineHeight * 2 + (IS_IPad ? 32 : 24) * _scale);
+            height += maxHeight;
+            if (height >= (IS_IPad ? 290 : 250 ) * _scale) {
+                height = (IS_IPad ? 290 : 250 ) * _scale;
                 break;
             }
             
         }
+        
         //float h = MIN(250 * _scale, self.dataArr.count * 50) ;
-        BOOL showInTop = ((self.clickPoint.y + 45 * _scale + height) > IphoneHeight);
-        float y = (showInTop ? (self.clickPoint.y - height - 25 * _scale) : (self.clickPoint.y + 45 * _scale));
+        CGFloat h = (IS_IPad ? 68 : 45) * _scale;
+        BOOL showInTop = ((self.clickPoint.y + h + height) > IphoneHeight - kSafeBottomHeight - 25 * _scale);
+        float y = (showInTop ? (self.clickPoint.y - height - 50 * _scale) : (self.clickPoint.y + h));
+        CGFloat bottomH = _itemModel.isDropDownBox ? 0 : h;
         [_tableView mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.centerX.equalTo(self);
             make.top.equalTo(self).offset(y);
-            make.size.mas_equalTo(CGSizeMake(IphoneWidth - _leftSpace * 2, height + 44 * _scale));
+            make.size.mas_equalTo(CGSizeMake(IphoneWidth - _leftSpace * 2, height + bottomH));
         }];
         [self layoutIfNeeded];
         [self.tableView reloadData];
@@ -183,8 +192,10 @@
         }];
     }
 
+    cellView.isDropDownBox = _itemModel.isDropDownBox;
     cellView.saveModel = saveModel;
     cellView.index = indexPath.row;
+    cellView.isLast = (indexPath.row == self.dataArr.count - 1);
 }
 
 - (void)tableView:(UITableView *)tableView didHighlightRowAtIndexPath:(NSIndexPath *)indexPath
@@ -225,15 +236,21 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section
 {
-    return 44 * _scale;
+    if (self.itemModel.isDropDownBox) {
+        return 0.01;
+    }
+    return (IS_IPad ? 68 : 44) * _scale;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
+    if (self.itemModel.isDropDownBox) {
+        return UIView.new;
+    }
     UIButton *clearAllBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [clearAllBtn setTitle:TDDLocalized.clear_all forState:UIControlStateNormal];
     [clearAllBtn setTitleColor:[UIColor tdd_colorDiagTheme] forState:UIControlStateNormal];
-    clearAllBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
-    clearAllBtn.frame = CGRectMake(0, 0, IphoneWidth - _leftSpace * 2 * _scale, 44 * _scale);
+    clearAllBtn.titleLabel.font = [[UIFont systemFontOfSize:14 weight:UIFontWeightMedium] adaptHDWithSize:20];
+    clearAllBtn.frame = CGRectMake(0, 0, IphoneWidth - _leftSpace * 2 * _scale, (IS_IPad ? 68 : 44) * _scale);
     [clearAllBtn addTarget:self action:@selector(clearAll) forControlEvents:UIControlEventTouchUpInside];
     clearAllBtn.backgroundColor = [UIColor tdd_alertBg];
     return clearAllBtn;

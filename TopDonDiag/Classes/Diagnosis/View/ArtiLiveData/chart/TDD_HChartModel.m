@@ -9,6 +9,10 @@
 
 @implementation TDD_HChartModel
 
+- (void)setTime:(double)time {
+    _time = time;
+}
+
 - (void)setValueStr:(NSString *)valueStr
 {
     _valueStr = valueStr;

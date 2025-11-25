@@ -46,13 +46,13 @@
     
     UIImageView * tipIcon = [[UIImageView alloc] init];
     tipIcon.hidden = YES;
-    [tipIcon setImage:kImageNamed(@"diag_trouble_btn_lock")];
+    [tipIcon setImage:kImageNamed(@"diag_menu_lock")];
     self.tipImageView = tipIcon;
     [self.bgView addSubview:tipIcon];
     [tipIcon mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.size.mas_equalTo(CGSizeMake(22 * _scale, 22 * _scale));
-        make.top.equalTo(self).offset(10 * _scale);
-        make.right.equalTo(self.mas_right).offset(-10 * _scale);
+        make.size.mas_equalTo(CGSizeMake(22 * _scale, 26 * _scale));
+        make.top.equalTo(self);
+        make.right.equalTo(self.mas_right).offset(-8 * _scale);
     }];
     
     UIImageView * imageView = [[UIImageView alloc] init];

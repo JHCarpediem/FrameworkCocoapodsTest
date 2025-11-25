@@ -9,6 +9,7 @@
 #import "TDD_ButtonTableView.h"
 #import "TDD_ArtiPopupCellView.h"
 #import "TDD_ArtiPopupSuggestCellView.h"
+#import "TDD_ArtiTroubleCellView.h"
 #import "TDD_LoadingView.h"
 #import "TDD_ArtiTroubleAIGuildView.h"
 #import "TDD_DiagnosisViewController.h"
@@ -72,7 +73,7 @@
 - (void)setPopupModel:(TDD_ArtiPopupModel *)popupModel
 {
     _popupModel = popupModel;
-    [self.tableView reloadData];
+     [self.tableView reloadData];
 }
 
 - (void)setTroubleModel:(TDD_ArtiTroubleModel *)troubleModel {
@@ -188,8 +189,8 @@
                 cellView = [[TDD_ArtiPopupSuggestCellView alloc] init];
                 ((TDD_ArtiPopupSuggestCellView *)cellView).delegate = self;
             }else {
-                cellView = [[TDD_ArtiPopupCellView alloc] init];
-                ((TDD_ArtiPopupCellView *)cellView).delegate = self;
+                cellView = [[TDD_ArtiTroubleCellView alloc] init];
+                ((TDD_ArtiTroubleCellView *)cellView).delegate = self;
             }
 
         }
@@ -222,8 +223,8 @@
             ((TDD_ArtiPopupSuggestCellView *)cellView).isShowTranslated = self.popupModel.isShowTranslated;
             ((TDD_ArtiPopupSuggestCellView *)cellView).itemModel = itemModel;
         }else {
-            ((TDD_ArtiPopupCellView *)cellView).isShowTranslated = self.popupModel.isShowTranslated;
-            ((TDD_ArtiPopupCellView *)cellView).itemModel = itemModel;
+            ((TDD_ArtiTroubleCellView *)cellView).isShowTranslated = self.popupModel.isShowTranslated;
+            ((TDD_ArtiTroubleCellView *)cellView).popupItemModel = itemModel;
 
         }
     }
@@ -394,12 +395,8 @@
             //调 AI 接口
             [self loadAITroubleCodeInfo:code desc:desc];
         }
-        NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+        NSMutableDictionary *dic = [TDD_DiagnosisTools commStatisticsEventDict];
         [dic setObject:referrer forKey:@"Referrer"];
-        [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand?:@"" forKey:@"Make"];
-        [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel?:@"" forKey:@"Model"];
-        [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carYear?:@"" forKey:@"Year"];
-        [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].CarVIN?:@"" forKey:@"VIN"];
         [dic setObject:code?:@"" forKey:@"Code"];
         [TDD_Statistics event:Event_Cus_ClickTopFix attributes:dic];
     }

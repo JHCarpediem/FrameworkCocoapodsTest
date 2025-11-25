@@ -150,7 +150,7 @@
     [arrowImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(self.mas_right).offset(-leftSpace * _scale);
         make.centerY.equalTo(statusLab);
-        make.size.mas_equalTo(CGSizeMake((IS_IPad ? 20 : 10) * _scale, (IS_IPad ? 20 : 10) * _scale));
+        make.size.mas_equalTo(CGSizeMake((IS_IPad ? 24 : 12) * _scale, (IS_IPad ? 24 : 12) * _scale));
     }];
 }
 

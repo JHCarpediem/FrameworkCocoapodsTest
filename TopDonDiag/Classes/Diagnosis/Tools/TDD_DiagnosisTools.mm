@@ -19,8 +19,8 @@
 #import "TDD_STDPublicInterface.h"
 #import "TDD_AlertTools.h"
 #define TDD_kAutoUnZipSoftPackage @"TDD_kAutoUnZipSoftPackage"                          // 是否解压AUTOVIN、ACCSPEED车型
-
-
+#import "TDD_DeviceTools.h"
+#import "TDHAESEncryption.h"
 @implementation TDD_DiagnosisTools
 
 + (void)vehicleDecompressionPackage
@@ -35,17 +35,17 @@
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     NSString *appName = [infoDictionary objectForKey:@"CFBundleName"];
     NSArray *packageAry;
-    if ([appName isEqualToString:@"TopDonDiagDebug"] || [appName isEqualToString:@"DiagExample"] ) {
+    if ([appName isEqualToString:@"TopDonDiagDebug"]) {
         packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI",@"DEMO", @"EOBD"];
     }else {
 #ifdef DEBUG
-        if ([appName isEqualToString:@"TopVCI"] || [appName isEqualToString:@"TopVCI_FENCH"] || [appName isEqualToString:@"CarPal"]) {
-            packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"DEMO", @"EOBD"];
+        if ([appName isEqualToString:@"TopVCI"] || [appName isEqualToString:@"TopVCI_FENCH"] || [appName isEqualToString:@"CarPal"] || [appName isEqualToString:@"TopGuru"]) {
+            packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"DEMO", @"EOBD",@"COMM"];
         }else {
             if ([appName isEqualToString:@"TOPVCI_PRO"]) {
                 packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"EOBD", @"DEMO",@"COMM"];
             }else {
-                packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"DEMO",@"COMM"];
+                packageAry = @[@"DEMO",@"EOBD"];
             }
         }
 
@@ -53,11 +53,7 @@
         if ([appName isEqualToString:@"TopVCI"] || [appName isEqualToString:@"TopVCI_FENCH"] || [appName isEqualToString:@"CarPal"]) {
             packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"EOBD"];
         }else {
-            if ([appName isEqualToString:@"TOPVCI_PRO"]) {
-                packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"EOBD", @"DEMO"];
-            }else {
-                packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"DEMO"];
-            }
+            packageAry = @[@"ACCSPEED",@"AUTOVIN", @"IM_PRECHECK", @"CheckVCI", @"EOBD", @"DEMO"];
         }
 
 #endif
@@ -71,7 +67,7 @@
             
             
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-            NSString *docDir = [NSString stringWithFormat:@"%@/%@/%@",[paths objectAtIndex:0],[TDD_DiagnosisManage sharedManage].documentSubpath,appName];
+            NSString *docDir = [NSString stringWithFormat:@"%@/%@", [paths objectAtIndex:0], [TDD_DeviceTools docPathName]];
             NSError * error;
             if (![fileManager fileExistsAtPath:docDir]) {
                 BOOL isSuccess = [fileManager createDirectoryAtPath:docDir withIntermediateDirectories:YES attributes:nil error:&error];
@@ -132,8 +128,13 @@
     
     NSFileManager * fileManager = [NSFileManager defaultManager];
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-    NSString *appName = [infoDictionary objectForKey:@"CFBundleName"];
-    NSMutableArray * directoryArr1 = @[[NSString stringWithFormat:@"%@/%@/Diagnosis",[TDD_DiagnosisManage sharedManage].documentSubpath,appName],[NSString stringWithFormat:@"%@/%@/Immo",[TDD_DiagnosisManage sharedManage].documentSubpath,appName],[NSString stringWithFormat:@"%@/%@/NewEnergy",[TDD_DiagnosisManage sharedManage].documentSubpath,appName], [NSString stringWithFormat:@"%@/%@/RFID",[TDD_DiagnosisManage sharedManage].documentSubpath,appName], [NSString stringWithFormat:@"%@/%@/MOTOR",[TDD_DiagnosisManage sharedManage].documentSubpath,appName]].mutableCopy;
+    NSString *pathName = [TDD_DeviceTools docPathName];//[infoDictionary objectForKey:@"CFBundleName"];
+    NSMutableArray * directoryArr1 = @[
+        [NSString stringWithFormat:@"%@/Diagnosis", pathName],
+        [NSString stringWithFormat:@"%@/Immo", pathName],
+        [NSString stringWithFormat:@"%@/NewEnergy", pathName],
+        [NSString stringWithFormat:@"%@/RFID", pathName],
+        [NSString stringWithFormat:@"%@/MOTOR", pathName]].mutableCopy;
     
     if ([TDD_DiagnosisTools userIsLogin] && ([TDD_DiagnosisTools selectedVCISerialNum].length > 0 || [TDD_DiagnosisTools selectedTDartsSerialNum].length > 0)) {
         
@@ -144,13 +145,13 @@
             
             if ([path containsString:@"RFID"]) {
                 if ([TDD_DiagnosisTools selectedTDartsSerialNum].length > 0) {
-                    path = [NSString stringWithFormat:@"%@/%@/%@/%@", [TDD_DiagnosisManage sharedManage].documentSubpath,appName,[TDD_DiagnosisTools selectedTDartsSerialNum], path];
+                    path = [NSString stringWithFormat:@"%@/%@/%@", pathName, [TDD_DiagnosisTools selectedTDartsSerialNum], path];
                 }else{
                     path = @"";
                 }
             }else {
                 if ([TDD_DiagnosisTools selectedVCISerialNum].length > 0) {
-                    path = [NSString stringWithFormat:@"%@/%@/%@/%@", [TDD_DiagnosisManage sharedManage].documentSubpath,appName,[TDD_DiagnosisTools selectedVCISerialNum], path];
+                    path = [NSString stringWithFormat:@"%@/%@/%@", pathName, [TDD_DiagnosisTools selectedVCISerialNum], path];
                 }else{
                     path = @"";
                 }
@@ -286,7 +287,7 @@
     
     for (TDD_CarModel * model in linkArr) {
         for (TDD_CarModel * linkModel in resultArr) {
-            if ([model.strLink isEqualToString:linkModel.strVehicle]) {
+            if ([model.strLinkSoftCode isEqualToString:linkModel.strSoftCode]) {
                 model.linkCarPath = linkModel.path;
                 //链接车获取支持语言数组
                 model.languageArr = [self getLangugeWithPath:model.linkCarPath];
@@ -483,7 +484,7 @@
              @"AC_LEARNING": @(DEFE_AC_LEARNING_POS),
              @"RAIN_LIGH": @(DEFE_RAIN_LIGHT_SENSOR_POS),
              @"ECURESET": @(DEFE_RESET_CONTROL_UNIT_POS),
-             @"DEFE_CSS_ACC_POS": @(DEFE_CSS_ACC_POS),//ini 文档划掉
+             @"53": @(53),//保留
              @"REL_COMP": @(DEFE_RELATIVE_COMPRESSION_POS),
              @"HVPO": @(DEFE_HV_DE_ENERGIZATION_POS),
              @"COOL_REPL": @(DEFE_COOLANT_REFRIGERANT_CHANGE_POS),
@@ -500,8 +501,15 @@
              @"ODO_CHECK": @(DEFE_MT_ODO_CHECK_POS),
              @"IDLE_ADJ": @(DEFE_MT_IDLE_ADJ_POS),
              @"CO_ADJ": @(DEFE_MT_CO_ADJ_POS),
-             @"ECU_FLASH": @(DEFE_MT_ECU_FLASH_POS),
-             @"SOFT_EXPIRE": @(DEFE_MT_SOFT_EXPIRATION_POS)
+             @"SPC_ECUFLASHING": @(DEFE_AF_ECU_FLASH_POS),
+             @"SOFT_EXPIRE": @(DEFE_MT_SOFT_EXPIRATION_POS),
+             @"SPC_HOTFUNCTIONS": @(DEFE_AF_HOTFUN_POS),
+             @"SPC_INITIALIZE": @(DEFE_AF_INIT_POS),
+             @"SPC_CODING": @(DEFE_AF_CODING_POS),
+             @"SPC_ADAPTATION": @(DEFE_AF_ADAPTATION_POS),
+             @"SPC_PROGRAMMING": @(DEFE_AF_PROGRAMMING_POS),
+             @"SPC_ECUCLONING": @(DEFE_AF_ECUCLONING_POS),
+             @"SPC_CUSTOMIZE": @(DEFE_AF_CUSTOMIZE_POS),
     };
 }
 
@@ -655,6 +663,18 @@
         model.strName = model.strENName;
     }
     
+    //SoftCode
+    if ([dataDic.allKeys containsObject:@"SOFTCODE"]) {
+        NSDictionary *dict = [dataDic objectForKey:@"SOFTCODE"];
+        if ([dict.allKeys containsObject:@"IOS"]) {
+            model.strSoftCode = dict[@"IOS"];
+        }
+        if ([dict.allKeys containsObject:@"LK_IOS"]) {
+            model.strLinkSoftCode = dict[@"LK_IOS"];
+        }
+        
+    }
+
     //MAINTENANCE 支持的功能掩码总和
     if ([dataDic.allKeys containsObject:@"MAINTENANCE"]) {
         NSDictionary *maintenanceDict = [TDD_DiagnosisTools carMaintenanceDict];
@@ -662,15 +682,36 @@
         NSArray * maintenanceKeyArr = maintenanceDict.allKeys;
         NSArray * maintenanceExKeyArr = maintenanceExDict.allKeys;
         //创建一个跟  maintenanceEx 位数一样的数组
-        NSMutableArray *maintenanceExValueArr = [NSMutableArray arrayWithArray:maintenanceExKeyArr];
+        NSMutableArray *maintenanceExValueArr = [NSMutableArray array];
+        for (NSUInteger i = 0; i < maintenanceExKeyArr.count; i++) {
+            [maintenanceExValueArr addObject:@"0"];
+        }
         long maintenance = 0;
-        NSDictionary *dict = [dataDic objectForKey:@"MAINTENANCE"];
+        NSDictionary *iniMaintenanceDict = [dataDic objectForKey:@"MAINTENANCE"];
+        NSDictionary *specFuncDict = [dataDic objectForKey:@"SPCFUNTYPE"];
+        
+        NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:iniMaintenanceDict];
+        //功能掩码从 ini 取Maintenance 和 SpcFunType合并
+        model.spcFunTypeDict = specFuncDict;
+        if (specFuncDict.count > 0) {
+            
+            NSMutableDictionary *specFuncMDict = [NSMutableDictionary dictionary];
+            
+            for (id key in specFuncDict) {
+                NSString *prefixedKey = [NSString stringWithFormat:@"SPC_%@", key];
+                specFuncMDict[prefixedKey] = specFuncDict[key];
+            }
+            [dict addEntriesFromDictionary:specFuncMDict];
+        }
+
+        
         for (int i = 0; i < maintenanceExKeyArr.count; i++) {
             NSString *key = maintenanceExKeyArr[i];
             key = key.uppercaseString;
             //新版功能掩码，下标值
             NSNumber * maintenanceExValue = maintenanceExDict[key];
             //ini 里值为 1
+            
             if (((NSString *)dict[key]).intValue > 0) {
                 //旧版功能掩码
                 NSNumber *maintenanceValue = maintenanceDict[key];
@@ -820,9 +861,16 @@
     
 }
 
++ (NSString *)selectedVCIProductModel {
+    if ([[TDD_DiagnosisManage sharedManage].manageDelegate respondsToSelector:@selector(selectedVCIProductModel)]) {
+        return [[TDD_DiagnosisManage sharedManage].manageDelegate selectedVCIProductModel];
+    }
+    return @"";
+}
+
 + (BOOL )isIpad {
     
-    return [TDD_DiagnosisTools appProduct] == PD_NAME_TOPSCAN_HD;
+    return (TDD_DiagnosisManage.sharedManage.currentSoftware & TDDSoftwareTopScanHD);
 }
 
 /// 获取选中VCI sn
@@ -1017,6 +1065,15 @@
     }
 }
 
++ (NSMutableDictionary *)commStatisticsEventDict {
+    NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+    [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand?:@"" forKey:@"Make"];
+    [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel?:@"" forKey:@"Model"];
+    [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carYear?:@"" forKey:@"Year"];
+    [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].CarVIN?:@"" forKey:@"VIN"];
+    return dic;
+}
+
 + (void)resetAlert {
     [TDD_AlertTools resetAlert];
 }
@@ -1041,6 +1098,10 @@
 
 + (void)showSoftExpiredToBuyAlert:(nullable void (^)(void))completionHandler {
     [TDD_AlertTools showSoftExpiredToBuyAlert:completionHandler];
+}
+
++ (void)showUnScanSoftExpiredAlert:(nullable void (^)(void))completionHandler {
+    [TDD_AlertTools showUnScanSoftExpiredAlert:completionHandler];
 }
 
 #pragma mark 静态库版本打印
@@ -1080,7 +1141,7 @@
     }
     for (TDD_CarModel *carModel in carArr) {
         
-        if ([carModel.strVehicle isEqualToString:model.strLink]) {
+        if ([carModel.strSoftCode isEqualToString:model.strLinkSoftCode]) {
             return carModel.strVersion;
         }
     }
@@ -1180,6 +1241,7 @@
         case TDDSoftwareTopScanFORD:
             return @[@"AUTOVIN",@"DEMO",@"EOBD",@"FORD"];
         case TDDSoftwareTopVciPro:
+            // car_array_topvcipro
             return @[@"ACCSPEED",@"AUTOVIN",
                      @"BENZ",@"BMW",@"BYD",@"BAICMOTOR",
                      @"CHRYSLER",@"CMC",@"CHANGAN",@"CHERY",
@@ -1199,12 +1261,15 @@
                      @"SUBARU",@"SUZUKI",@"SSANGYONG",@"SAAB",@"SMART",@"SPRINTER",@"SWMMOTOR",@"SAICMG",@"SGMW",@"SAICMAXUS",
                      @"TOYOTA",@"TATA",
                      @"VW",@"VOLVO"];
+            // car_array_topvcipro_end
             break;
         default:
             //默认:TopScan
+            // car_array_default
             return @[
-                @"ACCSPEED",@"AUTOVIN",@"BAICMOTOR",@"BENZ",@"BMW",@"BYD",@"CHANGAN",@"CHERY",@"CHRYSLER",@"CMC",@"DAIHATSU",@"DEMO",@"DFFS",@"DFFX",@"DFXK",@"EOBD",@"FAWCAR",@"FERRARI",@"FIAT",@"FIATBRAZIL",@"FORCE",@"FORD",@"GACMOTOR",@"GEELY",@"GM",@"GREATWALL",@"HAFEI",@"HONDA",@"HYUNDAI",@"IM_PRECHECK",@"ISUZU",@"IVECO_LD",@"JAC",@"JMC",@"LANDROVER",@"LYNKCO",@"MAHINDRA",@"MASERATI",@"MAZDA",@"MITSUBISHI",@"NISSAN",@"OPEL",@"PERODUA",@"PEUGEOT",@"POLESTAR",@"PORSCHE",@"PROTON",@"RENAULT",@"SAAB",@"SAICMAXUS",@"SAICMG",@"SGMW",@"SMART",@"SPRINTER",@"SSANGYONG",@"SUBARU",@"SUZUKI",@"SWMMOTOR",@"TATA",@"TOYOTA",@"VOLVO",@"VW"
+                @"ACCSPEED",@"ASHOK_LEYLAND_CV",@"AUTOVIN",@"BAICMOTOR",@"BENZ",@"BMW",@"BYD",@"CHANGAN",@"CHERY",@"CHRYSLER",@"CMC",@"DAIHATSU",@"DEMO",@"DFFS",@"DFFX",@"DFXK",@"EOBD",@"FAWCAR",@"FERRARI",@"FIAT",@"FIATBRAZIL",@"FORCE",@"FORD",@"GACMOTOR",@"GEELY",@"GM",@"GREATWALL",@"HAFEI",@"HONDA",@"HYUNDAI",@"IM_PRECHECK",@"ISUZU",@"IVECO_LD",@"JAC",@"JMC",@"LANDROVER",@"LYNKCO",@"MAHINDRA",@"MASERATI",@"MAZDA",@"MITSUBISHI",@"NISSAN",@"OPEL",@"PERODUA",@"PEUGEOT",@"POLESTAR",@"PORSCHE",@"PROTON",@"RENAULT",@"SAAB",@"SAICMAXUS",@"SAICMG",@"SGMW",@"SMART",@"SPRINTER",@"SSANGYONG",@"SUBARU",@"SUZUKI",@"SWMMOTOR",@"TATA",@"TOYOTA",@"VOLVO",@"VW"
             ];
+            // car_array_default_end
             break;
     }
     
@@ -1219,9 +1284,11 @@
             break;
         default:
             //默认:TopScan
+            // immo_array_default
             return @[
-                @"ABARTH",@"ACURA",@"ALFAROMEO",@"AUDI",@"Algorithm",@"BAICHUANSU",@"BAICMOTOR",@"BAICSENOVA",@"BAICWEIWANG",@"BJEV",@"BYD",@"CHANGAN",@"CHERY",@"CHRYSLER",@"CITROEN",@"DENZA",@"DFHONDA",@"DFNISSAN",@"DFVENUCIA",@"DODGE",@"DS",@"EMGRAND",@"ENGLON",@"FERRARI",@"FIAT",@"FIATBRAZIL",@"FORD",@"FORDAU",@"FORDEU",@"FORD_CHANGAN",@"FREQUENCY_DETECTION",@"GACAION",@"GACMOTOR",@"GEELY",@"GENERATE_TRANSPONDER",@"GENESIS",@"GLEAGLE",@"GM",@"GMBRAZIL",@"GREATWALL",@"GZHONDA",@"HAVAL",@"HOLDEN",@"HONDA",@"HUMMER",@"HYUNDAI",@"HYUNDAI_BEIJING",@"INFINITI",@"ISUZU",@"JAC",@"JAGUAR",@"JEEP",@"JMC",@"KARRY",@"KIA",@"KIA_CHINA",@"LANCIA",@"LANDROVER",@"LEXUS",@"MAHINDRA",@"MAPLE",@"MARUTI_SUZUKI",@"MASERATI",@"MAZDA",@"MAZDA_CHINA",@"MG",@"MITSUBISHI",@"NISSAN",@"OPEL",@"PEUGEOT",@"RELY",@"RENAULT",@"RIICH",@"ROEWE",@"SAAB",@"SAICMAXUS",@"SCION",@"SEAT",@"SKODA",@"SMART",@"SSANGYONG",@"SUBARU",@"SUZUKI",@"TATA",@"TEST_IMMO_PKE_COIL",@"TOYOTA",@"TOYOTACN",@"TRANSPONDER_RECOGNITION",@"VAUXHALL",@"VW",@"WEY"
+                @"ABARTH",@"ACURA",@"ALFAROMEO",@"AUDI",@"BAICHUANSU",@"BAICMOTOR",@"BAICSENOVA",@"BAICWEIWANG",@"BJEV",@"BYD",@"CHANGAN",@"CHERY",@"CHRYSLER",@"CITROEN",@"DENZA",@"DFHONDA",@"DFNISSAN",@"DFVENUCIA",@"DS",@"EMGRAND",@"ENGLON",@"FERRARI",@"FIAT",@"FIATBRAZIL",@"FORD",@"FORDAU",@"FORDEU",@"FORD_CHANGAN",@"FREQUENCY_DETECTION",@"GACAION",@"GACMOTOR",@"GEELY",@"GENERATE_TRANSPONDER",@"GENESIS",@"GLEAGLE",@"GM",@"GREATWALL",@"GZHONDA",@"HAVAL",@"HONDA",@"HYUNDAI",@"HYUNDAI_BEIJING",@"INFINITI",@"ISUZU",@"JAC",@"JMC",@"KARRY",@"KIA",@"KIA_CHINA",@"LANCIA",@"LANDROVER",@"LEXUS",@"MAHINDRA",@"MAPLE",@"MASERATI",@"MAZDA",@"MAZDA_CHINA",@"MG",@"MITSUBISHI",@"NISSAN",@"OPEL",@"PEUGEOT",@"RELY",@"RENAULT",@"RIICH",@"ROEWE",@"SAICMAXUS",@"SCION",@"SEAT",@"SKODA",@"SMART",@"SSANGYONG",@"SUBARU",@"SUZUKI",@"TATA",@"TEST_IMMO_PKE_COIL",@"TOYOTA",@"TOYOTACN",@"TRANSPONDER_RECOGNITION",@"VAUXHALL",@"VW",@"WEY"
             ];
+            // immo_array_default_end
             break;
     }
 }
@@ -1234,6 +1301,7 @@
             return @[];
             break;
         case TDDSoftwareTopVciPro:
+            // moto_array_topvcipro
             return @[@"AGUSTA",
                      @"BMW",@"BRP",@"BENELLI",@"BROUGH",
                      @"DUCATI",@"DEMO",
@@ -1267,14 +1335,18 @@
                      @"ORCAL",
                      @"HAOJUE",
                      @"AKT",
-                     @"EOBD"
+                     @"EOBD",
+                     @"ZONTES",
                     ];
+            // moto_array_topvcipro_end
                        break;
         default:
             //默认:TopScan
+            // moto_array_default
             return @[
-                @"ABS_CHINA",@"AGUSTA",@"ARCTICCAT",@"BAJAJ",@"BENELLI",@"BMW",@"BROSE",@"BROUGH",@"BRP",@"DAFRA",@"DEMO",@"DUCATI",@"ENFIELD",@"ENGINE_CHINA",@"EOBD",@"FANTIC",@"GGTECHNIK",@"HAOJUE",@"HARLEY",@"HM",@"HONDA",@"HUSQVARNA",@"INDIAN",@"ITALJET",@"KAWASAKI",@"KEEWAY",@"KELLER",@"KSRMOTO",@"KTM",@"KYMCO",@"LEXMOTO",@"MACBOR",@"MALAGUTI",@"MGK",@"MH",@"MORINI",@"PEUGEOT",@"PIAGGIO",@"POLARIS",@"RVM",@"SHERCO",@"SUZUKI",@"SYM",@"TRIUMPH",@"TVS",@"URAL",@"VENT",@"VERVE",@"VICTORY",@"VOGE",@"YAMAHA",@"ZEEHO"
+                @"ABS_CHINA",@"AGUSTA",@"AKT",@"ARCTICCAT",@"BAJAJ",@"BENELLI",@"BMW",@"BROSE",@"BROUGH",@"BRP",@"CFMOTO",@"DAFRA",@"DEMO",@"DUCATI",@"ENFIELD",@"ENGINE_CHINA",@"EOBD",@"FANTIC",@"GGTECHNIK",@"HAOJUE",@"HARLEY",@"HM",@"HONDA",@"HUSQVARNA",@"INDIAN",@"ITALJET",@"KAWASAKI",@"KEEWAY",@"KELLER",@"KSRMOTO",@"KTM",@"KYMCO",@"LEXMOTO",@"MACBOR",@"MALAGUTI",@"MGK",@"MH",@"MORINI",@"PEUGEOT",@"PIAGGIO",@"POLARIS",@"QJBENELLI",@"QJMOTOR",@"RVM",@"SHERCO",@"SUZUKI",@"SYM",@"TRIUMPH",@"TVS",@"URAL",@"VENT",@"VERVE",@"VICTORY",@"VOGE",@"YAMAHA",@"ZEEHO",@"ZONTES"
             ];
+            // moto_array_default_end
             break;
     }
 }
@@ -1512,4 +1584,15 @@
     return ArtiInput_ALL;
 }
 
++ (NSString *)AESEncrypt:(NSString *)str {
+    return [TDHAESEncryption td_AES128ParmEncryptWithContent:str];
+}
+
++ (NSString *)AESLocalEncrypt:(NSString *)str {
+    return [TDHAESEncryption td_AESLocalEncryptionWithContent:str];
+}
+
++ (NSString *)AESLocalDecryption:(NSString *)str {
+    return [TDHAESEncryption td_AESLocalDecryptionWithContent:str];
+}
 @end

@@ -71,9 +71,6 @@
 }
 
 -(void)updateLayout {
-    if (IS_IPad) {
-        self.iconImageView.image = kImageNamed(@"section_title_hd_bg");
-    }
     self.nameLabel.font = [UIFont systemFontOfSize:IS_IPad ? 24 : 16];
     [self.nameLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(IS_IPad ? @55 : @30);

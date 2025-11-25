@@ -7,6 +7,7 @@
 
 #import "TDD_Tools.h"
 @import TDBasis;
+#import <TopdonDiagnosis/TopdonDiagnosis-Swift.h>
 
 @interface TDD_Tools()
 
@@ -41,10 +42,12 @@
 
 + (UIImage *)tdd_imageNamed:(NSString *)imageName
 {
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-
-    UIImage * image = [UIImage imageNamed:[NSString stringWithFormat:@"TopdonDiagnosis.bundle/image/%@",imageName] inBundle:bundle compatibleWithTraitCollection:nil];
-    return image;
+    
+    return [TDD_UIProvider imageWith:imageName];
+//    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+//
+//    UIImage * image = [UIImage imageNamed:[NSString stringWithFormat:@"TopdonDiagnosis.bundle/image/%@",imageName] inBundle:bundle compatibleWithTraitCollection:nil];
+//    return image;
 }
 
 + (int )troubleCodeLevelWithVehicle:(NSString *)vehicle statusStr:(NSString *)statusStr {

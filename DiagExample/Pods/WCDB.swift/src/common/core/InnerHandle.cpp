@@ -34,7 +34,6 @@ InnerHandle::InnerHandle()
 : m_type(HandleType::Normal)
 , m_writeHint(false)
 , m_mainStatement(nullptr)
-, m_transactionEvent(nullptr)
 {
     m_mainStatement = getStatement();
 }
@@ -53,8 +52,7 @@ void InnerHandle::setType(HandleType type)
     case HandleType::Compress:
         m_error.infos.insert_or_assign(ErrorStringKeyType, ErrorTypeCompress);
         break;
-    case HandleType::BackupRead:
-    case HandleType::BackupWrite:
+    case HandleType::Backup:
     case HandleType::BackupCipher:
         m_error.infos.insert_or_assign(ErrorStringKeyType, ErrorTypeBackup);
         break;
@@ -172,7 +170,6 @@ bool InnerHandle::configure()
 #pragma mark - Statement
 bool InnerHandle::execute(const Statement &statement)
 {
-    TransactionGuard transactionedGuard(m_transactionEvent, this);
     bool succeed = false;
     if (prepare(statement)) {
         succeed = step();
@@ -183,7 +180,6 @@ bool InnerHandle::execute(const Statement &statement)
 
 bool InnerHandle::execute(const UnsafeStringView &sql)
 {
-    TransactionGuard transactionedGuard(m_transactionEvent, this);
     bool succeed = false;
     if (prepare(sql)) {
         succeed = step();
@@ -348,25 +344,6 @@ bool InnerHandle::isStatementReadonly()
 }
 
 #pragma mark - Transaction
-
-bool InnerHandle::beginTransaction()
-{
-    TransactionGuard transactionedGuard(m_transactionEvent, this);
-    return AbstractHandle::beginTransaction();
-}
-
-bool InnerHandle::commitTransaction()
-{
-    TransactionGuard transactionedGuard(m_transactionEvent, this);
-    return AbstractHandle::commitTransaction();
-}
-
-void InnerHandle::rollbackTransaction()
-{
-    TransactionGuard transactionedGuard(m_transactionEvent, this);
-    return AbstractHandle::rollbackTransaction();
-}
-
 bool InnerHandle::checkMainThreadBusyRetry()
 {
     const auto &element = m_pendings.find(StringView(BusyRetryConfigName));
@@ -442,11 +419,6 @@ bool InnerHandle::runPausableTransactionWithOneLoop(const TransactionCallbackFor
         }
     } while (!stop);
     return true;
-}
-
-void InnerHandle::configTransactionEvent(TransactionEvent *event)
-{
-    m_transactionEvent = event;
 }
 
 ConfiguredHandle::~ConfiguredHandle() = default;

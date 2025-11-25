@@ -8,6 +8,8 @@
 #import "TDD_ArtiFACAuthView.h"
 #import "TDD_ArtiUnlockTypeSelectView.h"
 #import "YYText/YYText.h"
+@import TDBasis;
+static NSString *demoDefaultSN = @"1104*******001";
 @import IQKeyboardManager;
 @import TDUIProvider;
 
@@ -20,6 +22,9 @@
 @property (nonatomic,strong)NSArray *webArr;
 @property (nonatomic,strong)NSArray *webAttStrArr;
 @property (nonatomic,strong)NSArray *unlockTypeTitleArr;
+///密文
+@property (nonatomic,strong)NSString *naEncryptionPassword;
+@property (nonatomic,strong)NSString *euEncryptionPassword;
 /// UI
 @property (nonatomic,strong)UIScrollView *contentView;
 @property (nonatomic,strong)UIView *switchTypeView;
@@ -41,12 +46,14 @@
 @property (nonatomic,strong)TDD_CustomTextField * accountTextField;
 @property (nonatomic,strong)TDD_CustomTextField * passwordTextField;
 @property (nonatomic,strong)UIButton *forgottenBtn;
+@property (nonatomic,strong)UIButton *remeberBtn;
 @property (nonatomic,strong)UIButton *createAccountBtn;
 @property (nonatomic,assign)NSInteger unlockSubTypeSelIndex;
 @property (nonatomic,strong)TDD_ArtiUnlockTypeSelectView *selectView;
 @property (nonatomic,strong)UIButton *tipsBtn;
 @property (nonatomic,strong)UIImageView *tipArrowImageView;
 @property (nonatomic,strong)TDD_CustomLabel *countTipLabel;
+@property (nonatomic,strong)UIView * phoneAndEmailView;
 @property (nonatomic,strong)YYLabel * webSpecLabel;
 @property (nonatomic,strong)TDD_CustomLabel * emailSpecLabel;
 @property (nonatomic,strong)TDD_CustomLabel * techSpecLabel;
@@ -92,7 +99,11 @@
 
 - (void)vciStatusDidChange {
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ([TDD_EADSessionController sharedController].VciStatus) {
+        if (self.fcaModel.uType == SST_FUNC_DEMO_AUTH) {
+            NSString *snStr = [NSString tdd_isEmpty:[TDD_EADSessionController sharedController].SN] ? [TDD_DiagnosisTools selectedVCISerialNum] : [TDD_EADSessionController sharedController].SN;
+            snStr = [NSString tdd_isEmpty:snStr] ? demoDefaultSN  : snStr;
+            self.snLabel.text = snStr;
+        }else if ([TDD_EADSessionController sharedController].VciStatus) {
             self.snLabel.text = [TDD_EADSessionController sharedController].SN?:@"--";
         }else {
             self.snLabel.text = @"--";
@@ -103,16 +114,18 @@
 
 - (void)createUI {
     _scale = IS_IPad ? HD_Height : H_Height;
-    CGFloat space = IS_IPad ? 214 * _scale : 40 * _scale;
+    CGFloat space = IS_IPad ? 212 * _scale : 40 * _scale;
     CGFloat iconWH = (56 - 2 * 10) * _scale; // 图标大小
     CGFloat itemSpace = 10 * _scale;    // 间距
+    CGFloat textViewH = (IS_IPad ? 60 : 50) * _scale;
+    CGFloat textViewSpace = (IS_IPad ? 8 : 12) * _scale;
     _renaultLogoSize = IS_IPad ? CGSizeMake(203 * _scale, 72 * _scale) : CGSizeMake(186 * _scale, 36 * _scale);
     _fcaLogoSize = IS_IPad ? CGSizeMake(400 * _scale, 64 * _scale) : CGSizeMake(245 * _scale, 36 * _scale);
     
     //字体
     CGFloat bigFontSize = IS_IPad ? 18 : 16;
     CGFloat midFontSize = IS_IPad ? 16 : 14;
-    CGFloat smallFontSize = IS_IPad ? 14 : 12;
+    CGFloat smallFontSize = IS_IPad ? 16 : 12;
     self.backgroundColor = [UIColor tdd_viewControllerBackground];
     
     [self addSubview:self.contentView];
@@ -122,18 +135,21 @@
     [self.contentView addSubview:self.switchTypeView];
     [self.switchTypeView addSubview:self.naAreaBtn];
     [self.switchTypeView addSubview:self.otherAreaBtn];
+    CGFloat btnSpace = IS_IPad ? 2 : 1;
+    CGFloat btnLeftSpace = (IS_IPad ? 212 : 40) * _scale;
     [_switchTypeView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(self.contentView).offset(20 * _scale);
-        make.left.equalTo(self.contentView).offset(40 * _scale);
+        make.left.equalTo(self.contentView).offset(btnLeftSpace);
         make.centerX.equalTo(self.contentView);
-        make.height.mas_equalTo(38 * _scale);
+        make.height.mas_equalTo((IS_IPad ? 46 : 38) * _scale);
     }];
     [_naAreaBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.left.bottom.equalTo(self.switchTypeView).insets(UIEdgeInsetsMake(1, 1, 1, 0));
-        make.width.mas_equalTo((IphoneWidth - 82 * _scale)/2);
+        make.top.left.bottom.equalTo(self.switchTypeView).insets(UIEdgeInsetsMake(btnSpace, btnSpace, btnSpace, 0));
+        make.width.mas_equalTo((IphoneWidth - (btnLeftSpace * 2 - btnSpace * 2))/2);
+        
     }];
     [_otherAreaBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.right.bottom.equalTo(self.switchTypeView).insets(UIEdgeInsetsMake(1, 0, 1, 1));
+        make.top.right.bottom.equalTo(self.switchTypeView).insets(UIEdgeInsetsMake(btnSpace, 0, btnSpace, btnSpace));
         make.width.equalTo(self.naAreaBtn);
     }];
     
@@ -141,9 +157,9 @@
     _logoImageView.contentMode = UIViewContentModeScaleAspectFit;
     [self.contentView addSubview:_logoImageView];
     [_logoImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.contentView).offset(55 * _scale);
+        make.top.equalTo(self.contentView).offset((IS_IPad ? 20 : 55) * _scale);
         make.centerX.equalTo(self.contentView);
-        make.size.mas_equalTo(_fcaLogoSize);
+//        make.size.mas_equalTo(_fcaLogoSize);
     }];
     
     // 中间容器View
@@ -154,13 +170,19 @@
     [containerView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.offset(space);
         make.width.mas_equalTo(IphoneWidth - space * 2);
-        make.top.equalTo(self.logoImageView.mas_bottom).offset((IS_IPad ? 40 : 20) * _scale);
+        make.top.equalTo(self.logoImageView.mas_bottom).offset(20 * _scale);
     }];
     
     [_otherUnlockBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.contentView).offset(10 * _scale);
-        make.right.equalTo(containerView).offset(20 * _scale);
-        make.height.mas_equalTo(22 * _scale);
+        if (IS_IPad) {
+            make.centerY.equalTo(self.logoImageView).offset;
+        }else {
+            make.top.equalTo(self.contentView).offset(10 * _scale);
+        }
+        
+        make.right.equalTo(self).offset(-(IS_IPad ? 40 * _scale : 20 * _scale));
+        make.height.mas_equalTo(IS_IPad ? 46 * _scale : 28 * _scale);
+
     }];
     
     //解锁方式
@@ -168,11 +190,13 @@
     _unlockTypeTitleLabel.text = TDDLocalized.unlock_method;
     _unlockTypeTitleLabel.textColor = [UIColor tdd_color666666];
     _unlockTypeTitleLabel.font = [[UIFont systemFontOfSize:bigFontSize weight:UIFontWeightRegular] tdd_adaptHD];
+    _unlockTypeTitleLabel.numberOfLines = 2;
     [containerView addSubview:_unlockTypeTitleLabel];
     [_unlockTypeTitleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(containerView);
         make.left.offset(0);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
+        make.width.mas_lessThanOrEqualTo(142.5 * _scale);
     }];
     
     _unlockTypeControl = [UIControl new];
@@ -181,26 +205,30 @@
     [_unlockTypeControl mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.offset(0);
         make.centerY.equalTo(_unlockTypeTitleLabel);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
     }];
     
     TDD_CustomLabel *unlockTypeLabel = [[TDD_CustomLabel alloc] init];
     unlockTypeLabel.textColor = [UIColor tdd_title];
     unlockTypeLabel.font = [[UIFont systemFontOfSize:bigFontSize weight:UIFontWeightRegular] tdd_adaptHD];
+    unlockTypeLabel.numberOfLines = 0;
     self.unlockTypeLabel = unlockTypeLabel;
     
     [_unlockTypeControl addSubview:unlockTypeLabel];
     [unlockTypeLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(_unlockTypeControl);
         make.left.offset(0);
+        make.width.mas_lessThanOrEqualTo((IS_IPad ? 300 : 116.5) * _scale);
     }];
     _unlockTypeArrowIcon = [[UIImageView alloc] initWithImage:kImageNamed(@"auth_input_drop")];
     
     [_unlockTypeControl addSubview:_unlockTypeArrowIcon];
+    CGFloat arrowWidth = IS_IPad ? 18 : 22;
     [_unlockTypeArrowIcon mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(_unlockTypeControl);
         make.right.offset(0);
         make.left.equalTo(unlockTypeLabel.mas_right).offset(6 * _scale);
+        make.size.mas_equalTo(CGSizeMake(arrowWidth, arrowWidth));
     }];
     
     _unlockTypeLineView = [UIView new];
@@ -210,7 +238,7 @@
         make.top.equalTo(_unlockTypeTitleLabel.mas_bottom);
         make.left.offset(0);
         make.centerX.equalTo(containerView);
-        make.height.offset(0.5);
+        make.height.offset(IS_IPad ? 1 : 0.5);
     }];
     
     //VIN
@@ -220,9 +248,9 @@
     _vinTitleLabel.font = [[UIFont systemFontOfSize:bigFontSize weight:UIFontWeightRegular] tdd_adaptHD];
     [containerView addSubview:_vinTitleLabel];
     [_vinTitleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_unlockTypeLineView.mas_bottom).offset(12 * _scale);
+        make.top.equalTo(_unlockTypeLineView.mas_bottom).offset(textViewSpace);
         make.left.offset(0);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
     }];
     
     TDD_CustomLabel * vinLabel = [[TDD_CustomLabel alloc] init];
@@ -233,7 +261,7 @@
     [vinLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(_vinTitleLabel);
         make.right.offset(0);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
     }];
     
     UIView *vinLineView = [UIView new];
@@ -243,7 +271,7 @@
         make.top.equalTo(_vinTitleLabel.mas_bottom);
         make.left.offset(0);
         make.centerX.equalTo(containerView);
-        make.height.offset(0.5);
+        make.height.mas_equalTo(IS_IPad ? 1 : 0.5);
     }];
     
     //sn
@@ -253,9 +281,9 @@
     snTitleLabel.font = [[UIFont systemFontOfSize:bigFontSize weight:UIFontWeightRegular] tdd_adaptHD];
     [containerView addSubview:snTitleLabel];
     [snTitleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(vinLineView.mas_bottom).offset(12 * _scale);
+        make.top.equalTo(vinLineView.mas_bottom).offset(textViewSpace);
         make.left.offset(0);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
     }];
     
     _snLabel = [[TDD_CustomLabel alloc] init];
@@ -265,7 +293,7 @@
     [_snLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(snTitleLabel);
         make.right.offset(0);
-        make.height.offset(50 * _scale);
+        make.height.offset(textViewH);
     }];
     
     UIView *snLineView = [UIView new];
@@ -275,11 +303,11 @@
         make.top.equalTo(snTitleLabel.mas_bottom);
         make.left.offset(0);
         make.centerX.equalTo(containerView);
-        make.height.offset(0.5);
+        make.height.offset(IS_IPad ? 1 : 0.5);
     }];
     
     //输入框
-    NSArray * titleArr = @[TDDLocalized.please_enter_email,TDDLocalized.hint_login_password];
+    NSArray * titleArr = @[TDDLocalized.hint_email,TDDLocalized.hint_login_password];
     UIView * lastView;
     
     for (int i = 0; i < titleArr.count; i++) {
@@ -289,9 +317,9 @@
         [containerView addSubview:itemView];
         
         [itemView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.top.equalTo(lastView ? lastView.mas_bottom : snLineView.mas_bottom).offset(12 * _scale);
+            make.top.equalTo(lastView ? lastView.mas_bottom : snLineView.mas_bottom).offset(textViewSpace);
             make.left.right.offset(0);
-            make.height.offset(50 * _scale);
+            make.height.offset(textViewH);
         }];
         
         TDD_CustomTextField * textField = [[TDD_CustomTextField alloc] init];
@@ -311,7 +339,7 @@
         
         [lineView mas_makeConstraints:^(MASConstraintMaker *make) {
             make.left.right.bottom.offset(0);
-            make.height.offset(0.5);
+            make.height.offset(IS_IPad ? 1 : 0.5);
         }];
         
         if (i == 0) {
@@ -325,7 +353,7 @@
             textField.keyboardType = UIKeyboardTypeEmailAddress;
             textField.clearButtonMode = UITextFieldViewModeWhileEditing;
             textField.placeholder = nil;
-            [textField addTarget:self action:@selector(valueChange) forControlEvents:UIControlEventEditingChanged];
+            [textField addTarget:self action:@selector(valueChange:) forControlEvents:UIControlEventEditingChanged];
             UIButton *clean = [textField valueForKey:@"_clearButton"]; //key是固定的
             [clean setImage:kImageNamed(@"LMS_login_delete") forState:UIControlStateNormal];
             [clean setImage:kImageNamed(@"LMS_login_delete") forState:UIControlStateHighlighted];
@@ -343,7 +371,7 @@
         } else {
         
             textField.secureTextEntry = YES;
-            
+            [textField addTarget:self action:@selector(valueChange:) forControlEvents:UIControlEventEditingChanged];
             // 显示密码按钮
             UIButton * eyesBtn = [[UIButton alloc] init];
             [eyesBtn setImage:[kImageNamed(@"LMS_login_hidden_password") tdd_imageByTintColor:[UIColor tdd_title]] forState:UIControlStateNormal];
@@ -369,21 +397,6 @@
         lastView = itemView;
     }
     
-    // 忘记密码
-    UIButton * forgottenBtn = [UIButton new];
-    NSString * password_str = [NSString stringWithFormat:@"%@",TDDLocalized.user_login_forgotten];
-    forgottenBtn.titleLabel.font = [[UIFont systemFontOfSize:midFontSize] tdd_adaptHD];
-    [forgottenBtn setTitle:password_str forState:UIControlStateNormal];
-    [forgottenBtn setTitleColor:[UIColor tdd_colorDiagTheme] forState:UIControlStateNormal];
-    [forgottenBtn addTarget:self action:@selector(forgottenBtnClick) forControlEvents:UIControlEventTouchUpInside];
-    self.forgottenBtn = forgottenBtn;
-    [containerView addSubview:forgottenBtn];
-    
-    [forgottenBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(containerView);
-        make.top.equalTo(lastView.mas_bottom).offset(20 * _scale);
-    }];
-    
     _tipsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [_tipsBtn addTarget:self action:@selector(tipClick) forControlEvents:UIControlEventTouchUpInside];
     [containerView addSubview:_tipsBtn];
@@ -394,7 +407,7 @@
     _countTipLabel = [TDD_CustomLabel new];
     _countTipLabel.textColor = [UIColor tdd_color666666];
     _countTipLabel.text = TDDLocalized.operation_guide;
-    _countTipLabel.font = [[UIFont systemFontOfSize:14 weight:UIFontWeightRegular] tdd_adaptHD];
+    _countTipLabel.font = [[UIFont systemFontOfSize:IS_IPad ? 16 : 14 weight:UIFontWeightRegular] tdd_adaptHD];
     _countTipLabel.numberOfLines = 0;
     [_tipsBtn addSubview:_countTipLabel];
     
@@ -412,7 +425,7 @@
     }];
     
     [_tipsBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(_passwordTextField.mas_bottom);
+        make.top.equalTo(_passwordItemView.mas_bottom);
         make.centerX.equalTo(self);
     }];
     
@@ -431,11 +444,64 @@
         make.left.right.equalTo(containerView);
     }];
     
+    // 忘记密码
+    UIButton * forgottenBtn = [UIButton new];
+    NSString * password_str = [NSString stringWithFormat:@"%@",TDDLocalized.login_forgotten];
+    forgottenBtn.titleLabel.font = [[UIFont systemFontOfSize:midFontSize] tdd_adaptHD];
+    [forgottenBtn setTitle:password_str forState:UIControlStateNormal];
+    [forgottenBtn setTitleColor:[UIColor tdd_colorDiagTheme] forState:UIControlStateNormal];
+    [forgottenBtn addTarget:self action:@selector(forgottenBtnClick) forControlEvents:UIControlEventTouchUpInside];
+    forgottenBtn.titleLabel.numberOfLines = 0;
+    if (IS_IPad) {
+        forgottenBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+    }
+
+    self.forgottenBtn = forgottenBtn;
+    [containerView addSubview:forgottenBtn];
+    
+    [forgottenBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        if (IS_IPad) {
+            make.right.equalTo(containerView);
+            make.width.mas_equalTo(284 * _scale);
+        }else {
+            make.right.equalTo(containerView);
+            make.left.greaterThanOrEqualTo(containerView.mas_centerX).offset(6 * _scale);
+        }
+
+        make.top.equalTo(lastView.mas_bottom).offset(18 * _scale);
+    }];
+    
+    // 记住密码
+    UIButton * remeberBtn = [UIButton new];
+    UIImage *normalImg = [UIImage tdd_imageCheckboxRoundNormal];
+    normalImg = [normalImg td_scaledTo:CGSizeMake(14, 14) opaque:false];
+    UIImage *selectImg = [UIImage tdd_imageCheckboxRoundSelect];
+    selectImg = [selectImg  td_scaledTo:CGSizeMake(14, 14) opaque:false];
+    remeberBtn.titleLabel.font = [[UIFont systemFontOfSize:midFontSize] tdd_adaptHD];
+    [remeberBtn setImage:normalImg forState:UIControlStateNormal];
+    [remeberBtn setImage:selectImg forState:UIControlStateSelected];
+    [remeberBtn setTitle:TDDLocalized.login_remember forState:UIControlStateNormal];
+    [remeberBtn setTitleColor:[UIColor tdd_title] forState:UIControlStateNormal];
+    [remeberBtn setTitleEdgeInsets:UIEdgeInsetsMake(0, -remeberBtn.imageView.tdd_width + 4, 0, remeberBtn.imageView.tdd_width - 4)];
+    [remeberBtn setImageEdgeInsets:UIEdgeInsetsMake(0, remeberBtn.titleLabel.tdd_width - 4, 0, -remeberBtn.titleLabel.tdd_width + 4)];
+    [remeberBtn addTarget:self action:@selector(remeberBtnClick:) forControlEvents:UIControlEventTouchUpInside];
+    remeberBtn.titleLabel.numberOfLines = 0;
+    self.remeberBtn = remeberBtn;
+    [containerView addSubview:remeberBtn];
+    [remeberBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(containerView);
+        make.right.lessThanOrEqualTo(containerView.mas_centerX).offset(-6 * _scale);
+        make.centerY.equalTo(forgottenBtn);
+    }];
+    
     // 注册
     UIButton * createAccountBtn = [UIButton new];
     NSString *accountStr = TDDLocalized.no_account;
     NSString *registerStr = TDDLocalized.click_register;
-    
+    if (IS_IPad) {
+        createAccountBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentLeft;
+    }
+    createAccountBtn.titleLabel.numberOfLines = 0;
     NSString * createAccountStr = [NSString stringWithFormat:@"%@ %@",accountStr,registerStr];
     createAccountBtn.titleLabel.font = [[UIFont systemFontOfSize:midFontSize] tdd_adaptHD];
     [createAccountBtn setTitleColor:[UIColor tdd_colorDiagTheme] forState:UIControlStateNormal];
@@ -448,8 +514,15 @@
     [self.contentView addSubview:createAccountBtn];
     
     [createAccountBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.contentView);
-        make.top.equalTo(forgottenBtn.mas_bottom);
+        if (IS_IPad) {
+            make.left.equalTo(containerView);
+            make.centerY.equalTo(forgottenBtn);
+            make.width.mas_equalTo(224 * _scale);
+        }else {
+            make.centerX.equalTo(containerView);
+            make.top.equalTo(forgottenBtn.mas_bottom);
+        }
+
     }];
     
     [containerView mas_updateConstraints:^(MASConstraintMaker *make) {
@@ -463,48 +536,92 @@
     webSpecLabel.textAlignment = NSTextAlignmentLeft;
     
     self.webSpecLabel = webSpecLabel;
-    [self.contentView addSubview:webSpecLabel];
-    [webSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.contentView);
-        //make.bottom.equalTo(self.contentView.mas_bottom).offset(IS_iPhoneX ? -30 * H_Height : -10 * H_Height);
-    }];
     
     TDD_CustomLabel * emailSpecLabel = [TDD_CustomLabel new];
     emailSpecLabel.font = [[UIFont systemFontOfSize:smallFontSize] tdd_adaptHD];
     emailSpecLabel.textColor = [UIColor tdd_color666666];
     emailSpecLabel.text = [NSString stringWithFormat:@"%@: support@topdon.us", TDDLocalized.tech_support];
     self.emailSpecLabel = emailSpecLabel;
-    [self.contentView addSubview:emailSpecLabel];
-    [emailSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.contentView);
-        make.bottom.equalTo(webSpecLabel.mas_top).offset(-4 * _scale);
-    }];
     
     TDD_CustomLabel * techSpecLabel = [TDD_CustomLabel new];
     techSpecLabel.font = [[UIFont systemFontOfSize:smallFontSize] tdd_adaptHD];
     techSpecLabel.textColor = [UIColor tdd_color666666];
     techSpecLabel.text = [NSString stringWithFormat:@"%@: (+1) 833-629-4832", TDDLocalized.contact_number];
     self.techSpecLabel = techSpecLabel;
-    [self.contentView addSubview:techSpecLabel];
-    [techSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.contentView);
-        make.top.equalTo(self.passwordItemView.mas_bottom).offset((IS_IPad ? 56 : 94) * _scale);
-        make.bottom.equalTo(emailSpecLabel.mas_top).offset(-4 * _scale);
-    }];
     
-    [_contentView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.top.right.bottom.equalTo(self);
-        make.bottom.equalTo(webSpecLabel.mas_bottom).offset(IS_iPhoneX ? 30 * H_Height : 10 * H_Height);
-        make.width.mas_equalTo(IphoneWidth);
-    }];
+    if (IS_IPad) {
+        _phoneAndEmailView = [UIView new];
+        [self.contentView addSubview:webSpecLabel];
+        [_phoneAndEmailView addSubview:emailSpecLabel];
+        [_phoneAndEmailView addSubview:techSpecLabel];
+        [self.contentView addSubview:_phoneAndEmailView];
+        techSpecLabel.textAlignment = NSTextAlignmentRight;
+        emailSpecLabel.textAlignment = NSTextAlignmentLeft;
+        
+        [_phoneAndEmailView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            make.top.equalTo(self.passwordItemView.mas_bottom).offset(92 * _scale);
+            make.bottom.equalTo(webSpecLabel.mas_top).offset(-5 * _scale);
+        }];
+
+        [techSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.equalTo(self.phoneAndEmailView);
+            make.top.bottom.equalTo(self.phoneAndEmailView);
+        }];
+        
+        [emailSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.right.equalTo(self.phoneAndEmailView);
+            make.centerY.equalTo(techSpecLabel);
+            make.left.equalTo(techSpecLabel.mas_right).offset(60 * _scale);
+        }];
+        
+        [webSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+        }];
+        
+        [_contentView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.top.right.bottom.equalTo(self);
+            make.bottom.equalTo(webSpecLabel.mas_bottom).offset(24 * _scale);
+            make.width.mas_equalTo(IphoneWidth);
+        }];
+        
+    }else {
+        [self.contentView addSubview:webSpecLabel];
+        [self.contentView addSubview:emailSpecLabel];
+        [self.contentView addSubview:techSpecLabel];
+        
+        [techSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            make.top.equalTo(self.passwordItemView.mas_bottom).offset((IS_IPad ? 56 : 94) * _scale);
+            make.bottom.equalTo(emailSpecLabel.mas_top).offset(-5 * _scale);
+        }];
+        
+        [emailSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            make.bottom.equalTo(webSpecLabel.mas_top).offset(-5 * _scale);
+        }];
+        
+        [webSpecLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            //make.bottom.equalTo(self.contentView.mas_bottom).offset(IS_iPhoneX ? -30 * H_Height : -10 * H_Height);
+        }];
+        
+        [_contentView mas_makeConstraints:^(MASConstraintMaker *make) {
+            make.left.top.right.bottom.equalTo(self);
+            make.bottom.equalTo(webSpecLabel.mas_bottom).offset(IS_iPhoneX ? 30 * _scale : 10 * _scale);
+            make.width.mas_equalTo(IphoneWidth);
+        }];
+    }
+
 }
 
 - (NSAttributedString *)webAttStr:(NSInteger)i {
     //添加点击事件
+    CGFloat smallFontSize = IS_IPad ? 16 : 12;
     NSString * webValue = _webArr[MIN(i, _webArr.count-1)];
     NSString * webText = [NSString stringWithFormat:@"%@: %@", TDDLocalized.web,webValue];
     NSMutableAttributedString *attStr = [NSMutableAttributedString mutableAttributedStringWithLTRString: webText];
-    attStr.yy_font = [[UIFont systemFontOfSize:12] tdd_adaptHD];
+    attStr.yy_font = [[UIFont systemFontOfSize:smallFontSize] tdd_adaptHD];
     attStr.yy_color = [UIColor tdd_color666666];
     NSRange range = [webText rangeOfString:webValue];
     [attStr yy_setUnderlineStyle:NSUnderlineStyleSingle range:range];
@@ -513,7 +630,7 @@
     
     //添加点击事件
     YYTextHighlight *highlight = [YYTextHighlight new];
-    [highlight setFont:[[UIFont systemFontOfSize:12] tdd_adaptHD]];
+    [highlight setFont:[[UIFont systemFontOfSize:smallFontSize] tdd_adaptHD]];
     [attStr yy_setTextHighlight:highlight range:range];
     
     highlight.tapAction = ^(UIView *containerView, NSAttributedString *text, NSRange range, CGRect rect) {
@@ -552,7 +669,14 @@
     [self changeSubUnlockType:_unlockSubTypeSelIndex];
     
     //这个地方使用连接的SN
-    _snLabel.text = [TDD_EADSessionController sharedController].SN;
+    if (self.fcaModel.uType == SST_FUNC_DEMO_AUTH) {
+        NSString *snStr = [NSString tdd_isEmpty:[TDD_EADSessionController sharedController].SN] ? [TDD_DiagnosisTools selectedVCISerialNum] : [TDD_EADSessionController sharedController].SN;
+        snStr = [NSString tdd_isEmpty:snStr] ? demoDefaultSN  : snStr;
+        self.snLabel.text = snStr;
+    }else {
+        _snLabel.text = [TDD_EADSessionController sharedController].SN;
+    }
+
     
 }
 
@@ -561,6 +685,9 @@
     NSString *passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthPassword];
     if ([NSString tdd_isEmpty:passwordStr]) {
         passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getSaveAuthPassword];
+    }
+    if ([NSString tdd_isEmpty:passwordStr]) {
+        passwordStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
     }
     _accountTextField.text = accountStr;
     if ([NSString tdd_isEmpty:_accountTextField.text]) {
@@ -574,7 +701,7 @@
         NSString *str = TDDLocalized.ple_input_autoauth_email_hint;
         _accountTipsLabel.text = str;
     }else {
-        NSString *str = TDDLocalized.please_enter_email;
+        NSString *str = TDDLocalized.hint_email;
         _accountTipsLabel.text = str;
     }
     
@@ -598,6 +725,8 @@
         //FCA TopDon 解锁时 隐藏注册登录按钮
         [self hideRegisterAndForget:YES];
     }else {
+        NSString *entryPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+        self.remeberBtn.selected = [TDD_ArtiGlobalModel sharedArtiGlobalModel].isRemeberAutoAuthPassword = ![NSString tdd_isEmpty:entryPassword];
         [self hideRegisterAndForget:NO];
     }
     //设置联系方式
@@ -606,19 +735,20 @@
     }else {
         [self setConnect:[TDD_DiagnosisTools isAutoAuthNa]? 0 : 1];
     }
-    CGFloat techTopSpace;
     switch (_fcaModel.uType) {
         case SST_FUNC_FCA_AUTH:
         case SST_FUNC_NISSAN_AUTH:
         {
             _otherUnlockBtn.hidden = true;
             _switchTypeView.hidden = false;
+            UIImageView *fcaLogoImage = kImageNamed(@"FCA_Logo");
+            UIImageView *fcaTDLogoImage = [UIImage tdd_imageDiagGateWayFCATopDonLogo];
+            UIImageView *nissanLogoImgae = [UIImage tdd_imageDiagGateWayNissanLogo];
+
             if (_fcaModel.unlockType == 0) {
-                [_logoImageView setImage: kImageNamed(@"FCA_Logo")];
-                techTopSpace = 142;
+                [_logoImageView setImage: fcaLogoImage];
             }else {
-                [_logoImageView setImage:(_fcaModel.uType == SST_FUNC_FCA_AUTH) ? [UIImage tdd_imageDiagGateWayFCATopDonLogo] : [UIImage tdd_imageDiagGateWayNissanLogo]];
-                techTopSpace = 92;
+                [_logoImageView setImage:(_fcaModel.uType == SST_FUNC_FCA_AUTH) ? fcaTDLogoImage : nissanLogoImgae];
             }
             
             if (_fcaModel.uType == SST_FUNC_NISSAN_AUTH) {
@@ -633,7 +763,7 @@
             
             _tipsBtn.hidden = true;
             [_logoImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.size.mas_equalTo((_fcaModel.unlockType == 0) ? _fcaLogoSize :_renaultLogoSize);
+                //make.size.mas_equalTo((_fcaModel.unlockType == 0) ? _fcaLogoSize :_renaultLogoSize);
                 make.top.equalTo(self.contentView).offset(98 * _scale);
             }];
         }
@@ -642,13 +772,12 @@
         {
             _otherUnlockBtn.hidden = true;
             _switchTypeView.hidden = true;
-            UIImage *renualtImage = IS_IPad ? kImageNamed(@"FCA_Logo_renualt_hd") : [UIImage tdd_imageDiagGateWayRenualtLogo];
+            UIImage *renualtImage = [UIImage tdd_imageDiagGateWayRenualtLogo];
             [_logoImageView setImage:renualtImage];
-            techTopSpace = 128;
             [self setSubUnlockTypeDefault:0];
             
             [_logoImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.size.mas_equalTo(_renaultLogoSize);
+                //make.size.mas_equalTo(_renaultLogoSize);
                 make.top.equalTo(self.contentView).offset(_switchTypeView.hidden? 55 * _scale : 98 * _scale);
             }];
             
@@ -666,14 +795,11 @@
             _otherUnlockBtn.hidden = false;
             _switchTypeView.hidden = true;
             [_logoImageView setImage:[UIImage tdd_imageDiagGateWayVWSFDLogo]];
-            techTopSpace = 128;
             [self setSubUnlockTypeDefault:0];
-            
-            [_otherUnlockBtn setTitle:TDDLocalized.third_party_processing forState:UIControlStateNormal];
             
             _tipsBtn.hidden = true;
             [_logoImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.size.mas_equalTo(_fcaLogoSize);
+                //make.size.mas_equalTo(_fcaLogoSize);
                 make.top.equalTo(self.contentView).offset(58 * _scale);
             }];
             
@@ -684,12 +810,11 @@
             _otherUnlockBtn.hidden = true;
             _switchTypeView.hidden = true;
             [_logoImageView setImage:[UIImage tdd_imageDiagGateWayDEMOLogo]];
-            techTopSpace = 128;
             [self setSubUnlockTypeDefault:0];
             
             _tipsBtn.hidden = true;
             [_logoImageView mas_updateConstraints:^(MASConstraintMaker *make) {
-                make.size.mas_equalTo(_fcaLogoSize);
+                //make.size.mas_equalTo(_fcaLogoSize);
                 make.top.equalTo(self.contentView).offset(55 * _scale);
             }];
             break;
@@ -697,22 +822,7 @@
         default:
             break;
     }
-    techTopSpace = (IS_iPhoneX ? techTopSpace : 22) * _scale;
-    [_techSpecLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.centerX.equalTo(self.contentView);
-        if (IS_IPad) {
-            make.top.equalTo(self.tipsBtn.hidden ? self.tipsBtn.mas_bottom : self.createAccountBtn.mas_bottom).offset(20 * _scale);
-        }else {
-            if (IS_iPhoneX) {
-                make.top.equalTo(self.passwordItemView.mas_bottom).offset(techTopSpace);
-            }else {
-                make.top.equalTo(self.tipsBtn.hidden ? (self.createAccountBtn.hidden ? self.passwordItemView.mas_bottom : self.createAccountBtn.mas_bottom) : self.tipsBtn.mas_bottom).offset(techTopSpace);
-            }
-            
-        }
-        
-        make.bottom.equalTo(_emailSpecLabel.mas_top).offset(-4 * _scale);
-    }];
+
 }
 
 - (void)setSelectUnlockTypeViewHide:(BOOL)isHide {
@@ -730,8 +840,42 @@
 
 /// 隐藏注册忘记密码按钮
 - (void)hideRegisterAndForget:(BOOL )hide {
-    self.forgottenBtn.hidden = self.createAccountBtn.hidden = hide;
-    
+    self.forgottenBtn.hidden = self.createAccountBtn.hidden = self.remeberBtn.hidden = hide;
+    CGFloat techTopSpace;
+    if (_fcaModel.uType == SST_FUNC_FCA_AUTH ||
+        _fcaModel.uType == SST_FUNC_NISSAN_AUTH) {
+        if (_fcaModel.unlockType == 0) {
+            techTopSpace = 142;
+        }else {
+            techTopSpace = 92;
+        }
+    }else {
+        techTopSpace = 128;
+    }
+
+    techTopSpace = (IS_iPhoneX ? techTopSpace : 22) * _scale;
+    if (IS_IPad) {
+        [_phoneAndEmailView mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            if (self.tipsBtn.hidden) {
+                make.top.equalTo(self.createAccountBtn.hidden ? self.passwordItemView.mas_bottom : self.createAccountBtn.mas_bottom).offset(self.createAccountBtn.hidden ? 40 * _scale : 24 * _scale);
+            }else {
+                make.top.equalTo(self.tipsBtn.mas_bottom).offset(24 * _scale);
+            }
+            make.bottom.equalTo(self.webSpecLabel.mas_top).offset(-5 * _scale);
+        }];
+    }else {
+        [_techSpecLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.centerX.equalTo(self.contentView);
+            if (IS_iPhoneX) {
+                make.top.equalTo(self.passwordItemView.mas_bottom).offset(techTopSpace);
+            }else {
+                make.top.equalTo(self.tipsBtn.hidden ? (self.createAccountBtn.hidden ? self.passwordItemView.mas_bottom : self.createAccountBtn.mas_bottom) : self.tipsBtn.mas_bottom).offset(techTopSpace);
+            }
+            make.bottom.equalTo(_emailSpecLabel.mas_top).offset(-5 * _scale);
+        }];
+    }
+
 }
 
 #pragma mark - 解锁方式
@@ -764,7 +908,19 @@
     if (_fcaModel.uType == SST_FUNC_FCA_AUTH) {
         _unlockTypeArrowIcon.image = kImageNamed(@"auth_input_drop");
     }
-
+    if (_fcaModel.unlockType == 0) {
+        if (!_naEncryptionPassword) {
+            _naEncryptionPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+        }
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = ![NSString tdd_isEmpty:_naEncryptionPassword];
+    }else if (_fcaModel.unlockType == 2) {
+        if (!_euEncryptionPassword) {
+            _euEncryptionPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+        }
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = ![NSString tdd_isEmpty:_euEncryptionPassword];
+    }
+    NSString *entryPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+    self.remeberBtn.selected = [TDD_ArtiGlobalModel sharedArtiGlobalModel].isRemeberAutoAuthPassword = ![NSString tdd_isEmpty:entryPassword];
     [self hideRegisterAndForget:_fcaModel.unlockType == 1];
 }
 
@@ -797,22 +953,31 @@
 
 #pragma mark 注册按钮点击
 - (void)createAccountBtnClick {
-    if (_unlockSubTypeSelIndex >= self.createUrlArr.count){
+    NSInteger area = 0;
+    area = (_fcaModel.unlockType == 0) ? 0 : 1;
+    if (area >= self.createUrlArr.count){
         return;
     }
-    NSURL *url = [NSURL URLWithString:[self.createUrlArr[_unlockSubTypeSelIndex] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
+    NSURL *url = [NSURL URLWithString:[self.createUrlArr[area] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
     
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
 }
 
 #pragma mark 忘记密码点击
 - (void)forgottenBtnClick {
-    if (_unlockSubTypeSelIndex >= self.forgetUrlArr.count){
+    NSInteger area = 0;
+    area = (_fcaModel.unlockType == 0) ? 0 : 1;
+    if (area >= self.createUrlArr.count){
         return;
     }
-    NSURL *url = [NSURL URLWithString:[self.forgetUrlArr[_unlockSubTypeSelIndex] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
+    NSURL *url = [NSURL URLWithString:[self.forgetUrlArr[area] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
     
     [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
+}
+
+- (void)remeberBtnClick:(UIButton *)sender {
+    sender.selected = !sender.selected;
+    [TDD_ArtiGlobalModel sharedArtiGlobalModel].isRemeberAutoAuthPassword = sender.selected;
 }
 
 #pragma mark 观看视频
@@ -827,6 +992,7 @@
     if (sender.tag == _selectTapBtnTag) {
         return;
     }
+
     TDD_ArtiUnlockTypeSelectView *view = [self viewWithTag:400];
     view.hidden = true;
     _unlockTypeArrowIcon.image = kImageNamed(@"auth_input_drop");
@@ -845,6 +1011,19 @@
     
     [btn setBackgroundColor:[UIColor cardBg]];
     [btn setTitleColor:[UIColor tdd_subTitle] forState:UIControlStateNormal];
+    if (_fcaModel.unlockType == 0) {
+        if (!_naEncryptionPassword) {
+            _naEncryptionPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+        }
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = ![NSString tdd_isEmpty:_naEncryptionPassword];
+    }else if (_fcaModel.unlockType == 2) {
+        if (!_euEncryptionPassword) {
+            _euEncryptionPassword = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAutoAuthPassword];
+        }
+
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = ![NSString tdd_isEmpty:_euEncryptionPassword];
+    }
+    [self.switchTypeView bringSubviewToFront:sender];
 
     [self updateUType];
     
@@ -857,12 +1036,17 @@
 }
 #pragma mark UITextFieldDelegate
 
-- (void)valueChange {
-    if ([NSString tdd_isEmpty:_accountTextField.text]) {
-        _accountTipsLabel.hidden = NO;
+- (void)valueChange:(UITextField *)sender {
+    if (sender == _passwordTextField) {
+        [self changeEncryptionPWD];
     }else {
-        _accountTipsLabel.hidden = YES;
+        if ([NSString tdd_isEmpty:_accountTextField.text]) {
+            _accountTipsLabel.hidden = NO;
+        }else {
+            _accountTipsLabel.hidden = YES;
+        }
     }
+
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
@@ -882,7 +1066,9 @@
     } else if (textField.tag == 101 && toBeString.length > 30){
         
         textField.text = [toBeString substringToIndex:30];
-            
+        if (textField == _passwordTextField) {
+            [self changeEncryptionPWD];
+        }else
         return NO;
     }
 
@@ -933,6 +1119,7 @@
     }
     if (textField == _passwordTextField) {
         [[TDD_ArtiGlobalModel sharedArtiGlobalModel].authPasswordDict setValue:@"" forKey:typeStr];
+        [self changeEncryptionPWD];
     }
     if ([NSString tdd_isEmpty:_accountTextField.text]) {
         _accountTipsLabel.hidden = NO;
@@ -940,6 +1127,20 @@
         _accountTipsLabel.hidden = YES;
     }
     return YES;
+}
+
+- (void)changeEncryptionPWD {
+    if (_fcaModel.unlockType == 0 && ![NSString tdd_isEmpty:_naEncryptionPassword]) {
+        //密码有密文时修改马上清空
+        _naEncryptionPassword = @"";
+        _passwordTextField.text = @"";
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = false;
+    }else if (_fcaModel.unlockType == 2 &&  ![NSString tdd_isEmpty:_euEncryptionPassword]){
+        //密码有密文时修改马上清空
+        _euEncryptionPassword = @"";
+        _passwordTextField.text = @"";
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].isEncryptionPWD = false;
+    }
 }
 
 #pragma mark lazy
@@ -957,7 +1158,7 @@
         _switchTypeView = [UIView new];
         _switchTypeView.backgroundColor = [UIColor cardBg];
         _switchTypeView.hidden = YES;
-        [_switchTypeView tdd_addCornerRadius:5];
+        [_switchTypeView tdd_addCornerRadius:IS_IPad ? 8 : 5];
     }
     return _switchTypeView;
 }
@@ -969,9 +1170,9 @@
         _naAreaBtn.backgroundColor = [UIColor tdd_colorDiagTheme];
         [_naAreaBtn setTitle:TDDLocalized.region_north_american forState:UIControlStateNormal];
         [_naAreaBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-        _naAreaBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
+        _naAreaBtn.titleLabel.font = [UIFont systemFontOfSize:IS_IPad ? 16 : 14 weight:UIFontWeightRegular];
         [_naAreaBtn addTarget:self action:@selector(switchArea:) forControlEvents:UIControlEventTouchUpInside];
-        [_naAreaBtn tdd_addCornerRadius:5];
+        [_naAreaBtn tdd_addCornerRadius:IS_IPad ? 6 : 5];
     }
     return _naAreaBtn;
 }
@@ -983,24 +1184,25 @@
         _otherAreaBtn.backgroundColor = [UIColor cardBg];
         [_otherAreaBtn setTitle:TDDLocalized.other_regions forState:UIControlStateNormal];
         [_otherAreaBtn setTitleColor:[UIColor tdd_subTitle] forState:UIControlStateNormal];
-        _otherAreaBtn.titleLabel.font = [UIFont systemFontOfSize:14 weight:UIFontWeightRegular];
+        _otherAreaBtn.titleLabel.font = [UIFont systemFontOfSize:IS_IPad ? 16 : 14 weight:UIFontWeightRegular];
         [_otherAreaBtn addTarget:self action:@selector(switchArea:) forControlEvents:UIControlEventTouchUpInside];
-        [_otherAreaBtn tdd_addCornerRadius:5];
+        [_otherAreaBtn tdd_addCornerRadius:IS_IPad ? 6 : 5];
     }
     return _otherAreaBtn;
 }
 
 - (UIButton *)otherUnlockBtn {
     if (!_otherUnlockBtn) {
-        UIImage *backgroundImage = [UIImage tdd_imageDiagGateWaySwitchBG];
-        UIEdgeInsets capInsets = UIEdgeInsetsMake(10, 10, 10, 10);
-        UIImage *resizableImage = [backgroundImage resizableImageWithCapInsets:capInsets];
         _otherUnlockBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_otherUnlockBtn setBackgroundImage:resizableImage forState:UIControlStateNormal];
-        [_otherUnlockBtn setTitle:TDDLocalized.third_party_processing forState:UIControlStateNormal];
+        [_otherUnlockBtn setBackgroundColor:[UIColor tdd_colorDiagTheme]];
+        [_otherUnlockBtn.layer setCornerRadius:IS_IPad ? 23 * _scale : 14 * _scale];
+        [_otherUnlockBtn.layer setMasksToBounds:YES];
+        [_otherUnlockBtn setTitle:[NSString stringWithFormat:@"%@ ",TDDLocalized.third_party_processing] forState:UIControlStateNormal];
         [_otherUnlockBtn setTitleColor:[UIColor tdd_colorFFFFFF] forState:UIControlStateNormal];
-        _otherUnlockBtn.titleLabel.font = [UIFont systemFontOfSize:12 weight:UIFontWeightRegular];
-        [_otherUnlockBtn setContentEdgeInsets:UIEdgeInsetsMake(0, 8, 0, 8)];
+        _otherUnlockBtn.titleLabel.font = [UIFont systemFontOfSize:IS_IPad ? 16 : 12 weight:UIFontWeightRegular];
+        [_otherUnlockBtn setContentEdgeInsets:UIEdgeInsetsMake(0, 30, 0, 20)];
+        [_otherUnlockBtn setImage:kImageNamed(@"diag_arrow_right_white") forState:UIControlStateNormal];
+        _otherUnlockBtn.semanticContentAttribute = UISemanticContentAttributeForceRightToLeft;
         [_otherUnlockBtn addTarget:self action:@selector(toOtherUnlockType) forControlEvents:UIControlEventTouchUpInside];
     }
     return _otherUnlockBtn;

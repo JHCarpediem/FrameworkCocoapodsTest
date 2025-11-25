@@ -26,7 +26,7 @@
     CGFloat heightSpace = (IS_IPad ? 60 : 40) * _scale;
     CGFloat fontSize = (IS_IPad ? 20 : 14);
     UIView *shadowView = [UIView new];
-    shadowView.layer.cornerRadius = 10 * H_Height;
+    shadowView.layer.cornerRadius = 5 * _scale;
     shadowView.layer.masksToBounds = YES;
     shadowView.backgroundColor = [UIColor tdd_alertBg];
     [self addSubview:shadowView];
@@ -35,8 +35,8 @@
     }];
     self.layer.shadowColor = [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.14].CGColor;
     self.layer.shadowOffset = CGSizeMake(0,2);
-    self.layer.shadowOpacity = 1 * H_Height;
-    self.layer.shadowRadius = 25 * H_Height;
+    self.layer.shadowOpacity = 1 * _scale;
+    self.layer.shadowRadius = 25 * _scale;
 
     
     NSArray *unlockTypeLabelTitleArr = @[TDDLocalized.topdon_account, TDDLocalized.europe_fca_official_site];

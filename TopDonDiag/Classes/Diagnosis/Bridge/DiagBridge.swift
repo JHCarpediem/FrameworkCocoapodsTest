@@ -8,12 +8,28 @@
 import Foundation
 import UIKit
 
-class DiagBridge: NSObject {
+@objc public class DiagBridge: NSObject {
     
-    static var HD_HeightValue: CGFloat = TDD_DiagBridge.hd_HeightValue()
+    /// 在横屏前初始化，防止值问题
+    @objc public static let shared = DiagBridge()
     
-    static var H_HeightValue: CGFloat = TDD_DiagBridge.h_HeightValue()
+    public static var HD_HeightValue: CGFloat = TDD_DiagBridge.hd_HeightValue()
     
-    static var iphoneWidthValue: CGFloat = TDD_DiagBridge.iphoneWidthValue()
+    public static var H_HeightValue: CGFloat = TDD_DiagBridge.h_HeightValue()
+    
+    public static var iphoneWidthValue: CGFloat = TDD_DiagBridge.iphoneWidthValue()
+    
+    /// 是否是刘海屏
+    @objc public let iPhoneX: Bool
+    
+    @objc public static var iPhoneX: Bool { shared.iPhoneX }
+    
+    @objc public static var liveLandscapeLeftCombineWidth: CGFloat { iPhoneX ? 244.0 : 202.5 }
+    
+    private override init() {
+        iPhoneX = TDD_DiagBridge.isIPhoneX()
+        super.init()
+    }
+    
 }
 

@@ -49,6 +49,7 @@ FOUNDATION_EXPORT const unsigned char TopdonDiagnosisVersionString[];
 #import "TDD_ArtiLiveDataChartSelectModel.h"
 #import "TDD_ArtiLiveDataMoreChartModel.h"
 #import "TDD_ArtiLiveDataRecordeModel.h"
+#import "TDD_ArtiLiveDataRecordeChangeModel.h"
 #import "TDD_ArtiLiveDataRecordeSaveModel.h"
 #import "TDD_ArtiLiveDataSelectModel.h"
 #import "TDD_ArtiLiveDataSetModel.h"
@@ -81,6 +82,7 @@ FOUNDATION_EXPORT const unsigned char TopdonDiagnosisVersionString[];
 #import "TDD_ArtiLiveDataSetView.h"
 #import "TDD_ArtiLiveDataSelectView.h"
 #import "TDD_ArtiLiveDataMoreChartView.h"
+#import "TDD_ArtiLiveDataHDMoreChartView.h"
 #import "TDD_ArtiReportGeneratorView.h"
 #import "TDD_ArtiReportPrintHeaderView.h"
 #import "TDD_ArtiReportInfoTableViewCell.h"
@@ -123,4 +125,5 @@ FOUNDATION_EXPORT const unsigned char TopdonDiagnosisVersionString[];
 #import "TDD_HChartModel.h"
 #import "UIInterface+HXRotation.h"
 #import "TDD_VXXScrollButton.h"
+#import "TDD_VXXScrollLabel.h"
 

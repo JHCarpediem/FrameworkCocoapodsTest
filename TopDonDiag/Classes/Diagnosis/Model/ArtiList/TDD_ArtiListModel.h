@@ -35,8 +35,23 @@ typedef enum
     SCREEN_TYPE_LAST_ROW  = 1,    // 当前屏最后一行
 }eScreenRowType;
 
-@interface ArtiListItemModel : NSObject
+@protocol TDD_ArtiListModelDelegata <NSObject>
+/**********************************************************
+*    功  能：获取当前显示屏的更新项的下标集合
+*    参  数：无
+*    返回值：更新项的下标集合
+**********************************************************/
+- (NSArray *)GetUpdateItems;
 
+/**********************************************************
+*    功  能：获取某条数据是否需要更新
+*    参  数：无
+*    返回值：true 需要更新，false 不需要更新
+**********************************************************/
+- (BOOL)GetItemIsUpdateWithUIndex:(uint32_t)uIndex;
+@end
+
+@interface ArtiListItemModel : NSObject
 @property (nonatomic, strong) NSMutableArray * vctItems;
 
 @property (nonatomic, assign) BOOL isGroup; //是否以组的形式显示
@@ -52,6 +67,8 @@ typedef enum
 @end
 
 @interface TDD_ArtiListModel : TDD_ArtiModelBase
+
+@property (nonatomic, assign) __nullable id<TDD_ArtiListModelDelegata> delegate;
 
 @property (nonatomic, strong) NSArray * vctColWidth; //列表各列的宽度
 

@@ -68,7 +68,7 @@
         UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
         btn.frame = CGRectMake(0, 0, 40 * _scale, 40 * _scale);
         [btn addTarget:self action:@selector(selectButtonClick) forControlEvents:UIControlEventTouchUpInside];
-        [btn setImage:kImageNamed(@"test_result_cell_select") forState:UIControlStateNormal];
+        [btn setImage:[UIImage tdd_imageCheckboxSquareNormal] forState:UIControlStateNormal];
         [btn setImageEdgeInsets:UIEdgeInsetsMake(10 * _scale, 10 * _scale, 10 * _scale, 10 * _scale)];
         btn.hidden = YES;
         btn;
@@ -344,17 +344,17 @@
 {
     if (isSelect) {
         if (self.listViewType == ITEM_WITH_CHECKBOX_SINGLE){
-            [self.selectButton setImage:[UIImage tdd_imageSingleCheckDidSelect] forState:UIControlStateNormal];
+            [self.selectButton setImage:[UIImage tdd_imageCheckboxRoundSelect] forState:UIControlStateNormal];
         }else {
-            [self.selectButton setImage:[UIImage tdd_imageCheckDidSelect] forState:UIControlStateNormal];
+            [self.selectButton setImage:[UIImage tdd_imageCheckboxSquareSelected] forState:UIControlStateNormal];
         }
 
         
     }else {
         if (self.listViewType == ITEM_WITH_CHECKBOX_SINGLE){
-            [self.selectButton setImage:[UIImage tdd_imageSingleCheckUnSelect] forState:UIControlStateNormal];
+            [self.selectButton setImage:[UIImage tdd_imageCheckboxRoundNormal] forState:UIControlStateNormal];
         }else {
-            [self.selectButton setImage:kImageNamed(@"test_result_cell_select") forState:UIControlStateNormal];
+            [self.selectButton setImage:[UIImage tdd_imageCheckboxSquareNormal] forState:UIControlStateNormal];
         }
 
     }

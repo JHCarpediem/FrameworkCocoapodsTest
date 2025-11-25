@@ -21,6 +21,8 @@
     CRegAppProduct::Name(ArtiAppProductName);
     CRegAppProduct::Group(ArtiAppProductGroup);
     CRegAppProduct::IsSupported(ArtiAppProductIsSupported);
+    CRegAppProduct::HwProductModel(ArtiAppProductHwProductModel);
+    CRegAppProduct::CurVehSoftCode(ArtiAppProductCurVehSoftCode);
 }
 
 static uint32_t ArtiAppProductName() {
@@ -42,6 +44,26 @@ static bool ArtiAppProductIsSupported(const std::string& strClass, const std::st
     
 }
 
+static const std::string ArtiAppProductHwProductModel(uint32_t uType) {
+
+    return [TDD_CTools NSStringToCStr:[TDD_ArtiAppProductModel hwProductModel:uType]];
+    
+}
+
+/*-------------------------------------------------------------------------------------------------------
+功    能： 获取当前进车的软件编码
+
+参数说明： uVehType          保留，当前不起作用
+
+返 回 值： 例如，"AD900_CarSW_MAZDA"
+           如果App没有此接口，返回空串
+-------------------------------------------------------------------------------------------------------*/
+static const std::string ArtiAppProductCurVehSoftCode(uint32_t uVehType) {
+
+    
+    return [TDD_CTools NSStringToCStr:[TDD_ArtiAppProductModel curVehSoftCode:uVehType]];
+    
+}
 
 /*-----------------------------------------------------------------------------
 功    能： 获取当前app应用的产品名称
@@ -128,5 +150,18 @@ static bool ArtiAppProductIsSupported(const std::string& strClass, const std::st
     
     HLog(@"%@ - 获取当前 App 应用的功能 或 接口 不支持 - 未找到方法", [self class]);
     return false;
+}
+
++ (NSString *)hwProductModel:(uint32_t )uType {
+    NSString *hwProductModel = [TDD_ArtiGlobalModel getHwProductModel];
+    HLog(@"%@ - 获取当前 App 应用的功能 或 接口 是否支持 - uType:%d - hwProductModel:%@", [self class],uType,hwProductModel);
+    return hwProductModel;
+    
+}
+
++ (NSString *)curVehSoftCode:(uint32_t )uVehType {
+    NSString *softCode = [TDD_ArtiGlobalModel sharedArtiGlobalModel].softCode?:@"";
+    HLog(@"%@ - ArtiAppProductCurVehSoftCode - uVehType:%d - softCode:%@", [self class], uVehType, softCode);
+    return softCode;
 }
 @end

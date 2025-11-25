@@ -74,7 +74,7 @@
     
 
     _tipsLabel = [[TDD_CustomLabel alloc] init];
-    _tipsLabel.textColor = [UIColor tdd_colorDiagBottomTextColor];
+    _tipsLabel.textColor = [UIColor tdd_colorDiagBottomTipsTextColor];
     _tipsLabel.font = [[UIFont systemFontOfSize:14 weight:UIFontWeightBold] tdd_adaptHD];
 
     _tipsLabel.text = TDDLocalized.note;
@@ -87,7 +87,7 @@
     }];
     
     _contentLabel = [[TDD_CustomLabel alloc] init];
-    _contentLabel.textColor = [UIColor tdd_colorDiagBottomTextColor];
+    _contentLabel.textColor = [UIColor tdd_colorDiagBottomTipsTextColor];
     _contentLabel.font = [[UIFont systemFontOfSize:14 weight:UIFontWeightRegular] tdd_adaptHD];
     _contentLabel.numberOfLines = 0;
     [_scrollView addSubview:self.contentLabel];

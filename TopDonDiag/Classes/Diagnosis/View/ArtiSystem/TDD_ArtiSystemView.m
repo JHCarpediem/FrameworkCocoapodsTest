@@ -217,14 +217,11 @@
     if (self.systemModel.scanStatus == DF_SYS_SCAN_START || self.systemModel.clearStatus == DF_SYS_CLEAR_START) {
         return;
     }
-    //软件过期
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
-        [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
-        return;
-    }
+
     int row = (int)indexPath.row;
     
     if (row >= self.dataArr.count) {
+        HLog(@"%@ - 点击 cell 的index 超出数据源",[self class]);
         return;
     }
     
@@ -235,19 +232,33 @@
     if isKindOfTopVCI {
         if (itemModel.uResult >= DF_ENUM_DTCNUM) {
             self.systemModel.returnID = itemModel.uIndex + DF_ID_SYS_DTC_0;
-            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            NSMutableDictionary *dic = [TDD_DiagnosisTools commStatisticsEventDict];
             [dic setObject:[TDD_DiagnosisTools selectedVCISerialNum] forKey:@"SN"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand?:@"" forKey:@"Make"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel?:@"" forKey:@"Model"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carYear?:@"" forKey:@"Year"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].CarVIN?:@"" forKey:@"VIN"];
             [dic setObject:itemModel.strItem?:@"" forKey:@"System"];
             [TDD_Statistics event:Event_Cus_ReadCode attributes:dic];
         } else {
             self.systemModel.returnID = DF_ID_NOKEY;
         }
     } else {
-        self.systemModel.returnID = itemModel. uIndex;
+        //软件过期
+        if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
+            if (itemModel.uResult >= DF_ENUM_DTCNUM) {
+                //过期有码点击进入 popup
+                self.systemModel.returnID = itemModel.uIndex + DF_ID_SYS_DTC_0;
+            } else if (itemModel.uResult == 0){
+                //未扫描过
+                [TDD_DiagnosisTools showUnScanSoftExpiredAlert:nil];
+                return;
+            }else {
+                //扫描过但是无码
+                [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
+                return;
+            }
+
+        }else {
+            self.systemModel.returnID = itemModel.uIndex;
+        }
+        
     }
 
     HLog("systemModel返回值：%d", self.systemModel.returnID);
@@ -267,11 +278,6 @@
     if (self.systemModel.scanStatus == DF_SYS_SCAN_START || self.systemModel.clearStatus == DF_SYS_CLEAR_START) {
         return;
     }
-    //软件过期
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
-        [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
-        return;
-    }
     ArtiSystemItemModel * itemModel = cellView.systemItemModel;
     
     self.systemModel.selectItem = itemModel.uIndex;
@@ -279,19 +285,32 @@
     if isKindOfTopVCI {
         if (itemModel.uResult >= DF_ENUM_DTCNUM) {
             self.systemModel.returnID = itemModel.uIndex + DF_ID_SYS_DTC_0;
-            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            NSMutableDictionary *dic = [TDD_DiagnosisTools commStatisticsEventDict];
             [dic setObject:[TDD_DiagnosisTools selectedVCISerialNum] forKey:@"SN"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand?:@"" forKey:@"Make"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel?:@"" forKey:@"Model"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carYear?:@"" forKey:@"Year"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].CarVIN?:@"" forKey:@"VIN"];
             [dic setObject:itemModel.strItem?:@"" forKey:@"System"];
             [TDD_Statistics event:Event_Cus_ReadCode attributes:dic];
         } else {
             self.systemModel.returnID = DF_ID_NOKEY;
         }
     } else {
-        self.systemModel.returnID = itemModel.uIndex;
+        //软件过期
+        if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
+            if (itemModel.uResult >= DF_ENUM_DTCNUM) {
+                //过期有码点击进入 popup
+                self.systemModel.returnID = itemModel.uIndex + DF_ID_SYS_DTC_0;
+            } else if (itemModel.uResult == 0){
+                //未扫描过
+                [TDD_DiagnosisTools showUnScanSoftExpiredAlert:nil];
+                return;
+            }else {
+                //扫描过但是无码
+                [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
+                return;
+            }
+
+        }else {
+            self.systemModel.returnID = itemModel.uIndex;
+        }
     }
     HLog("systemModel返回值：%d", self.systemModel.returnID);
     

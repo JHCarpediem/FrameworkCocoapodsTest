@@ -65,6 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) NSInteger area;
 ///权益模型
 @property (nonatomic, strong) TDD_GatewayProductEquityModel *equityModel;
+@property (nonatomic, assign) BOOL isEncryptionPWD;
 @property (nonatomic, assign) BOOL lastDemoGatewaySuccess;
 + (void)requestFcaLoginWithType:(eSpecialShowType)type complete:(void(^)(BOOL isSuccess,NSInteger code))complete;// 登陆认证
 - (void)requestSGWRight:(nullable NSString *)accountStr complete:(nullable void(^)(id result))complete;//权益次数查询

@@ -9,10 +9,11 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonKeyDerivation.h>
 #import "TDGTMBase64.h"
+#import "TDCacheHelper.h"
 
-NSString *const Kkey = @"thanks,lenkor123";
-
-NSString *const Localkey = @"hkr123hkr123,^&*";
+//NSString *const Kkey = @"thanks,lenkor123";
+//
+//NSString *const Localkey = @"hkr123hkr123,^&*";
 size_t const kKeySize = kCCKeySizeAES256;
 @implementation TDHAESEncryption
 
@@ -30,6 +31,7 @@ size_t const kKeySize = kCCKeySizeAES256;
 */
 + (NSString *)td_AES128ParmEncryptWithContent:(NSString *)content
 {
+    NSString *Kkey = TDCacheHelper.cacheIdentifer;
     NSData *originData = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSData *encryData = [self td_AES128ParmEncryptWithContent:originData Key:Kkey iv:Kkey];
     NSString *base64string = [encryData base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
@@ -38,6 +40,7 @@ size_t const kKeySize = kCCKeySizeAES256;
 
 + (NSString *)td_AES128ParmDecryptWithContent:(NSString *)content
 {
+    NSString *Kkey = TDCacheHelper.cacheIdentifer;
     NSData *data = [[NSData alloc] initWithBase64EncodedString:content options:NSDataBase64DecodingIgnoreUnknownCharacters];
     NSData *resultData = [self td_AES128ParmDecryptWithContent:data Key:Kkey iv:Kkey];
     NSString *reusltString = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
@@ -46,10 +49,20 @@ size_t const kKeySize = kCCKeySizeAES256;
 
 + (NSString *)td_AESLocalEncryptionWithContent:(NSString *)content
 {
+    NSString *Localkey = TDCacheHelper.localCacheIdentifer;
     NSData *originData = [content dataUsingEncoding:NSUTF8StringEncoding];
     NSData *encryData = [self td_AES128ParmEncryptWithContent:originData Key:Localkey iv:Localkey];
     NSString *base64string = [encryData base64EncodedStringWithOptions:NSDataBase64EncodingEndLineWithLineFeed];
     return base64string;
+}
+
++ (NSString *)td_AESLocalDecryptionWithContent:(NSString *)content
+{
+    NSString *localIdentify = TDCacheHelper.localCacheIdentifer;
+    NSData *data = [[NSData alloc] initWithBase64EncodedString:content options:NSDataBase64DecodingIgnoreUnknownCharacters];
+    NSData *resultData = [self td_AES128ParmDecryptWithContent:data Key:localIdentify iv:localIdentify];
+    NSString *reusltString = [[NSString alloc] initWithData:resultData encoding:NSUTF8StringEncoding];
+    return reusltString;
 }
 
 + (NSData *)td_AES128ParmEncryptWithContent:(NSData *)content Key:(NSString *)key iv:(NSString *)iv

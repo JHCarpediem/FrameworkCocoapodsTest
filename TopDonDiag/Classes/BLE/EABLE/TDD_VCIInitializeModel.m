@@ -30,12 +30,13 @@ typedef enum
 @property (nonatomic, copy) NSString *fwVersion;
 ///蓝牙版本
 @property (nonatomic, copy) NSString *btVersion;
-///引脚电压数组(除开 4、5)
-@property (nonatomic, strong) NSMutableDictionary *voltaDict;
 ///是否支持MT7628
 @property (nonatomic, assign) BOOL isSupportMT7628;
+///引脚电压数组(除开 4、5)
+@property (nonatomic, strong) NSMutableDictionary *voltaDict;
 ///初始化状态
 @property (nonatomic, assign) eVCIInitializeStatus initStatus;
+@property (nonatomic, assign) NSInteger vciCompleteIndex;
 @property (nonatomic, assign) NSInteger failIndex;
 
 @property (nonatomic, assign) NSInteger reGetCount;
@@ -51,6 +52,7 @@ typedef enum
 @property (nonatomic, assign) NSInteger wifiFailIndex;
 @property (nonatomic, assign) NSInteger wifiReGetCount;
 @property (nonatomic, assign) BOOL isWIFITimeout;
+@property (nonatomic, assign) BOOL isVCIFinishGet;
 ///获取 VCI 信息定时器
 @property (nonatomic) dispatch_source_t reGetMessageTimer;
 ///获取 WIFI 信息定时器
@@ -70,12 +72,13 @@ typedef enum
         [self reset];
     }
     return self;
-
+    
 }
 
 ///重置
 - (void)reset {
     self.reGetCount = 0;
+    self.vciCompleteIndex = 0;
     self.vciSN = @"";
     self.deviceType = 0;
     self.fwVersion = @"";
@@ -108,65 +111,167 @@ typedef enum
 
 #pragma mark - VCI信息
 /// 初始化获取信息(sdtCommModel 的方法可能阻塞线程)
-- (void)getMessage {
-    _isVCITimeout = false;
+- (void)getMessage:(BOOL )shouldInitTimer {
+    if (shouldInitTimer) {
+        _isVCITimeout = false;
+        //VCI初始化超时
+        [self cancelTaskTimer:_vciInitTimer];
+        @kWeakObj(self);
+        [self scheduleTaskAfterDelay:60 timerStorage:_vciInitTimer type:VCI_INIT_TIMER_MESSAGE_TIMEOUT task:^{
+            @kStrongObj(self);
+            [self vciInitTimeOut];
+        }];
+        self.reGetCount = 0;
+        self.initStatus = VCI_INIT_ING;
+        self.vciCompleteIndex = 0;
+    }
+    [self cancelTaskTimer:self.reGetMessageTimer];
     
-    //VCI初始化超时
-    [self cancelTaskTimer:_vciInitTimer];
-    @kWeakObj(self);
-    [self scheduleTaskAfterDelay:60 timerStorage:_vciInitTimer type:VCI_INIT_TIMER_MESSAGE_TIMEOUT task:^{
-        @kStrongObj(self);
-        [self vciInitTimeOut];
-    }];
+    self.reGetCount ++;
     
-    [self cancelTaskTimer:_reGetMessageTimer];
-
-    self.reGetCount = 0;
-    self.initStatus = VCI_INIT_ING;
-
     //获取 VCISN
-    if (_isVCITimeout) return;
-    self.vciSN = [TDD_StdCommModel VciSn];
+    if (!(self.vciCompleteIndex & VCI_VALUE_ERROR_VCI_SN)) {
+        //VCISN 未获取完成
+        self.vciSN = [TDD_StdCommModel VciSn];
+    }
+    if ((self.failIndex & VCI_VALUE_ERROR_VCI_SN) && _reGetCount < 4) {
+        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+            [self getMessage:false];
+        }];
+        return;
+    }else {
+        //标记为 VCISN已完成
+        self.vciCompleteIndex |= VCI_VALUE_COMPLETE_VCI_SN;
+    }
     
     //获取 VCI 型号
-    if (_isVCITimeout) return;
-    self.deviceType = [TDD_StdCommModel FwDeviceType];
+    if (self.vciCompleteIndex & VCI_VALUE_ERROR_VCI_SN && !(self.vciCompleteIndex & VCI_VALUE_COMPLETE_DEVCIE_TYPE)) {
+        //VCI SN获取完成并且 VCI 型号未完成
+        self.deviceType = [TDD_StdCommModel FwDeviceType];
+    }
+    if ((self.failIndex & VCI_VALUE_ERROR_DEVCIE_TYPE) && _reGetCount < 4) {
+        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+            [self getMessage:false];
+        }];
+        return;
+    }else {
+        //标记为VCI 型号已完成
+        self.vciCompleteIndex |= VCI_VALUE_COMPLETE_DEVCIE_TYPE;
+    }
     
     //获取 VCI 版本
-    if (_isVCITimeout) return;
-    self.fwVersion = [TDD_StdCommModel FwVersion];
-    
-    //获取 VCI 蓝牙软件版本号
-    if (_isVCITimeout) return;
-    self.btVersion = [TDD_StdCommModel BtVersion];
+    if (self.vciCompleteIndex & VCI_VALUE_ERROR_DEVCIE_TYPE && !(self.vciCompleteIndex & VCI_VALUE_COMPLETE_FW_VERSION)) {
+        //VCI 型号获取完成并且 VCI 版本未完成
+        self.fwVersion = [TDD_StdCommModel FwVersion];
+    }
+    if ((self.failIndex & VCI_VALUE_ERROR_FW_VERSION) && _reGetCount < 4) {
+        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+            [self getMessage:false];
+        }];
+        return;
+    }else {
+        //标记为 VCI 版本已完成
+        self.vciCompleteIndex |= VCI_VALUE_COMPLETE_FW_VERSION;
+    }
     
     //获取 VCI 是否支持 MT7628
-    if (_isVCITimeout) return;
-    self.isSupportMT7628 = [TDD_StdCommModel MT7628IsSupported];
+    if (self.vciCompleteIndex & VCI_VALUE_ERROR_FW_VERSION && !(self.vciCompleteIndex & VCI_VALUE_COMPLETE_WIFI_SUPPORT)) {
+        //VCI 型号获取完成并且 VCI 版本未完成
+        self.isSupportMT7628 = [TDD_StdCommModel MT7628IsSupported];
+    }
+    if (_isSupportMT7628 == 0 && _reGetCount < 4) {
+        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+            [self getMessage:false];
+        }];
+        return;
+    }else {
+        self.reGetCount = 0;
+        self.vciCompleteIndex |= VCI_VALUE_COMPLETE_WIFI_SUPPORT;
+    }
     
     NSInteger boot =  [TDD_StdCommModel FwIsBoot];
-    //boot 模式不获取电压
+    //boot 模式不获取电压和蓝牙版本号
     if (boot == 0) {
         //获取 16 个引脚电压
-        if (_isVCITimeout) return;
-        self.voltaDict = @{}.mutableCopy;
-        for (int i = 1; i < 17; i++) {
-            if (i != 4 && i != 5) {
-                NSInteger volta = [TDD_StdCommModel readPinNum:i];
-                [self.voltaDict setValue:@(volta) forKey:[NSString stringWithFormat:@"%d",i]];
+        if (!(self.vciCompleteIndex & VCI_VALUE_COMPLETE_VOLTA)) {
+            //引脚电压未完成
+            self.voltaDict = @{}.mutableCopy;
+            for (int i = 1; i < 17; i++) {
+                if (i != 4 && i != 5) {
+                    NSInteger volta = [TDD_StdCommModel readPinNum:i];
+                    [self.voltaDict setValue:@(volta) forKey:[NSString stringWithFormat:@"%d",i]];
+                }
             }
+            //标记为引脚电压已完成
+            self.vciCompleteIndex |= VCI_VALUE_COMPLETE_VOLTA;
+        }
+
+        
+        //获取 VCI 蓝牙软件版本号
+        if (self.vciCompleteIndex & VCI_VALUE_COMPLETE_WIFI_SUPPORT && !(self.vciCompleteIndex & VCI_VALUE_COMPLETE_BT_VERSION)) {
+            //是否支持 Wi-Fi完成并且蓝牙版本未完成
+            self.btVersion = [TDD_StdCommModel BtVersion];
+        }
+        if ((self.failIndex & VCI_VALUE_ERROR_BT_VERSION) && _reGetCount < 4) {
+            [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+                [self getMessage:false];
+            }];
+            return;
+        }else {
+            //标记为蓝牙版本已完成
+            self.vciCompleteIndex |= VCI_VALUE_COMPLETE_BT_VERSION;
         }
     }
-
     
-    if (self.failIndex > 0) {
-        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
-            @kStrongObj(self);
+    self.initStatus = (self.failIndex > 0) ? VCI_INIT_FAIL : VCI_INIT_SUCCESS;
+    self.isVCIFinishGet = false;
+    
+}
+- (void)getMessage {
+    [self getMessage:true];
+
+}
+
+/// 重新获取 VCI信息
+- (void)reGetMessage {
+    @kWeakObj(self);
+    [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
+        @kStrongObj(self);
+        [self cancelTaskTimer:self.reGetMessageTimer];
+        HLog(@"VCI初始化 重试次数:%d - 失败类型:%d - SN: %@",self.reGetCount + 1, self.failIndex, _vciSN);
+        self.reGetCount ++;
+        if (self.failIndex & VCI_VALUE_ERROR_VCI_SN) {
+            self.vciSN = [TDD_StdCommModel VciSn];
+        }
+
+        if (self.failIndex & VCI_VALUE_ERROR_DEVCIE_TYPE) {
+            self.deviceType = [TDD_StdCommModel FwDeviceType];
+        }
+
+        if (self.failIndex & VCI_VALUE_ERROR_FW_VERSION) {
+            self.fwVersion = [TDD_StdCommModel FwVersion];
+        }
+        
+        if (_isSupportMT7628 == 0) {
+            self.isSupportMT7628 = [TDD_StdCommModel MT7628IsSupported];
+        }
+        
+
+        if (self.failIndex & VCI_VALUE_ERROR_BT_VERSION) {
+            self.btVersion = [TDD_StdCommModel BtVersion];
+        }
+        
+        
+        if (self.failIndex > 0 && self.reGetCount < 3) {
             [self reGetMessage];
-        }];
-    }else {
-        self.initStatus = VCI_INIT_SUCCESS;
-    }
+
+        }else {
+            self.initStatus = (self.failIndex > 0) ? VCI_INIT_FAIL : VCI_INIT_SUCCESS;
+            self.reGetCount = 0;
+            self.isVCIFinishGet = false;
+        }
+    }];
     
 }
 
@@ -179,42 +284,6 @@ typedef enum
         self.reGetCount = 0;
         [self cancelTaskTimer:self.vciInitTimer];
         [self cancelTaskTimer:self.reGetMessageTimer];
-    }
-}
-
-/// 重新获取 VCI信息
-- (void)reGetMessage {
-    [self cancelTaskTimer:self.reGetMessageTimer];
-    HLog(@"VCI初始化 重试次数:%d - 失败类型:%d - SN: %@",self.reGetCount + 1, self.failIndex, _vciSN);
-    self.reGetCount ++;
-    if (_isVCITimeout) return;
-    if (self.failIndex & VCI_VALUE_ERROR_VCI_SN) {
-        self.vciSN = [TDD_StdCommModel VciSn];
-    }
-    if (_isVCITimeout) return;
-    if (self.failIndex & VCI_VALUE_ERROR_DEVCIE_TYPE) {
-        self.deviceType = [TDD_StdCommModel FwDeviceType];
-    }
-    if (_isVCITimeout) return;
-    if (self.failIndex & VCI_VALUE_ERROR_FW_VERSION) {
-        self.fwVersion = [TDD_StdCommModel FwVersion];
-    }
-    if (_isVCITimeout) return;
-    if (self.failIndex & VCI_VALUE_ERROR_BT_VERSION) {
-        self.btVersion = [TDD_StdCommModel BtVersion];
-    }
-    
-    if (self.failIndex > 0 && self.reGetCount < 3) {
-        @kWeakObj(self);
-        [self scheduleTaskAfterDelay:1 timerStorage:_reGetMessageTimer type:VCI_INIT_TIMER_REGET_MESSAGE task:^{
-            @kStrongObj(self);
-            [self reGetMessage];
-        }];
-
-    }else {
-        self.initStatus = (self.failIndex > 0) ? VCI_INIT_FAIL : VCI_INIT_SUCCESS;
-        self.reGetCount = 0;
-        
     }
 }
 
@@ -279,7 +348,7 @@ typedef enum
             [self reGetWifiMessage];
         }];
     }else {
-        self.wifiInitStatus = WIFI_INIT_SUCCESS;
+        self.wifiInitStatus = WIFI_INIT_COMPLETE;
     }
     
 }
@@ -311,7 +380,7 @@ typedef enum
         }];
 
     }else {
-        self.wifiInitStatus = (self.wifiFailIndex > 0) ? WIFI_INIT_FAIL : WIFI_INIT_SUCCESS;
+        self.wifiInitStatus = (self.wifiFailIndex > 0) ? WIFI_INIT_FAIL : WIFI_INIT_COMPLETE;
     }
     
 }
@@ -423,6 +492,7 @@ typedef enum
         self.failIndex |= VCI_VALUE_ERROR_VCI_SN;
     }else {
         self.failIndex &= ~VCI_VALUE_ERROR_VCI_SN;
+        self.reGetCount = 0;
     }
 }
 
@@ -432,6 +502,7 @@ typedef enum
         self.failIndex |= VCI_VALUE_ERROR_DEVCIE_TYPE;
     }else {
         self.failIndex &= ~VCI_VALUE_ERROR_DEVCIE_TYPE;
+        self.reGetCount = 0;
     }
 }
 
@@ -441,15 +512,18 @@ typedef enum
         self.failIndex |= VCI_VALUE_ERROR_FW_VERSION;
     }else {
         self.failIndex &= ~VCI_VALUE_ERROR_FW_VERSION;
+        self.reGetCount = 0;
     }
 }
 
 - (void)setBtVersion:(NSString *)btVersion {
     _btVersion = btVersion;
+    _isVCIFinishGet = true;
     if ([NSString tdd_isEmpty:btVersion]) {
         self.failIndex |= VCI_VALUE_ERROR_BT_VERSION;
     }else {
         self.failIndex &= ~VCI_VALUE_ERROR_BT_VERSION;
+        self.reGetCount = 0;
     }
     
 }
@@ -471,14 +545,14 @@ typedef enum
         
         //VCI 成功或者失败都去获取 Wi-Fi 信息
         if (initStatus == VCI_INIT_SUCCESS || initStatus == VCI_INIT_FAIL) {
-            //支持MT7628获取Wi-Fi 信息并且不在 boot 模式，不支持直接返回失败
-            
+            //支持MT7628获取Wi-Fi 信息并且不在 boot 模式，不支持直接返回完成
             if (self.isSupportMT7628 && ([TDD_StdCommModel FwIsBoot] == 0)) {
+                _isWIFITimeout = false;
                 self.wifiInitStatus = WIFI_INIT_ING;
                 [self getMT7628IsReady];
             }else {
                 HLog(@"isSupportMT7628 为 false 不进行wifi初始化 - SN: %@",self.vciSN);
-                self.wifiInitStatus = WIFI_INIT_FAIL;
+                self.wifiInitStatus = WIFI_INIT_COMPLETE;
             }
         }
     }
@@ -546,7 +620,7 @@ typedef enum
         }
     }
     
-    if (self.mt7628IsReady == 0) {
+    if (self.mt7628IsReady == 0 && _isWIFITimeout) {
         errorFuctionStr = [errorFuctionStr stringByAppendingString:@",MT7628IsReady"];
     }
     if (_wifiFailIndex > 0) {

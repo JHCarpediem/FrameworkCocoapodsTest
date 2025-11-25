@@ -37,7 +37,7 @@
         if (diagnosticUnit.length == 0) {
             diagnosticUnit = @"metric";
         }
-        TDD_UnitConversionType *type;
+        TDD_UnitConversionType type = TDD_UnitConversionType_None;
         if ([diagnosticUnit isEqualToString:@"metric"]) {
             type = TDD_UnitConversionType_Metric;
         } else if ([diagnosticUnit isEqualToString:@"imperial"]) {

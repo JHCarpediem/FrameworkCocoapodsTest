@@ -36,6 +36,25 @@ NS_ASSUME_NONNULL_BEGIN
 **********************************************************/
 + (void)AddItemWithId:(uint32_t)ID strItem:(NSString *)strItem uStatus:(uint32_t )uStatus;
 
+/**************************************************************************************
+*    功  能：设置菜单的状态
+*
+*    参  数：uIndex    指定的菜单项
+*            bStatus   菜单项的状态
+*
+*            DF_ST_MENU_NORMAL       正常状态
+*            DF_ST_MENU_EXPIR        软件过期
+*            DF_ST_MENU_DISABLE      失能状态，不可用状态
+*
+*    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+*            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+*            其它值，暂无意义
+*
+*    说  明：
+*            如果没有调用此接口，默认的菜单项状态为AddItem中指定的初始状态
+****************************************************************************************/
++ (uint32_t)SetMenuStatus:(uint32_t)ID uIndex:(uint16_t)uIndex uStatus:(uint32_t)uStatus;
+
 /**********************************************************
 *    功  能：获取指定菜单项的文本串
 *    参  数：uIndex 指定的菜单项

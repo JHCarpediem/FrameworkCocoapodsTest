@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 // 车型包支持功能配置 和eDiagEntryType进行&运算判断
 @property (nonatomic, assign) long maintenance;
 @property (nonatomic, strong) NSArray * maintenanceExArr;
+/// SpcFunType 原始字典(保留，暂无用处)
+@property (nonatomic, strong) NSDictionary *spcFunTypeDict;
 
 // 车型实际开发内容配置 和eDiagMenuMask进行&运算判断
 @property (nonatomic, assign) long system;
@@ -58,7 +60,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) NSString *fileSize;
 /// 支持专业故障码维修指引(旧版开放故障码维修指引)
 @property (nonatomic, assign) BOOL supportProfessionalTrouble;
-
+/// 软件编码
+@property (nonatomic, copy) NSString *strSoftCode;
+/// 链接的软件编码(主车的软件编码)
+@property (nonatomic, copy) NSString *strLinkSoftCode;
 /// 计算文件大小
 - (NSString *)calculateFileSize;
 

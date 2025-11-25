@@ -216,6 +216,7 @@ public extension TDBasisWrap where Base == String {
     func date(withFormat format: String) -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = format
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         return dateFormatter.date(from: base)
     }
     /// Removes spaces and new lines in beginning and end of string.
@@ -357,32 +358,49 @@ public extension TDBasisWrap where Base == String {
     /// - Parameter locale: Locale (default is Locale.current)
     /// - Returns: Optional Float value from given string.
     func float(locale: Locale = .current) -> Float? {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.allowsFloats = true
-        return formatter.number(from: base)?.floatValue
+        number(local: locale)?.floatValue
     }
     /// Double value from string (if applicable).
     ///
     /// - Parameter locale: Locale (default is Locale.current)
     /// - Returns: Optional Double value from given string.
     func double(locale: Locale = .current) -> Double? {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.allowsFloats = true
-        return formatter.number(from: base)?.doubleValue
+        number(local: locale)?.doubleValue
     }
     /// CGFloat value from string (if applicable).
     ///
     /// - Parameter locale: Locale (default is Locale.current)
     /// - Returns: Optional CGFloat value from given string.
     func cgFloat(locale: Locale = .current) -> CGFloat? {
-        let formatter = NumberFormatter()
-        formatter.locale = locale
-        formatter.numberStyle = .decimal
-        formatter.allowsFloats = true
-        return formatter.number(from: base) as? CGFloat
+        guard let number = number(local: locale) else {
+            return nil
+        }
+        return CGFloat(number.doubleValue)
     }
+    
+    /// NSNumber from string (if applicable)
+    /// - Parameter local: Locale (default is Local.current)
+    /// - Returns: Optional NSNumber from given string.
+    func number(local: Locale = .current) -> NSNumber? {
+        let formatter = NumberFormatter()
+        formatter.locale = local
+        formatter.allowsFloats = true
+        if let number = formatter.number(from: base) {
+            return number
+        }
+        
+        let decimalSeparator = formatter.decimalSeparator ?? "."
+        let alternativeSparators = [".", ","].filter { $0 != decimalSeparator }
+        for separator in alternativeSparators {
+            let modified = base.replacingOccurrences(of: separator, with: decimalSeparator)
+            if let number = formatter.number(from: modified) {
+                return number
+            }
+        }
+        
+        return nil
+    }
+    
     /// Array of strings separated by new lines.
     ///
     ///        "Hello\ntest".td.lines() -> ["Hello", "test"]
@@ -770,3 +788,201 @@ extension Character {
 }
 
 
+
+public extension String {
+    // 将 10 进制数字字符串 转换成二进制数字字符串 例如："10" -> "1010"
+    var binary: String? {
+        // 校验输入是否合法（仅数字）
+        guard !isEmpty, allSatisfy({ $0.isNumber }) else { return nil }
+        
+        var digits = self.map { Int(String($0))! }
+        var result = ""
+        
+        while digits.contains(where: { $0 != 0 }) {
+            var carry = 0
+            var nextDigits: [Int] = []
+            
+            for d in digits {
+                let value = carry * 10 + d
+                nextDigits.append(value / 2)
+                carry = value % 2
+            }
+            
+            // 记录最低位
+            result.insert(Character(String(carry)), at: result.startIndex)
+            
+            // 移除前导零
+            while let first = nextDigits.first, first == 0, nextDigits.count > 1 {
+                nextDigits.removeFirst()
+            }
+            
+            digits = nextDigits
+        }
+        
+        return result.isEmpty ? "0" : result
+    }
+    
+    /// 将二进制数字字符串 转换成 10 进制数字字符串
+    var decimal: String? {
+        // 校验输入是否合法
+        guard !isEmpty else { return nil }
+        // 判断是否为二进制字符串
+        if allSatisfy({ $0 == "0" || $0 == "1" }) {
+            // 二进制转十进制（大数支持）
+            var result = "0"
+            for c in self {
+                // result = result * 2 + (c == "1" ? 1 : 0)
+                result = multiplyStringByInt(result, 2)
+                if c == "1" {
+                    result = addStringAndInt(result, 1)
+                }
+            }
+            // 去除前导 0
+            return result.trimLeadingZeros()
+        } else if allSatisfy({ $0.isNumber }) {
+            // 已经是十进制字符串
+            return self.trimLeadingZeros()
+        } else {
+            // 非法输入
+            return nil
+        }
+    }
+
+    // 字符串大数相加: str + int
+    private func addStringAndInt(_ str: String, _ num: Int) -> String {
+        var chars = Array(str)
+        var carry = num
+        var idx = chars.count - 1
+        while idx >= 0 && carry > 0 {
+            let d = Int(String(chars[idx]))! + carry
+            chars[idx] = Character(String(d % 10))
+            carry = d / 10
+            idx -= 1
+        }
+        if carry > 0 {
+            chars.insert(contentsOf: String(carry), at: 0)
+        }
+        return String(chars)
+    }
+
+    // 字符串大数乘法: str * int (int < 10)
+    private func multiplyStringByInt(_ str: String, _ num: Int) -> String {
+        guard num >= 0 && num < 10 else { return "" }
+        var chars = Array(str)
+        var carry = 0
+        var res = [Character](repeating: "0", count: chars.count)
+        for i in (0..<chars.count).reversed() {
+            let d = Int(String(chars[i]))! * num + carry
+            res[i] = Character(String(d % 10))
+            carry = d / 10
+        }
+        var result = String(res)
+        if carry > 0 {
+            result = String(carry) + result
+        }
+        return result
+    }
+
+    // 去除前导零
+    private func trimLeadingZeros() -> String {
+        var s = self
+        while s.count > 1 && s.first == "0" {
+            s.removeFirst()
+        }
+        return s
+    }
+    
+    /// 将 10 进制数字字符串转换成 2 进制数字字符串
+    /// - Parameter maxCount: 最大位数， 如果转换后位数不足 maxCount 则前面补 0
+    /// - Returns: 二进制字符串
+    func binaryString(for maxCount: Int) -> String? {
+        guard let binaryValue = self.binary else { return nil }
+        if binaryValue.count >= maxCount {
+            return binaryValue
+        } else {
+            let paddingCount = maxCount - binaryValue.count
+            return String(repeating: "0", count: paddingCount) + binaryValue
+        }
+    }
+    
+    
+}
+
+// MARK: - 自定义按位操作符定义
+precedencegroup BitwisePrecedence {
+    higherThan: LogicalConjunctionPrecedence
+    associativity: left
+}
+
+infix operator &? : BitwisePrecedence
+infix operator |? : BitwisePrecedence
+infix operator ^? : BitwisePrecedence
+infix operator ↓? : BitwisePrecedence
+infix operator ==? : BitwisePrecedence
+prefix operator ~?
+
+extension String {
+    private var isBinary: Bool {
+        allSatisfy { $0 == "0" || $0 == "1" }
+    }
+
+    public func alignBinary(_ other: String) -> (String, String) {
+        let maxLen = max(self.count, other.count)
+        let a = String(repeating: "0", count: maxLen - self.count) + self
+        let b = String(repeating: "0", count: maxLen - other.count) + other
+        return (a, b)
+    }
+}
+
+public extension String {
+    // 辅助方法：若为二进制字符串直接返回，否则若为十进制数字字符串则转为二进制，否则返回 nil
+    fileprivate var binaryForBitwise: String? {
+        if self.isBinary {
+            return self
+        } else if !self.isEmpty, self.allSatisfy({ $0.isNumber }) {
+            return self.binary
+        } else {
+            return nil
+        }
+    }
+
+    /// 数字字符串 按位与 （支持 10 进制和 二进制的字符串）
+    static func &? (lhs: String, rhs: String) -> String? {
+        guard let aBin = lhs.binaryForBitwise, let bBin = rhs.binaryForBitwise else { return nil }
+        let (a, b) = aBin.alignBinary(bBin)
+        return zip(a, b).map { ($0 == "1" && $1 == "1") ? "1" : "0" }.joined()
+    }
+
+    /// 数字字符串 按位或 （支持 10 进制和 二进制的字符串）
+    static func |? (lhs: String, rhs: String) -> String? {
+        guard let aBin = lhs.binaryForBitwise, let bBin = rhs.binaryForBitwise else { return nil }
+        let (a, b) = aBin.alignBinary(bBin)
+        return zip(a, b).map { ($0 == "1" || $1 == "1" ) ? "1" : "0" }.joined()
+    }
+    
+    /// 数字字符串 按位异或 （支持 10 进制和 二进制的字符串）
+    static func ^? (lhs: String, rhs: String) -> String? {
+        guard let aBin = lhs.binaryForBitwise, let bBin = rhs.binaryForBitwise else { return nil }
+        let (a, b) = aBin.alignBinary(bBin)
+        return zip(a, b).map { ($0 != $1) ? "1" : "0" }.joined()
+    }
+
+    /// 数字字符串 按位取反 （支持 10 进制和 二进制的字符串）
+    static prefix func ~? (value: String) -> String? {
+        guard let bin = value.binaryForBitwise else { return nil }
+        return bin.map { $0 == "1" ? "0" : "1" }.joined()
+    }
+
+    /// 数字字符串 按位或非 （支持 10 进制和 二进制的字符串）
+    static func ↓? (lhs: String, rhs: String) -> String? {
+        guard let orValue = lhs |? rhs else { return nil }
+        return ~?orValue
+    }
+    
+    /// 判断数字字符串 按位比较 是否相等  （支持 10 进制和 二进制的字符串的比较）
+    static func ==? (lhs: String, rhs: String) -> Bool {
+        guard let lBin = lhs.binaryForBitwise, let rBin = rhs.binaryForBitwise else { return false }
+        let (l, h) = lBin.alignBinary(rBin)
+        return l == h
+    }
+}

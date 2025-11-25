@@ -17,7 +17,7 @@
 #import "TDD_ArtiActiveOperationBottomView.h"
 typedef void(^GetHeightCacheFuncBlock)(void);
 
-@interface TDD_ArtiListView ()<UITableViewDelegate,UITableViewDataSource,TDD_ArtiListCellViewDelegate,TDD_ArtiActiveFloatingViewDelegate>
+@interface TDD_ArtiListView ()<UITableViewDelegate,UITableViewDataSource,TDD_ArtiListCellViewDelegate,TDD_ArtiActiveFloatingViewDelegate,TDD_ArtiListModelDelegata>
 @property (nonatomic, assign) BOOL isScroll;
 @property (nonatomic, strong) TDD_ButtonTableView * tableView;
 @property (nonatomic, strong) TDD_ArtiListTableHeaderView *tableHeadView;
@@ -28,6 +28,8 @@ typedef void(^GetHeightCacheFuncBlock)(void);
 @property (nonatomic, strong) NSMutableDictionary * cellHightDic;
 @property (nonatomic, assign) CGFloat maxTextViewHeight;
 @property (nonatomic, assign) CGFloat scale;
+/// 首次获取刷新项
+@property (nonatomic,assign) BOOL isFirstGetUpdateItem;
 @end
 
 @implementation TDD_ArtiListView
@@ -39,6 +41,7 @@ typedef void(^GetHeightCacheFuncBlock)(void);
         _scale = IS_IPad ? HD_Height : H_Height;
         CGFloat bottomHeight = (IS_IPad ? 100 : 58) * _scale;
         self.backgroundColor = UIColor.tdd_viewControllerBackground;
+        _isFirstGetUpdateItem = YES;
         _maxTextViewHeight = (IphoneHeight - NavigationHeight - (bottomHeight + iPhoneX_D))/3;
 
         [self creatTableView];
@@ -55,6 +58,7 @@ typedef void(^GetHeightCacheFuncBlock)(void);
         isScroll = YES;
     }
     _listModel = listModel;
+    self->_listModel.delegate = self;
     //顶部提示
     [_tableHeadView mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.top.left.right.equalTo(self);
@@ -165,7 +169,59 @@ typedef void(^GetHeightCacheFuncBlock)(void);
     }];
     [self addSubview:self.bottomBtn];
 }
+#pragma mark - TDD_ArtiListModelDelegate
+- (NSArray *)GetUpdateItems {
+    __block NSArray * indexPaths;
+    //获取当前屏幕显示的 cell
+    if ([NSThread isMainThread]) {
+        [self.tableView layoutIfNeeded];
+        indexPaths = [self.tableView indexPathsForVisibleRows];
+    }else {
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self.tableView layoutIfNeeded];
+            indexPaths = [self.tableView indexPathsForVisibleRows];
+        });
+    }
+    
+    NSMutableArray * resultArr = [[NSMutableArray alloc] init];
+    
+    //把当前屏幕的 cell 加到数组
+    for (NSIndexPath * indexPath in indexPaths) {
+        int row = (int)indexPath.row;
+        if (row >= self.listModel.itemArr.count) {
+            continue;
+        }
+        ArtiListItemModel * itemModel = self.listModel.itemArr[row];
+        if (itemModel.index >= 0) {
+            [resultArr addObject:@(itemModel.index)];
+        }
+    }
+    if (_isFirstGetUpdateItem) {
+        //初次获取时如果屏幕的 cell 少于 10 个时，补成最多 10 个
+        if (resultArr.count < 10) {
+            for (ArtiListItemModel *itemModel in self.listModel.itemArr) {
+                if (![resultArr containsObject:@(itemModel.index)]) {
+                    [resultArr addObject:@(itemModel.index)];
+                    if (resultArr.count >= 10) {
+                        break;
+                    }
+                }
+            }
+        }
+        //改为非初次获取
+        _isFirstGetUpdateItem = NO;
+    }
+    
+    return resultArr;
+    
+}
 
+- (BOOL)GetItemIsUpdateWithUIndex:(uint32_t)uIndex {
+    NSArray *arr = [self GetUpdateItems];
+    NSNumber *indexNum = @(uIndex);
+    return [arr containsObject:indexNum];
+    
+}
 #pragma mark - TDD_ArtiActiveFloatingViewDelegate
 - (void)floatingViewDidClickView {
     [UIView animateWithDuration:0.3 animations:^{

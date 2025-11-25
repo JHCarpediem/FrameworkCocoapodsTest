@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TDD_ArtiLiveDataChartSelectModel : TDD_ArtiModelBase
 @property (nonatomic,strong) TDD_ArtiLiveDataMoreChartModel * liveDataMoreChartModel;
 @property (nonatomic, strong) NSMutableArray * selectItmes; //选中的item
+@property (nonatomic, strong) NSMutableArray *showItems;
+- (void)updateShowLiveData;
 @end
 
 NS_ASSUME_NONNULL_END

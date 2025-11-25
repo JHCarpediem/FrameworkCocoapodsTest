@@ -21,6 +21,7 @@
     self = [super init];
     
     if (self) {
+        self.backgroundColor = UIColor.tdd_viewControllerBackground;
         _scale = IS_IPad ? HD_Height : H_Height;
         _leftSpace = (IS_IPad ? 40 : 15) * _scale;
         _topSpace = (IS_IPad ? 20 : 10) * _scale;

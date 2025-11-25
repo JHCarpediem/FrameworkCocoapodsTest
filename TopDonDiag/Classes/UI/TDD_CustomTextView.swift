@@ -9,7 +9,8 @@ import UIKit
 
 @objcMembers
 open class TDD_CustomTextView: UITextView {
-    public let placeholderLabel = TDD_CustomLabel()
+    
+    @objc public let placeholderLabel = TDD_CustomLabel()
 
     open var placeholder: String? {
         get {

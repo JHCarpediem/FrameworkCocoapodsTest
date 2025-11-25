@@ -20,7 +20,7 @@
     self = [super init];
     
     if (self) {
-        self.backgroundColor = [UIColor tdd_line];
+        self.backgroundColor = UIColor.tdd_viewControllerBackground;
         
         [self creatTableView];
     }

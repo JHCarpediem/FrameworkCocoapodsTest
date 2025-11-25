@@ -69,6 +69,9 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
         manage.appScenarios = AS_EXTERNAL_USE;
         manage.enabledBleLog = YES;
         manage.enabledAD200Log = YES;
+        
+        // 初始化bridge
+        [DiagBridge shared];
     });
     return manage;
 }
@@ -269,7 +272,7 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
 
 #pragma mark - 获取版本号
 + (NSString *)getVersion {
-    return @"2.09.066";//与podspec版本号保持一致
+    return @"2.09.119";//与podspec版本号保持一致
 }
 
 #pragma mark - 进入诊断界面
@@ -501,7 +504,7 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
 }
 
 + (NSString *)converMaskExArrToMaskStr:(NSArray *)maskArr {
-    return [NSString tdd_converBinaryArrToDecimal:maskArr];
+    return [NSString tdd_decimalStringFromBinaryString:maskArr];
 }
 
 #pragma mark stdComm
@@ -652,6 +655,13 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
 + (uint32_t )setLock
 {
     return [TDD_StdCommModel setLock];
+}
+
++ (uint32_t )runMaigc:(NSString *)topDonId magic:(NSString *)magic
+{
+    //JH:现在版本的 STDCOMM runMagic 会崩溃，先使用 setLock
+    return [TDD_StdCommModel setLock];
+//    return [TDD_StdCommModel runMaigc:topDonId magic:magic];
 }
 
 + (uint32_t )setUnlock
@@ -893,52 +903,9 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
     [TDD_HTipManage deallocView];
 }
 
-- (void)setViewColorType:(TDD_DiagViewColorType)viewColorType {
-    _viewColorType = viewColorType;
-    _didSetColorType = YES;
-}
 
 - (void)setCurrentSoftware:(TDDSoftware)currentSoftware {
     _currentSoftware = currentSoftware;
-    if (!_didSetColorType) {
-        
-        if ( (currentSoftware & TDDSoftwareTopVciPro) || (currentSoftware & TDDSoftwareTopScan) ) {
-            _viewColorType = TDD_DiagViewColorType_Red;
-        } else if (currentSoftware & TDDSoftwareTopVci) {
-            _viewColorType = TDD_DiagViewColorType_GradientBlack;
-        } else if ( (currentSoftware & TDDSoftwareCarPal) || (currentSoftware & TDDSoftwareCarPalGuru) ) {
-            _viewColorType = TDD_DiagViewColorType_Black;
-        } else if (currentSoftware & TDDSoftwareKeyNow) {
-            _viewColorType = TDD_DiagViewColorType_Orange;
-        } else { // default
-            _viewColorType = TDD_DiagViewColorType_Red;
-        }
-        
-        /*
-        switch (currentSoftware) {
-            case TDDSoftwareTopVciPro:
-            case TDDSoftwareTopScan:
-            case TDDSoftwareTopScanVAG:
-            case TDDSoftwareTopScanBMW:
-            case TDDSoftwareTopScanFORD:
-            case TDDSoftwareTopScanHD:
-                _viewColorType = TDD_DiagViewColorType_Red;
-                break;
-            case TDDSoftwareTopVci:
-                _viewColorType = TDD_DiagViewColorType_GradientBlack;
-                break;
-            case TDDSoftwareCarPal:
-                _viewColorType = TDD_DiagViewColorType_Black;
-                break;
-            case TDDSoftwareKeyNow:
-                _viewColorType = TDD_DiagViewColorType_Orange;
-                break;
-            default:
-                _viewColorType = TDD_DiagViewColorType_Red;
-                break;
-        }
-         */
-    }
 }
 
 //- (TDD_SoftWare)currentSoftware {
@@ -967,4 +934,18 @@ extern "C" uint32_t ArtiDiag(const char* strType, const char* strVehicle);
     return [TDD_StdCommModel Version];
 }
 
+- (NSString *)carMaintenceExAllSupportStr {
+    if (![NSString tdd_isEmpty:_carMaintenceExAllSupportStr]) {
+        return _carMaintenceExAllSupportStr;
+    }
+    NSDictionary *dict = [TDD_DiagnosisTools carMaintenanceExDict];
+    NSUInteger numberOfEntries = dict.count;
+
+    NSMutableArray *onesArray = [NSMutableArray arrayWithCapacity:numberOfEntries];
+    for (int i = 0; i < numberOfEntries; i++) {
+        [onesArray addObject:@"1"];
+    }
+    _carMaintenceExAllSupportStr = [TDD_DiagnosisManage converMaskExArrToMaskStr:onesArray];
+    return _carMaintenceExAllSupportStr;
+}
 @end

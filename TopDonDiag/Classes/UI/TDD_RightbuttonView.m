@@ -43,7 +43,7 @@
             return nil;
             break;
         case kSearchBtn:
-            return kImageNamed(isKindOfTopVCI? @"nav_search_ic_white" : @"nav_search_ic");
+            return kImageNamed(@"nav_search_ic");
             break;
         case kNavMoreBtn:
             return [UIImage tdd_imageDiagNavMore];
@@ -72,8 +72,8 @@
 - (instancetype)initWithType:(TDD_DiagNavType)diagNavType {
     self = [super init];
     if (self) {
-        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(bluetoothConnectedChanged) name:KTDDNotificationVciStatusChange object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tDartsStatusChanged) name:KTDDNotificationTDartsStatusChange object:nil];
+        [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(bluetoothConnectedChanged) name:KTDDNotificationVciStatusDidChange object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(tDartsStatusChanged) name:KTDDNotificationTDartsStatusDidChange object:nil];
         _btnH = IS_IPad ? 30 : 36;
         _vciW = IS_IPad ? _btnH * 1.18 : _btnH;
         _vciH = IS_IPad ? 30 : ([TDD_DiagnosisTools softWareIsCarPal] ? 44 : 36);
@@ -109,7 +109,7 @@
     [self addSubview:self.saveBtn];
     
     [self.saveBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.center.equalTo(self);
+        make.centerY.equalTo(self);
         make.right.equalTo(self).offset(-10);
         if ([TDD_DiagnosisTools softWareIsCarPalSeries]) {
             make.width.equalTo(@100);
@@ -158,7 +158,7 @@
             [self.vciStatusBtn mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.centerY.equalTo(self);
                 make.right.equalTo(self).offset(-5);
-                make.width.mas_equalTo(self.diagNavType == TDD_DiagShowType_TDarts ? 72 : ([TDD_DiagnosisTools softWareIsCarPal] ? 44 : _vciW));
+                make.width.mas_equalTo(self.diagNavType == TDD_DiagNavType_TDarts ? 72 : ([TDD_DiagnosisTools softWareIsCarPal] ? 44 : _vciW));
                 if ([TDD_DiagnosisTools softWareIsCarPal]) {
                     make.height.mas_lessThanOrEqualTo(NavigationHeight);
                 }else {
@@ -188,7 +188,7 @@
             [self.vciStatusBtn mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.centerY.equalTo(self);
                 make.right.equalTo(self).offset(-5);
-                make.width.mas_equalTo(self.diagNavType == TDD_DiagShowType_TDarts ? 72 : ([TDD_DiagnosisTools softWareIsCarPal] ? 44 : _vciW));
+                make.width.mas_equalTo(self.diagNavType == TDD_DiagNavType_TDarts ? 72 : ([TDD_DiagnosisTools softWareIsCarPal] ? 44 : _vciW));
                 if ([TDD_DiagnosisTools softWareIsCarPal]) {
                     make.height.mas_lessThanOrEqualTo(NavigationHeight);
                 }else {
@@ -298,8 +298,8 @@
             if ([TDD_DiagnosisTools softWareIsKindOfTopScan]) {
                 self.vciUnConnectView.hidden = NO;
                 self.vciStatusBtn.hidden = YES;
-                if (_vciUnConnectView && _vciUnConnectView.superview && !_vciUnConnectView.hidden) {
-                    [_vciUnConnectView playAnimation];
+                if (self.vciUnConnectView && self.vciUnConnectView.superview && !self.vciUnConnectView.hidden) {
+                    [self.vciUnConnectView playAnimation];
                 }
             }else {
                 self.vciUnConnectView.hidden = YES;
@@ -307,7 +307,7 @@
                 
             }
         }
-        if ([TDD_DiagnosisManage sharedManage].viewColorType == TDD_DiagViewColorType_Red && TDD_EADSessionController.sharedController.VciStatus) {
+        if (TDD_DiagnosisTools.softWareIsKindOfTopScan && TDD_EADSessionController.sharedController.VciStatus) {
             UIImage *image = [TDD_RightbuttonView navBtnImage:kVCIStatusBtn];
             if (IS_IPad) {
                 [self.vciStatusBtn setBackgroundImage:image forState:UIControlStateNormal];

@@ -87,7 +87,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIColor *)loadingViewBg;
 
-+ (UIColor *)tdd_progressBackground;
 
 + (UIColor *)tdd_dtcStatusNormalColor;
 
@@ -186,7 +185,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (UIColor *)tdd_colorDiagTopTipsBackground;
 + (UIColor *)tdd_colorDiagTopTipsTextColor;
 + (UIColor *)tdd_colorDiagBottomTipsBackground;
-+ (UIColor *)tdd_colorDiagBottomTextColor;
++ (UIColor *)tdd_colorDiagBottomTipsTextColor;
 
 /// FCA
 + (UIColor *)tdd_fcaAreaBackGroundColor;
@@ -201,17 +200,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 215CB0
 + (UIColor *)tdd_blue;
 
-+ (UIColor *)tdd_colorDiagTableViewGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
-
-+ (UIColor *)tdd_mainBackgroundGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
-
 + (UIColor *)tdd_viewControllerBackground;
 
-//主题色渐变
-//高亮渐变
-+ (UIColor *)tdd_colorDiagThemeGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
-//normal渐变
-+ (UIColor *)tdd_colorDiagNormalGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
 //底部渐变
 + (UIColor *)tdd_colorDiagBottomGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
 /// 进车进度条 渐变色
@@ -219,8 +209,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 系统扫描 渐变色 
 + (UIColor *)tdd_systemScanBgGradient:(TDD_GradientStyle)gradientStyle withFrame:(CGSize)size;
 
-/// 按钮红色背景渐变色 
-+ (UIColor *)tdd_colorButtonBacgroundGradient:(CGSize)size;
 //报告配色
 + (UIColor *)tdd_colorDiagReportSummary;
 

@@ -57,6 +57,8 @@
     CRegList::SetTipsTitleOnTop(ArtiListSetTipsTitleOnTop);
     CRegList::SetSelectedType(ArtiSetSelectedType);
     CRegList::SetRowInCurrentScreen(ArtiSetRowInCurrentScreen);
+    CRegList::GetUpdateItems(ArtiListGetUpdateItems);
+    CRegList::GetItemIsUpdate(ArtiListGetItemIsUpdate);
     CRegList::Show(ArtiListShow);
     
     // 大众 SFD 解锁
@@ -232,6 +234,20 @@ uint32_t ArtiSetSelectedType(uint32_t id, uint32_t lstType)
 uint32_t ArtiSetRowInCurrentScreen(uint32_t id, uint32_t rowType, uint32_t uIndex)
 {
     return [TDD_ArtiListModel SetRowInCurrentScreenWithId:id eScreenRowType:(eScreenRowType)rowType uIndex:uIndex];
+}
+
+std::vector<uint16_t> ArtiListGetUpdateItems(uint32_t id)
+{
+    NSArray * arr = [TDD_ArtiListModel GetUpdateItemsWithId:id];
+    
+    std::vector<uint16_t> vct = [TDD_CTools NSArrayToInt16CVector:arr];
+    
+    return vct;
+}
+
+bool ArtiListGetItemIsUpdate(uint32_t id, uint16_t uIndex)
+{
+    return [TDD_ArtiListModel GetItemIsUpdateWithId:id uIndex:uIndex];
 }
 
 uint32_t ArtiListShow(uint32_t id)
@@ -839,6 +855,47 @@ uint32_t ArtiListShow(uint32_t id)
     return 0;
     
 }
+
+/**********************************************************
+ *    功  能：获取当前显示屏的更新项的下标集合
+ *    参  数：无
+ *    返回值：更新项的下标集合
+ **********************************************************/
++ (NSArray *)GetUpdateItemsWithId:(uint32_t)ID
+{
+    HLog(@"%@ - 获取当前显示屏的更新项的下标集合 - ID:%d", [self class], ID);
+    
+    TDD_ArtiListModel * model = (TDD_ArtiListModel *)[self getModelWithID:ID];
+    
+    if ([model.delegate respondsToSelector:@selector(GetUpdateItems)]) {
+        NSMutableArray * arr = [model.delegate GetUpdateItems].mutableCopy;
+        
+        HLog(@"%@ - 获取当前显示屏的更新项的下标集合为：%@", [self class], arr);
+        
+        return arr;
+    }
+    
+    return @[];
+}
+
+/**********************************************************
+ *    功  能：获取某条数据流是否需要更新 - 在当前屏幕即需要更新
+ *    参  数：无
+ *    返回值：true 需要更新，false 不需要更新
+ **********************************************************/
++ (BOOL)GetItemIsUpdateWithId:(uint32_t)ID uIndex:(uint32_t)uIndex
+{
+    HLog(@"%@ - 获取某条数据流是否需要更新 - ID:%d - uIndex:%d", [self class], ID, uIndex);
+    
+    TDD_ArtiListModel * model = (TDD_ArtiListModel *)[self getModelWithID:ID];
+    
+    if ([model.delegate respondsToSelector:@selector(GetItemIsUpdateWithUIndex:)]) {
+        return [model.delegate GetItemIsUpdateWithUIndex:uIndex];
+    }
+    
+    return NO;
+}
+
 
 /***************************************************************************
 *    功  能：在list左边增加一个图片，list半屏靠右显示，增加的图片半屏靠左显示

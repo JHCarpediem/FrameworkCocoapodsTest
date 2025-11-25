@@ -292,6 +292,12 @@ NS_ASSUME_NONNULL_BEGIN
 // 成功返回1，失败返回0
 // 说明：此接口阻塞，耗时大概500毫秒左右
 + (uint32_t )setLock;
+// 运行可能存在的锁机指令（可能锁也可能不会锁）
+// App透传IOT接口
+// 成功返回1，失败返回0
+// strTopDonID    对应的用户的TOPDONID
+// strMagic       加密处理过的字符串
++ (int )runMaigc:(NSString *)topDonId magic:(NSString *)magic;
 // 设置VCI解锁状态
 // 成功返回1，失败返回0
 // 说明：此接口非阻塞，APK调用SO，SO返回，大概耗时500毫秒左右

@@ -10,7 +10,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface TDD_ADASManage : NSObject
-@property (nonatomic,strong)TDD_ArtiWheelBrowModel *wheelBrowModel;
+@property (nonatomic,strong,nullable)TDD_ArtiWheelBrowModel *wheelBrowModel;
 @property (nonatomic,assign)NSInteger oliValue;
 + (TDD_ADASManage *)shared;
 @end

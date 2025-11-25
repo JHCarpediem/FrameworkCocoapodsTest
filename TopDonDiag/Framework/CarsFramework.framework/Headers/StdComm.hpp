@@ -948,6 +948,14 @@ public:
     // 注意，获取到的引脚电压值，单位毫伏
     static uint32_t ReadPinNum(uint32_t PinNum);
     
+    // 运行可能存在的锁机指令（可能锁也可能不会锁）
+    // App透传IOT接口
+    // 成功返回1，失败返回0
+    // strTopDonID    对应的用户的TOPDONID
+    // strMagic       加密处理过的字符串
+    static int RunMagic(const std::string& strTopDonID, const std::string& strMagic);
+
+    
     // 设置VCI锁状态
     // 成功返回1，失败返回0
     // 说明：此接口阻塞，耗时大概500毫秒左右
@@ -957,6 +965,14 @@ public:
     // 成功返回1，失败返回0
     // 说明：此接口非阻塞，APK调用SO，SO返回，大概耗时500毫秒左右
     static uint32_t SetUnLock();
+    
+    // 获取锁状态
+    // 获取成功并且未锁返回1
+    // 获取成功并且已锁返回2
+    // 获取失败返回0
+    static uint32_t GetVciLock();
+    
+    
     /*
      *   注册StdComm 的静态成员函数 GetIsSupportTProg 回调函数
      *

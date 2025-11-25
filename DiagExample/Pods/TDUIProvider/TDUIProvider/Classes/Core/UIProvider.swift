@@ -45,7 +45,7 @@ public struct UIProvider {
             return image
         }
         
-        for bundle in UIConfig.middlewareConfigs.map(\.bundle) {
+        for bundle in UIConfig.middlewareConfigs.values.map(\.bundle) {
             if let image = UIConfig.image(named: oldName, bundle: bundle) {
                 return image
             }
@@ -64,6 +64,7 @@ extension UIProvider {
 public extension UIProvider.Image {
     static var navigationBack: ThemeImagePicker? { UIProvider.navigationBackIcon }
     
+    /// 多选选择图片 - 未选中状态 （正方形）
     static var checkboxSquareNormal: ThemeImagePicker? {
         let oldName = "feedback_normal"
         if let image = UIConfig.image(named: oldName) {
@@ -72,6 +73,7 @@ public extension UIProvider.Image {
         return UIConfig.image(named: "td_checkbox_square_normal")
     }
     
+    /// 多选选择图片 - 选中状态 （正方形）
     static var checkboxSquareSelected: ThemeImagePicker? {
         let oldName = "feedback_selected"
         if let image = UIConfig.image(named: oldName) {
@@ -80,6 +82,7 @@ public extension UIProvider.Image {
         return UIConfig.image(named: "td_checkbox_square_selected")
     }
     
+    /// 单选选择图片 - 未选中状态 （圆形）
     static var checkboxRoundNormal: ThemeImagePicker? {
         let oldName = "LMS_login_round"
         if let image = UIConfig.image(named: oldName) {
@@ -88,12 +91,28 @@ public extension UIProvider.Image {
         return UIConfig.image(named: "td_checkbox_round_normal")
     }
     
+    /// 单选选择图片 - 1选中状态 （圆形）
     static var checkboxRoundSelected: ThemeImagePicker? {
         let oldName = "LMS_login_round_select"
         if let image = UIConfig.image(named: oldName) {
             return image
         }
         return UIConfig.image(named: "td_checkbox_round_selected")
+    }
+    
+    /// 单选选择图片 - 未选中不可选状态  （圆形）
+    static var checkboxRoundNormalDisabled: ThemeImagePicker? {
+        return UIConfig.image(named: "td_checkbox_round_normal_disabled")
+    }
+    
+    /// 多选选择图片 - 未选中不可选状态  （正方形）
+    static var checkboxSquareUnselectDisabled: ThemeImagePicker? {
+        return UIConfig.image(named: "td_checkbox_square_unselect_disabled")
+    }
+    
+    /// 单选选择图片 - 选中不可选状态  （圆形）
+    static var checkboxSquareSelectDisabled: ThemeImagePicker? {
+        return UIConfig.image(named: "td_checkbox_square_select_disabled")
     }
 }
 

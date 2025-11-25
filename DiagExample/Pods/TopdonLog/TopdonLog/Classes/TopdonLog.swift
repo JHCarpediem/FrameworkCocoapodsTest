@@ -448,6 +448,6 @@ extension TopdonLog {
 
 extension TopdonLog {
     
-    public static var version: String { "1.60.001" }
+    public static var version: String { "1.60.011" }
     
 }

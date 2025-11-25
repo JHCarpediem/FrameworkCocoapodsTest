@@ -25,7 +25,6 @@ ${BUILT_PRODUCTS_DIR}/SocketRocket/SocketRocket.framework
 ${BUILT_PRODUCTS_DIR}/SwiftyBeaver/SwiftyBeaver.framework
 ${BUILT_PRODUCTS_DIR}/TDBasis/TDBasis.framework
 ${BUILT_PRODUCTS_DIR}/TDTheme/TDTheme.framework
-${BUILT_PRODUCTS_DIR}/TDUIProvider/TDUIProvider.framework
 ${BUILT_PRODUCTS_DIR}/TDWCDB/TDWCDB.framework
 ${BUILT_PRODUCTS_DIR}/TZImagePickerController/TZImagePickerController.framework
 ${BUILT_PRODUCTS_DIR}/Texture/AsyncDisplayKit.framework

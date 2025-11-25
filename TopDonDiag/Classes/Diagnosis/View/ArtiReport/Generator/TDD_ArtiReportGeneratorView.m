@@ -85,8 +85,6 @@
     reportModel.describe_mileage = [[TDD_UnitConversion diagUnitConversionWithUnit:@"km" value:mileage] value];
     _reportModel = reportModel;
     
-    reportModel.reportCreateTime = reportModel.reportCreateTime == 0 ? [NSDate tdd_getTimestampSince1970] : reportModel.reportCreateTime;
-    
     // 添加里程单位
     [self updateMileageUint];
     
@@ -136,7 +134,7 @@
     sectionModel2.identifier = [TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier];
     sectionModel2.cellHeight = IS_IPad ? 70 : 40.0;
     sectionModel2.sectionTitleName = [NSString stringWithFormat:@"%@:", TDDLocalized.report_name];
-    [tempItems insertObject:sectionModel2 atIndex:0];
+    [tempItems addObject:sectionModel2];
     
     TDD_ArtiReportGeneratorCellModel *sectionModel3 = [[TDD_ArtiReportGeneratorCellModel alloc] init];
     sectionModel3.identifier = [TDD_ArtiReportGeneratorTextTableViewCell reuseIdentifier];
@@ -232,7 +230,7 @@
 
 - (NSString *)adasImageTitleWithImageCount:(NSInteger)imageCount {
     NSString *imageTitle = TDDLocalized.picture;
-    NSString *sectionTitleName = [NSString stringWithFormat:@"%@ (%zd/4)",imageTitle, imageCount];
+    NSString *sectionTitleName = [NSString stringWithFormat:@"%@ (%zd/12)",imageTitle, imageCount];
     return sectionTitleName;
 }
 
@@ -333,169 +331,156 @@
     return self.items.count;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    return self.items[indexPath.row].cellHeight;
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    TDD_ArtiReportGeneratorCellModel *cellModel = self.items[indexPath.row];
+    if ([cellModel.identifier isEqualToString: [TDD_ArtiReportImageCell reuseIdentifier]]) {
+        
+        if ([TDD_DiagnosisTools isIpad]) {
+            return  (self.reportModel.adasImageDatas.count / 4 + 1) * 140 + 20;
+        } else {
+            NSInteger line = (self.reportModel.adasImageDatas.count / 4 + 1);
+            if (self.reportModel.adasImageDatas.count == 12) {
+                line = 3;
+            }
+            return  line * (90 * H_Height) + 15 * H_Height;
+        }
+    }
+    return cellModel.cellHeight;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportGeneratorInputTableViewCell reuseIdentifier]]) {
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.items.count <= indexPath.row) {
+        return [UITableViewCell new];
+    }
+    if (![self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
+        return [UITableViewCell new];
+    }
+    TDD_ArtiReportGeneratorCellModel *cellModel = self.items[indexPath.row];
+    
+    if ([cellModel.identifier isEqualToString: [TDD_ArtiReportGeneratorInputTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportGeneratorInputTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportGeneratorInputTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            BOOL isMileage = [cellModel.inputTitleName isEqualToString:TDDLocalized.report_driving_distance];
-            cell.isMileage = isMileage;
-            
-            cell.nameLabel.text = cellModel.inputTitleName;
-            if ([TDD_DiagnosisTools isDebug]) {
-                NSString *identify = [self getUITestIdentifyStrFrom:cellModel.inputTitleName];
-                if (![NSString tdd_isEmpty:identify]) {
-                    cell.inputTextField.accessibilityIdentifier = [self getUITestIdentifyStrFrom:cellModel.inputTitleName];
-                }
-            }
 
-            [cell setInputText:cellModel.inputValue];
-            cell.diagnosticUnit = self.diagnosticUnit;
-            @kWeakObj(self)
-            if (isMileage) {
-                cell.didMileageInputChanged = ^(NSString * unit, double value) {
-                    @kStrongObj(self)
-                    if ([unit isEqualToString:@"metric"]) {
-                        self.inputKmValue = value;
-                        self.inputMileValue = 0;
-                    } else {
-                        self.inputKmValue = 0;
-                        self.inputMileValue = value;
-                    }
-                };
-                
-                cell.didDiagnosticUnitChanged = ^(NSString * unit) {
-                    @kStrongObj(self)
-                    self.diagnosticUnit = unit;
-                    [self updateMileageUint];
-                };
-            }
-            
-            cell.didChangedText = ^(NSString * _Nonnull changedText) {
-                @kStrongObj(self)
-                cellModel.inputValue = changedText;
-                [self updateReportModelWith:cellModel.inputTitleName withValue:changedText];
-            };
-            if ([cell.nameLabel.text hasPrefix:@"*"]) {
-                NSMutableAttributedString *string = [NSMutableAttributedString mutableAttributedStringWithLTRString:cell.nameLabel.text];
-                NSRange range = [cell.nameLabel.text rangeOfString:@"*"];
-                [string addAttribute:NSForegroundColorAttributeName
-                               value:[UIColor tdd_colorFF0000]
-                               range:range];
-                [cell.nameLabel setAttributedText:string];
+        BOOL isMileage = [cellModel.inputTitleName isEqualToString:TDDLocalized.report_driving_distance];
+        cell.isMileage = isMileage;
+        
+        cell.nameLabel.text = cellModel.inputTitleName;
+        if ([TDD_DiagnosisTools isDebug]) {
+            NSString *identify = [self getUITestIdentifyStrFrom:cellModel.inputTitleName];
+            if (![NSString tdd_isEmpty:identify]) {
+                cell.inputTextField.accessibilityIdentifier = [self getUITestIdentifyStrFrom:cellModel.inputTitleName];
             }
         }
-       
+
+        [cell setInputText:cellModel.inputValue];
+        cell.diagnosticUnit = self.diagnosticUnit;
+        @kWeakObj(self)
+        if (isMileage) {
+            cell.didMileageInputChanged = ^(NSString * unit, double value) {
+                @kStrongObj(self)
+                if ([unit isEqualToString:@"metric"]) {
+                    self.inputKmValue = value;
+                    self.inputMileValue = 0;
+                } else {
+                    self.inputKmValue = 0;
+                    self.inputMileValue = value;
+                }
+            };
+            
+            cell.didDiagnosticUnitChanged = ^(NSString * unit) {
+                @kStrongObj(self)
+                self.diagnosticUnit = unit;
+                [self updateMileageUint];
+            };
+        }
+        
+        cell.didChangedText = ^(NSString * _Nonnull changedText) {
+            @kStrongObj(self)
+            cellModel.inputValue = changedText;
+            [self updateReportModelWith:cellModel.inputTitleName withValue:changedText];
+        };
+        if ([cell.nameLabel.text hasPrefix:@"*"]) {
+            NSMutableAttributedString *string = [NSMutableAttributedString mutableAttributedStringWithLTRString:cell.nameLabel.text];
+            NSRange range = [cell.nameLabel.text rangeOfString:@"*"];
+            [string addAttribute:NSForegroundColorAttributeName
+                           value:[UIColor tdd_colorFF0000]
+                           range:range];
+            [cell.nameLabel setAttributedText:string];
+        }
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier]]) {
+    else if ([cellModel.identifier isEqualToString: [TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportGeneratorSectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            cell.nameLabel.text = cellModel.sectionTitleName;
-        }
+        cell.nameLabel.text = cellModel.sectionTitleName;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportGeneratorTextTableViewCell reuseIdentifier]]) {
+    else if ([cellModel.identifier isEqualToString: [TDD_ArtiReportGeneratorTextTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportGeneratorTextTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportGeneratorTextTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            cell.inputTextField.text = cellModel.text;
-            @kWeakObj(self)
-            cell.didChangedText = ^(NSString * _Nonnull changedText) {
-                @kStrongObj(self)
-                cellModel.inputValue = changedText;
-                cellModel.text = changedText;
-                self.reportModel.reportRecordName = changedText;
-            };
-        }
-       
+        cell.inputTextField.text = cellModel.text;
+        @kWeakObj(self)
+        cell.didChangedText = ^(NSString * _Nonnull changedText) {
+            @kStrongObj(self)
+            cellModel.inputValue = changedText;
+            cellModel.text = changedText;
+            self.reportModel.reportRecordName = changedText;
+        };
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportGeneratorSelectTableViewCell reuseIdentifier]]) {
+    else if ([cellModel.identifier isEqualToString: [TDD_ArtiReportGeneratorSelectTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportGeneratorSelectTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportGeneratorSelectTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            cell.selectedIndex = MAX(0, cellModel.repairIndex - 1);
-        }
+        cell.selectedIndex = MAX(0, cellModel.repairIndex - 1);
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
     
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportGeneratorMessageCell reuseIdentifier]]) {
+    else if ([cellModel.identifier isEqualToString: [TDD_ArtiReportGeneratorMessageCell reuseIdentifier]]) {
         TDD_ArtiReportGeneratorMessageCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportGeneratorMessageCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            
-            @kWeakObj(self)
-            cell.didChangedText = ^(NSString * _Nonnull message) {
-                @kStrongObj(self)
-                if (!self) { return; }
-                self.reportModel.adas_msg = message;
-            };
-            
-            cell.beginEditing = ^{
-                @kStrongObj(self)
-                if (!self) { return; }
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
-                });
-            };
+        @kWeakObj(self)
+        cell.didChangedText = ^(NSString * _Nonnull message) {
+            @kStrongObj(self)
+            if (!self) { return; }
+            self.reportModel.adas_msg = message;
+        };
+        
+        cell.beginEditing = ^{
+            @kStrongObj(self)
+            if (!self) { return; }
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self.tableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+            });
+        };
 
-            
-            NSString *msg = self.reportModel.adas_msg;
-//            if (![NSString tdd_isEmpty:msg]) {
-            cell.textView.text = msg;
-//            }
-        }
+        cell.textView.text = self.reportModel.adas_msg;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
     }
     
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportImageCell reuseIdentifier]]) {
+    else if ([cellModel.identifier isEqualToString: [TDD_ArtiReportImageCell reuseIdentifier]]) {
         TDD_ArtiReportImageCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportImageCell reuseIdentifier] forIndexPath:indexPath];
-        if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
-            TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
+        cell.maxPhotoCount = 12;
+        @kWeakObj(self)
+        cell.onImagesChanged = ^(NSArray<UIImage *> * _Nonnull imgs, NSArray *assets) {
+            @kStrongObj(self)
+            if (!self) { return; }
+            self.reportModel.adasImageDatas = imgs;
+            self.reportModel.adasAssets = assets;
             
-            cell.viewController = [UIViewController tdd_topViewController];
-            cell.maxPhotoCount = 4;
-            @kWeakObj(self)
-            cell.onImagesChanged = ^(NSArray<UIImage *> * _Nonnull imgs) {
-                @kStrongObj(self)
-                if (!self) { return; }
-                self.reportModel.adasImageDatas = imgs;
-                
-                // 刷新 图片 section
-                TDD_ArtiReportGeneratorCellModel * section = self.items[indexPath.row - 1];
-                if ([section isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]] && [section.identifier isEqualToString: [TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier]]) {
-                    section.sectionTitleName = [self adasImageTitleWithImageCount: imgs.count];
-                    NSIndexPath * sectionIndexPath = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
-                    [self.tableView reloadRowsAtIndexPaths:@[sectionIndexPath] withRowAnimation:UITableViewRowAnimationNone];
-                    [self.tableView scrollToRowAtIndexPath:sectionIndexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
-                }
-            };
-            
-            cell.onNotAuthorized = ^(NSString *tips) {
-                @kStrongObj(self)
-                if (!self) { return; }
-                [TDD_HTipManage showBottomTipViewWithTitle:tips];
-            };
-            
-            if (self.reportModel.adasImageDatas) {
-                [cell update: self.reportModel.adasImageDatas];
-            } else {
-                [cell update: @[]];
+            // 刷新 图片 section
+            TDD_ArtiReportGeneratorCellModel * section = self.items[indexPath.row - 1];
+            if ([section isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]] && [section.identifier isEqualToString: [TDD_ArtiReportGeneratorSectionTableViewCell reuseIdentifier]]) {
+                section.sectionTitleName = [self adasImageTitleWithImageCount: imgs.count];
+                NSIndexPath * sectionIndexPath = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
+                [self.tableView reloadRowsAtIndexPaths:@[sectionIndexPath] withRowAnimation:UITableViewRowAnimationNone];
+                [self.tableView scrollToRowAtIndexPath:sectionIndexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
             }
-            
+        };
+        
+        if (self.reportModel.adasImageDatas) {
+            [cell update: self.reportModel.adasImageDatas assets:self.reportModel.adasAssets isNeedAdd:YES];
+        } else {
+            [cell update: @[] assets:@[] isNeedAdd:YES];
         }
         return cell;
     }
@@ -533,14 +518,14 @@
 {
     NSString *mile = _reportModel.describe_mileage;
     NSString * temp = [mile stringByReplacingOccurrencesOfString:@"km" withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@"Miles" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"miles" withString:@""];
     temp = [temp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([NSString tdd_isEmpty:temp]) return; 
     _reportModel.describe_mileage = [NSString stringWithFormat:@"%@ %@", temp, [self unitDisplayWithDiagUnit:self.diagnosticUnit]];
 }
 
 - (NSString *)unitDisplayWithDiagUnit:(NSString *)unit {
-    if ([unit isEqualToString:@"imperial"]) return @"Miles";
+    if ([unit isEqualToString:@"imperial"]) return @"miles";
     if ([unit isEqualToString:@"metric"]) return @"km";
     return unit;
 }

@@ -50,6 +50,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (eAppProductGroup )appProductGroup;
 /// 提供选中的VCI sn
 - (NSString *)selectedVCISerialNum;
+/// 提供中台产品型号字符串
+- (NSString *)selectedVCIProductModel;
 /// SN是否禁用
 - (BOOL )isSNDisable;
 /// 提供选中的TDarts sn
@@ -71,6 +73,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// 提供诊断单位
 - (NSString *)diagnosticUnit;
 - (NSString *)AESEncrypt:(NSString *)str;
+///本地存储的加解密
+- (NSString *)AESLocalEncrypt:(NSString *)str;
+- (NSString *)AESLocalDecryption:(NSString *)str;
 - (NSString *)userAccount;
 - (NSString *)appKey;
 - (NSString *)ipAddress;
@@ -94,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// 往日志库插入信息
 /// - Parameters:
 ///   - message: 信息
-///   - type: 待定，目前只有车型路径，后续增加类型改为枚举
+///   - type: 0:车型路径、1:VIN
 - (void)insertMessageToTopDonLog:(NSString *)message time:(NSTimeInterval )time type:(NSInteger )type;
 @optional
 /// 评分字体
@@ -174,8 +179,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) BOOL isOpenDisorderlyScan;
 
-@property (nonatomic, assign) TDD_DiagViewColorType viewColorType; //诊断配色
-
 @property (nonatomic, copy) NSString *softwareCode; //软件编码
 
 @property (nonatomic, copy) NSString *documentSubpath; //沙盒文件夹子路径
@@ -188,7 +191,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic,assign) TDDSoftware currentSoftware;
 
 @property (nonatomic,assign) long functionConfigMask;//设备支持功能
-
+/// 功能掩码全支持字符串
+@property (nonatomic, strong) NSString *carMaintenceExAllSupportStr;
 + (TDD_DiagnosisManage *)sharedManage;
 
 #pragma mark - 初始化
@@ -397,6 +401,14 @@ NS_ASSUME_NONNULL_BEGIN
 // 成功返回1，失败返回0
 // 说明：此接口阻塞，耗时大概500毫秒左右
 + (uint32_t )setLock;
+
+// 运行可能存在的锁机指令（可能锁也可能不会锁）
+// App透传IOT接口
+// 成功返回1，失败返回0
+// strTopDonID    对应的用户的TOPDONID
+// strMagic       加密处理过的字符串
++ (uint32_t )runMaigc:(NSString *)topDonId magic:(NSString *)magic;
+
 // 设置VCI解锁状态
 // 成功返回1，失败返回0
 // 说明：此接口非阻塞，APK调用SO，SO返回，大概耗时500毫秒左右

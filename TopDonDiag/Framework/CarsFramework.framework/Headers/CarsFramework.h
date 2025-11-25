@@ -44,7 +44,6 @@ FOUNDATION_EXPORT const unsigned char CarsFrameworkVersionString[];
 #import <CarsFramework/HEventTracking.h>
 #import <CarsFramework/RegIotRequest.hpp>
 #import <CarsFramework/RegAppProduct.hpp>
+#import <CarsFramework/RegDataPicture.hpp>
 //#import <CarsFramework/TDD_ArtiBatteryModel.h>
 //#import <CarsFramework/TDD_StdShowModel.h>
-
-

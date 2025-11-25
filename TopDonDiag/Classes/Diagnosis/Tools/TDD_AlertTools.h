@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)showBackgroundAlert;
 /// 软件过期续费弹框
 + (void)showSoftExpiredToBuyAlert:(nullable void (^)(void))completionHandler;
+/// 软件过期未扫码续费弹框
++ (void)showUnScanSoftExpiredAlert:(nullable void (^)(void))completionHandler;
 /// 开启二次验证
 + (void)openTwoFaAlert:(NSDictionary *)param;
 /// 账号不一致开启二次验证

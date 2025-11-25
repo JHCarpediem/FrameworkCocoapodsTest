@@ -93,28 +93,32 @@ uint32_t ArtiPopupShow(uint32_t ID)
 + (void)Construct:(uint32_t)ID
 {
     [super Construct:ID];
-    
-//    TDD_ArtiPopupModel * model = (TDD_ArtiPopupModel *)[self getModelWithID:ID];
-//
-//    NSArray * titleArr = @[@"app_report",@"diagnosis_remove_code"];
-//
-//    NSArray * statusArr = @[@(ArtiButtonStatus_ENABLE),@(ArtiButtonStatus_UNVISIBLE)];
-//
-//    NSArray * IDArr = @[@(DF_ID_TROUBLE_REPORT),@(DF_ID_CLEAR_DTC)];
-//
-//    for (int i = 0; i < titleArr.count; i ++) {
-//        TDD_ArtiButtonModel * buttonModel = [[TDD_ArtiButtonModel alloc] init];
-//
-//        buttonModel.uButtonId = [IDArr[i] intValue];
-//
-//        buttonModel.strButtonText = titleArr[i];
-//
-//        buttonModel.uStatus = (ArtiButtonStatus)[statusArr[i] intValue];
-//
-//        buttonModel.bIsEnable = YES;
-//
-//        [model.buttonArr addObject:buttonModel];
-//    }
+    if ([TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+        TDD_ArtiPopupModel * model = (TDD_ArtiPopupModel *)[self getModelWithID:ID];
+
+        NSArray * titleArr = @[@"app_report",@"diagnosis_remove_code"];
+
+        NSArray * statusArr = @[@(ArtiButtonStatus_ENABLE),@(ArtiButtonStatus_ENABLE)];
+
+        NSArray * IDArr = @[@(DF_ID_TROUBLE_REPORT),@(DF_ID_CLEAR_DTC)];
+
+        for (int i = 0; i < titleArr.count; i ++) {
+            TDD_ArtiButtonModel * buttonModel = [[TDD_ArtiButtonModel alloc] init];
+
+            buttonModel.uButtonId = [IDArr[i] intValue];
+
+            buttonModel.strButtonText = titleArr[i];
+
+            buttonModel.uStatus = (ArtiButtonStatus)[statusArr[i] intValue];
+
+            buttonModel.bIsEnable = YES;
+            
+            buttonModel.isLock = true;
+            
+            [model.buttonArr addObject:buttonModel];
+        }
+    }
+
 }
 
 + (bool)initTitle:(uint32_t)ID withTitle:(NSString *)strTitle uPopupType:(int)uPopupType
@@ -220,6 +224,19 @@ uint32_t ArtiPopupShow(uint32_t ID)
 }
 
 - (BOOL)ArtiButtonClick:(uint32_t)buttonID {
+    //软件过期前往购买
+    if ([TDD_DiagnosisTools isLimitedTrialFuction]) {
+        if ([TDD_DiagnosisTools softWareIsCarPalSeries]) {
+            if (buttonID == DF_ID_CLEAR_DTC){
+                [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
+                return NO;
+            }
+        }else {
+            [TDD_DiagnosisTools showSoftExpiredToBuyAlert:nil];
+            return NO;
+        }
+
+    }
     if (buttonID == DF_ID_REPORT){
         //报告
         NSString *referrer = @"EngineInspection";

@@ -48,6 +48,29 @@
     return NO;
 }
 
+- (void)updateShowLiveData {
+    if ([NSString tdd_isEmpty:self.searchKey]) {
+        
+        self.showItems  = [NSMutableArray arrayWithArray:self.liveDataMoreChartModel.liveDataModel.itemArr];
+        
+    } else {
+        NSMutableArray *tempArr = [NSMutableArray array];
+        [self.liveDataMoreChartModel.liveDataModel.itemArr  enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            TDD_ArtiLiveDataItemModel *objModel;
+            if ([obj isKindOfClass:[TDD_ArtiLiveDataItemModel class]]){
+                objModel = obj;
+            }else {
+                objModel = [TDD_ArtiLiveDataItemModel yy_modelWithJSON:obj];
+            }
+            if ([objModel.strName.lowercaseString containsString:self.searchKey.lowercaseString]) {
+                [tempArr addObject:objModel];
+            }
+        }];
+        self.showItems = tempArr;
+    }
+    self.isReloadButton = YES;
+}
+
 - (uint32_t)show
 {
     TDD_ArtiButtonModel * buttonModel = self.buttonArr.lastObject;
@@ -81,5 +104,17 @@
     }
 
     return _selectItmes;
+}
+
+- (BOOL)isSearch {
+    return ![NSString tdd_isEmpty:self.searchKey];
+}
+
+- (NSMutableArray *)showItems
+{
+    if (!_showItems) {
+        _showItems = [[NSMutableArray alloc] initWithArray:self.liveDataMoreChartModel.liveDataModel.showItems];
+    }
+    return _showItems;
 }
 @end

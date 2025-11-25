@@ -136,16 +136,28 @@ public extension LogUploadManager {
         TopdonLog.globalQueue.async {
             
             let enterCarTime = Date.current().string(withFormatter: TopdonLog.appInfo.launchDateFormatter)
-            let para = TopdonLog.buildParam(subPath: car.brand, launchTime: enterCarTime)
+            let para = TopdonLog.buildParam(subPath: car.brand.uppercased(), launchTime: enterCarTime)
             
             /// 1. 记录进车
             RecordManager.shared.enter(car: car, logFile: para.fullLogPath)
             
             /// 2. 日志收集保存进车
-            LogColletionManager.shared.enter(car: .init(brand: car.brand, strType: car.strType, logType: car.logType))
+            LogColletionManager.shared.enter(car: .init(brand: car.brand.uppercased(), strType: car.strType.uppercased(), logType: car.logType))
             
             /// 3. log 重定向到 carBrand 日志
             TopdonLog.redirectionTo(param: para)
+        }
+    }
+    
+    /// 新增存储车型路径（字符串），存储到数据库跟这次进车绑定，每次进车你那边最多保存 50 条。退车的时候把所有路径和时间加在附加信息一起上传，
+    func saveAndAssociated(car path: String, millSeconds timestamp: TimeInterval) {
+        if path.isEmpty { return }
+        
+        // 使用同步执行确保数据库更新完成
+        TopdonLog.globalQueue.sync {
+            guard let carLogRecord = RecordManager.shared.queryEnterDiagRecord().first else { return }
+            carLogRecord.addCarModelPathWithTime(path, millSeconds: timestamp)
+            carLogRecord.updateIntoDB()
         }
     }
     

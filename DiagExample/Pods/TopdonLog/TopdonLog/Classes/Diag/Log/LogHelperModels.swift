@@ -204,6 +204,11 @@ public extension TopdonLog {
         
         public var lfuAppInfo: String = ""
         
+        ///       "pathArr":["1749611947176":"Automatic\\AW - Polo 2017 >\\2018 (J)\\Sedan\\all engine codes\\",
+        ///       "1749611947180":"Automatic\\AW - Polo 2017 >\\2018 (J)\\Sedan"
+        ///       ]
+        public var carPaths: [String] = []
+        
         mutating func update(from dbRecord: LogFileUploadable) {
             lfuSn = dbRecord.lfuSn
             lfuCarType = dbRecord.lfuCarType
@@ -214,6 +219,7 @@ public extension TopdonLog {
                 lfuLogGenerationTime = appLogRecord.createTimeForServer
             } else if let enterCarLogRecord = dbRecord as? EnterDiagLogRecordDBModel {
                 lfuLogGenerationTime = enterCarLogRecord.createTimeForServer
+                carPaths = enterCarLogRecord.carPaths
             } else {
                 lfuLogGenerationTime = dbRecord.lfuLogGenerationTime
             }
@@ -788,7 +794,11 @@ public struct UserDefault<T: Codable> {
             UserDefaults.standard.value(forKey: key) as? T ?? defaultValue
         }
         set {
-            UserDefaults.standard.setValue(newValue, forKey: key)
+            if case Optional<Any>.none = newValue as Any {
+                UserDefaults.standard.removeObject(forKey: key)
+            } else {
+                UserDefaults.standard.set(newValue, forKey: key)
+            }
             UserDefaults.standard.synchronize()
         }
     }

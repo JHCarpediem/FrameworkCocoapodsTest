@@ -126,6 +126,9 @@ typedef NS_ENUM(NSUInteger, TDD_ArtiReportType) {
 @property (nonatomic, copy) NSString *adas_msg;
 /// 拍照或者选中的图片，用于保存到本地
 @property (nonatomic, strong) NSArray<UIImage*> *adasImageDatas;
+
+@property (nonatomic, strong) NSArray *adasAssets;
+
 @property (nonatomic, strong) NSMutableArray <NSString *> *adas_image_paths;
 /// 胎压
 @property (nonatomic, strong) TDD_ArtiADASReportTireUnit *tirePressure;
@@ -190,6 +193,9 @@ typedef NS_ENUM(NSUInteger, TDD_ArtiReportType) {
 - (NSString *)generatPdfFileName: (NSInteger)repairIndex;
 
 + (TDD_ArtiReportCellModel *)reportCellModelWithItem:(TDD_ArtiLiveDataItemModel *)itemModel;
+
+/// reportShow 方法显示报告页面， show 方法是显示生成报告页面
+- (uint32_t)reportShow;
 
 @end
 

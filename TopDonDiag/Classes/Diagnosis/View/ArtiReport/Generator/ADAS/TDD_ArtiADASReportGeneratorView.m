@@ -60,8 +60,6 @@
     reportModel.describe_mileage = [[TDD_UnitConversion diagUnitConversionWithUnit:@"km" value:mileage] value];
     _reportModel = reportModel;
     
-    reportModel.reportCreateTime = reportModel.reportCreateTime == 0 ? [NSDate tdd_getTimestampSince1970] : reportModel.reportCreateTime;
-    
     // 添加里程单位
     [self updateMileageUint];
     
@@ -388,13 +386,12 @@
         
         if ([self.items[indexPath.row] isKindOfClass:[TDD_ArtiReportGeneratorCellModel class]]) {
             TDD_ArtiReportGeneratorCellModel *cellModel = (TDD_ArtiReportGeneratorCellModel *)self.items[indexPath.row];
-            
-            cell.viewController = self.owningViewController;
-            cell.maxPhotoCount = 4;
+            cell.maxPhotoCount = 12;
             @kWeakObj(self)
-            cell.onImagesChanged = ^(NSArray<UIImage *> * _Nonnull imgs) {
+            cell.onImagesChanged = ^(NSArray<UIImage *> * _Nonnull imgs, NSArray *assets) {
                 @kStrongObj(self)
                 self.reportModel.adasImageDatas = imgs;
+                self.reportModel.adasAssets = assets;
                 
                 // 刷新 图片 section
                 TDD_ArtiReportGeneratorCellModel * section = self.items[indexPath.row - 1];
@@ -405,16 +402,10 @@
                 }
             };
             
-            cell.onNotAuthorized = ^(NSString *tips) {
-                @kStrongObj(self)
-                if (!self) { return; }
-                [TDD_HTipManage showBottomTipViewWithTitle:tips];
-            };
-            
             if (self.reportModel.adasImageDatas) {
-                [cell update: self.reportModel.adasImageDatas];
+                [cell update: self.reportModel.adasImageDatas assets:self.reportModel.adasAssets isNeedAdd:YES];
             } else {
-                [cell update: @[]];
+                [cell update: @[] assets:@[] isNeedAdd:YES];
             }
             
         }
@@ -538,14 +529,14 @@
 {
     NSString *mile = _reportModel.describe_mileage;
     NSString * temp = [mile stringByReplacingOccurrencesOfString:@"km" withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@"Miles" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"miles" withString:@""];
     temp = [temp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([NSString tdd_isEmpty:temp]) return;
     _reportModel.describe_mileage = [NSString stringWithFormat:@"%@ %@", temp, [self unitDisplayWithDiagUnit:self.diagnosticUnit]];
 }
 
 - (NSString *)unitDisplayWithDiagUnit:(NSString *)unit {
-    if ([unit isEqualToString:@"imperial"]) return @"Miles";
+    if ([unit isEqualToString:@"imperial"]) return @"miles";
     if ([unit isEqualToString:@"metric"]) return @"km";
     return unit;
 }
@@ -565,7 +556,7 @@
 
 - (NSString *)adasImageTitleWithImageCount:(NSInteger)imageCount {
     NSString *imageTitle = TDDLocalized.picture;
-    NSString *sectionTitleName = [NSString stringWithFormat:@"%@ (%zd/4)",imageTitle, imageCount];
+    NSString *sectionTitleName = [NSString stringWithFormat:@"%@ (%zd/12)",imageTitle, imageCount];
     return sectionTitleName;
 }
 

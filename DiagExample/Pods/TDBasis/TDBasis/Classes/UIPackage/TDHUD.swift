@@ -114,15 +114,18 @@ open class TDHUD: NSObject {
     /// 弹出带图片的错误❎提示  图片在 `TDHUDConfig.shared.successImage`中配置
     /// - Parameter message: 提示消息
     public static func showError(_ message: String?) {
-        show(message: message, image: TDHUDConfig.shared.errorImage)
+        let position: ToastPosition = TDHUDConfig.shared.errorImage == nil ? TDHUDConfig.shared.toastPosition : .center
+        show(message: message, image: TDHUDConfig.shared.errorImage, position: position)
     }
     
     @objc
     /// 弹出带图片的警告⚠️提示  图片在 `TDHUDConfig.shared.warnningImage`中配置
     /// - Parameter message: 提示消息
     public static func showWarnning(_ message: String?) {
-        show(message: message, image: TDHUDConfig.shared.warnningImage)
+        let position: ToastPosition = TDHUDConfig.shared.warnningImage == nil ? TDHUDConfig.shared.toastPosition : .center
+        show(message: message, image: TDHUDConfig.shared.warnningImage, position: position)
     }
+    
     /// 弹出toast
     /// - Parameters:
     ///   - title: 标题

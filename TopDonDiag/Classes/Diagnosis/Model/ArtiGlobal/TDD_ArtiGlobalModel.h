@@ -10,6 +10,7 @@
 #import "TDD_HistoryDiagModel.h"
 #import "TDD_Enums.h"
 #import "TDD_VehInfoModel.h"
+#import "TDD_SetVinModel.h"
 NS_ASSUME_NONNULL_BEGIN
 
 //@class CAlgorithmData;
@@ -338,6 +339,12 @@ typedef enum {
     ////////////////////////////////////////////////////////////////////////////////////////
 
 
+    ///////////////////////////////     TopScan        /////////////////////////////////////
+    // TopScan 首页“OBD”快捷方式进入
+    OET_TOPSCAN_OBD_SHORTCUT    = (1 << 10),  // TopScan 首页快速进入,  1 << 10
+    ////////////////////////////////////////////////////////////////////////////////////////
+
+    
     ///////////////////////////////     其它    /////////////////////////////////////
     // “汽车诊断” 快捷方式进入
     OET_DIAG_DIAG            = (1 << 16),  // 汽车诊断，路径方式进入,  1 << 16
@@ -485,7 +492,8 @@ typedef enum
 @property (nonatomic, copy) NSString *carMileage;
 ///车辆故障灯亮后行驶里程
 @property (nonatomic, copy) NSString *carMILOnMileage;
-//网关
+
+///网关
 @property (nonatomic, assign) eSpecialShowType authType;
 ///解锁类型 0-autoAuth 解锁、1-TopDon解锁
 @property (nonatomic, assign) NSInteger authUnlockType;
@@ -499,6 +507,11 @@ typedef enum
 @property (nullable, nonatomic, copy) NSString * authToken;
 /// 切换账号缓存
 @property (nullable, nonatomic, copy) NSString * authChangeAccount;
+/// 记住密码
+@property (nonatomic, assign) BOOL isRemeberAutoAuthPassword;
+/// 是否使用密文登录
+@property (nonatomic, assign) BOOL isEncryptionPWD;
+
 @property (nonatomic, weak)id <TDD_ArtiGlobalModelDelegata> delegate;
 //autoVIN
 @property (nonatomic, assign) BOOL isAutoVinBindCar; // autoVin 扫描模式 是否是绑定车辆
@@ -519,11 +532,11 @@ typedef enum
 @property (nonatomic, strong) NSArray<NSString *> *vinServerInfoValue;
 
 @property (nonatomic, strong) NSArray *vehicleLogPath;//车型诊断日志文件地址
-@property (nonatomic, strong) NSMutableArray<NSNumber *> *instanceIDArr;//所有创建的悬浮窗 ID
+@property (nonatomic, strong,nullable) NSMutableArray<NSNumber *> *instanceIDArr;//所有创建的悬浮窗 ID
 @property (nonatomic, strong) NSString * strShareAccount; // 分享邮箱
 
 @property (nonatomic, strong, nullable) TDD_VehInfoModel *vehInfoModel;//车型路径临时存储
-
+@property (nonatomic, strong, nullable) TDD_SetVinModel *setVinModel;//车型VIN临时存储
 /// 缓存车型路径数组，最多 50 条数据
 @property (nonatomic, strong) NSMutableArray <NSString *>*carPaths;
 
@@ -750,6 +763,42 @@ typedef enum
 -----------------------------------------------------------------------------*/
 + (eProductName)GetAppProductName;
 
+/*----------------------------------------------------------------------------------------------------------------
+功    能： 获取当前硬件的产品型号，即SKU对应的中台产品型号
+
+参数说明： uType          保留，当前不起作用
+
+返 回 值： 返回举例
+
+           "ArtiDiag200"        // 表示 顶匠 ArtiDiag200诊断设备
+           "ArtiDiag500"        // 表示 鼎匠 ArtiDiag500 自研
+           "ArtiDiag500S"       // 表示 鼎匠 ArtiDiag500 S 自研
+           "ArtiDiag500 BMS"    // 表示 鼎匠 ArtiDiag500 BMS
+           "ArtiDiag600"        // 表示 鼎匠 ArtiDiag600 自研
+           "ArtiDiag600S"       // 表示 鼎匠 ArtiDiag600 S 自研
+           "ArtiDiag600 Pro"    // 表示 鼎匠 ArtiDiag600 Pro
+           "ArtiDiag600 Elite"  // 表示 鼎匠 ArtiDiag600 Elite
+           "ArtiDiag800 BT 2"   // 表示 鼎匠 ArtiDiag800 BT 2 诊断设备
+           "ArtiDiag700"        // 表示 顶匠 ArtiDiag700诊断设备
+           "ArtiDiag Moto"      // 表示 ArtiDiag Moto 智能摩托车诊断仪
+           "ArtiDiag900 Lite"   // 表示 顶匠 ArtiDiag900 Lite诊断设备
+           "UltraDiag"          // 表示 顶匠 UltraDiag诊断设备
+           "TopScan"            // 表示 TopScan
+           "TopScan Pro"        // 表示 鼎匠 TopScan Pro诊断设备
+           "TopScan Master"     // 表示 鼎匠 TopScan Master 诊断设备
+           "CarPal"             // 表示 鼎匠 CarPal诊断设备
+           "CarPal Guru"        // 表示 鼎匠 CarPal Guru 带刷隐藏诊断设备
+           "小车探Pro"          // 表示 鼎匠 小车探Pro汽车版诊断设备 国内
+           "TOPDON ONE"         // 表示 鼎匠 TOPDON ONE 综合诊断仪
+           "RLink Lite"         // 表示 鼎匠 RLink Lite B/C一体远程诊断设备
+           "DS900 Customized"   // 表示 DS900诊断设备
+           "DS200"              // 表示 DS200诊断设备
+           "DS100"              // 表示 DS100诊断设备
+
+           如果App没有此接口，返回空串
+----------------------------------------------------------------------------------------------------------------*/
++ (NSString *)getHwProductModel;
+
 /*-----------------------------------------------------------------------------
 功    能： 获取当前app应用的使用场景
 
@@ -821,13 +870,19 @@ typedef enum
 
 - (NSString *)getAuthAccount;
 - (NSInteger )getAuthArea;
+//输入框实时密码
 - (NSString *)getAuthPassword;
+//本地缓存密码
 - (NSString *)getSaveAuthPassword;
 - (NSInteger )getAuthBrand;
 - (NSString *)getAuthAccount:(NSInteger )viewType;
 //清空缓存
 - (void)clearAuthMessage:(BOOL)clearSavePWD;
+//密码缓存
 - (void)saveAuthPassword;
+//autoAuth密文密码存储在本地
+- (NSString *)getAutoAuthPassword;
+- (void)saveAutoAuthPassword:(NSString *)encryptionPWD;
 //本地化网关相关信息
 - (void)saveGatewayArea;
 

@@ -13,3 +13,5 @@
 
 @import JHCampoCharts;
 @import TDUIProvider;
+@import TDTheme;
+@import TDBasis;

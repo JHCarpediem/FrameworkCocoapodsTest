@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface TDD_ArtiLiveDataHDMoreSelectItemView : UIView
 @property (nonatomic, strong)UIColor *color;
 @property (nonatomic, strong)TDD_ArtiLiveDataItemModel *itemModel;
+@property (nonatomic, assign)BOOL isLast;
 @end
 
 @interface TDD_ArtiLiveDataHDMoreChartView : TDD_ArtiContentBaseView

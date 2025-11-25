@@ -10,6 +10,7 @@
 @property (nonatomic, strong) UIView *lineView;
 @property (nonatomic, strong) UIButton *deleteBtn;
 @property (nonatomic, assign) CGFloat scale;
+@property (nonatomic, assign) CGFloat topSpace;
 @end
 
 @implementation TDD_ArtiInputSaveCellView
@@ -27,12 +28,13 @@
 
 - (void)setupUI {
     _scale = IS_IPad ? HD_Height : H_Height;
+    _topSpace = (IS_IPad ? 20 : 12) * _scale;
 
     _titleLab = ({
         TDD_CustomLabel * label = [[TDD_CustomLabel alloc] init];
         label.tag = 1000;
-        label.font = [[UIFont systemFontOfSize:IS_IPad ? 18 : 14 weight:UIFontWeightMedium] tdd_adaptHD];
-        label.numberOfLines = 0;
+        label.font = [[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium] tdd_adaptHD];
+        label.numberOfLines = 2;
         label.textColor = [UIColor tdd_title];
         label;
     });
@@ -44,22 +46,28 @@
     [self addSubview:_lineView];
     
     _deleteBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_deleteBtn setImage:kImageNamed(@"arti_input_delete") forState:UIControlStateNormal];
+    [_deleteBtn setBackgroundImage:kImageNamed(@"arti_input_delete") forState:UIControlStateNormal];
     [_deleteBtn addTarget:self action:@selector(deleteAction) forControlEvents:UIControlEventTouchUpInside];
+    _deleteBtn.tdd_hitEdgeInsets = UIEdgeInsetsMake(-10, -16, -10, -16);
     [self addSubview:_deleteBtn];
 
     [_titleLab mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.edges.equalTo(self).insets(UIEdgeInsetsMake(12 * _scale, 12 * _scale, 12 * _scale, (12 + 76) * _scale));
+        make.left.equalTo(self).offset(16 * _scale);
+        make.top.equalTo(self).offset(_topSpace);
+        make.bottom.equalTo(self).offset(-_topSpace);
+        make.right.equalTo(self).offset(-(16 + 28) * _scale);
     }];
     
     [_lineView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.right.bottom.equalTo(self);
+        make.bottom.equalTo(self);
+        make.left.equalTo(self).offset(16 * _scale);
+        make.right.equalTo(self).offset(-16 * _scale);
         make.height.mas_equalTo(1);
     }];
     
     [_deleteBtn mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.size.mas_equalTo(CGSizeMake(54 * _scale, 22 * _scale));
-        make.right.equalTo(self);
+        make.size.mas_equalTo(CGSizeMake((IS_IPad ? 28 : 22) * _scale, (IS_IPad ? 28 : 22) * _scale));
+        make.right.equalTo(self).offset(-16 * _scale);
         make.centerY.equalTo(_titleLab);
     }];
 }
@@ -68,6 +76,21 @@
     _saveModel = saveModel;
     _titleLab.text = [NSString tdd_isEmpty:saveModel.value] ? @" " :saveModel.value;
     
+}
+
+- (void)setIsDropDownBox:(BOOL)isDropDownBox {
+    _isDropDownBox = isDropDownBox;
+    _deleteBtn.hidden = isDropDownBox;
+    [_titleLab mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self).offset(16 * _scale);
+        make.top.equalTo(self).offset(_topSpace);
+        make.bottom.equalTo(self).offset(-_topSpace);
+        make.right.equalTo(self).offset(-(16 + (isDropDownBox? 0 : (IS_IPad ? 44 : 38))) * _scale);
+    }];
+}
+
+- (void)setIsLast:(BOOL)isLast {
+    _lineView.hidden = isLast;
 }
 
 - (void)deleteAction {

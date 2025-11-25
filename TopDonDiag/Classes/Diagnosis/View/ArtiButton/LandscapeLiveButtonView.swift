@@ -22,7 +22,6 @@ public class LandscapeLiveButtonView: UIView {
     
     private var collectionView: UICollectionView!
     private var buttonArr: [TDD_ArtiButtonModel] = []
-    private var cellArr: [LandscapeLiveButtonCellView] = []
     
     private let btnWidth: CGFloat
     private let btnHeight: CGFloat
@@ -37,7 +36,7 @@ public class LandscapeLiveButtonView: UIView {
         self.btnHeight = TDD_DiagBridge.isPad() ? 50 : 35
         self.spaceWidth = TDD_DiagBridge.isPad() ? 20 : 10
         
-        let width = 244.0 // ArtiLiveDataLandscapeMoreChartView --> tableViewWidth
+        let width = DiagBridge.liveLandscapeLeftCombineWidth // ArtiLiveDataLandscapeMoreChartView --> tableViewWidth
         let leftMargin: CGFloat = TDD_DiagBridge.isIPhoneX() ? 3.0 + 44.0 : 10.0
         let btnWidth = width - leftMargin - spaceWidth
         self.btnWidth = btnWidth
@@ -97,6 +96,12 @@ public class LandscapeLiveButtonView: UIView {
     }
     
     private func createCollectionView() {
+        if let collectionView = self.collectionView {
+            if collectionView.superview != nil {
+                collectionView.removeFromSuperview()
+            }
+        }
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.minimumInteritemSpacing = spaceWidth
@@ -114,7 +119,7 @@ public class LandscapeLiveButtonView: UIView {
         
         // 注册 cell
         for row in 0..<noReuseCount {
-            let identify = "Cell0\(row)" // 以indexPath来唯一确定
+            let identify = "Cell\(row)"
             collectionView.register(LandscapeLiveButtonCellView.self, forCellWithReuseIdentifier: identify)
         }
         
@@ -134,7 +139,6 @@ public class LandscapeLiveButtonView: UIView {
             
             // 强制刷新布局，确保 inset 在屏幕旋转时能正确更新
             collectionView.collectionViewLayout.invalidateLayout()
-            collectionView.reloadData()
         }
     }
     
@@ -149,19 +153,8 @@ extension LandscapeLiveButtonView: UICollectionViewDataSource {
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let identify = "Cell0\(indexPath.row)" // 以indexPath来唯一确定
-        var cell: LandscapeLiveButtonCellView
-        
-        if indexPath.row < noReuseCount {
-            cell = collectionView.dequeueReusableCell(withReuseIdentifier: identify, for: indexPath) as! LandscapeLiveButtonCellView
-        } else {
-            cell = cellArr[indexPath.row % noReuseCount]
-        }
-        
-        if cell == nil {
-            cell = LandscapeLiveButtonCellView(frame: .zero)
-            print("不应该来到这里 LandscapeLiveButtonCellView alloc")
-        }
+        let identify = "Cell\(indexPath.row % noReuseCount)"
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: identify, for: indexPath) as! LandscapeLiveButtonCellView
         
         if indexPath.item >= buttonArr.count {
             return cell
@@ -222,9 +215,10 @@ extension LandscapeLiveButtonView: LandscapeLiveButtonCellViewDelegate {
     func landscapeLiveButtonCellButtonClick(_ button: UIButton, cell: LandscapeLiveButtonCellView) {
         guard let model = cell.model else { return }
         
-        let cellCenter = cell.center
-        // 将 cell 的中心点转换到 window 坐标系
-        let cellCenterInWindow = cell.convert(cellCenter, to: TDD_DiagBridge.flt_APP_WINDOWValue())
+        // cell 自己坐标系里的中心点
+        let cellLocalCenter = CGPoint(x: cell.bounds.midX, y: cell.bounds.midY)
+        // 转换到 window 坐标系
+        let cellCenterInWindow = cell.convert(cellLocalCenter, to: TDD_DiagBridge.flt_APP_WINDOWValue())
         model.clickPoint = cellCenterInWindow
         
         // 过期加锁软件不适用报告置灰逻辑
@@ -297,7 +291,7 @@ class LandscapeLiveButtonCellView: UICollectionViewCell {
         
         contentView.addSubview(lockIcon)
         
-        let width = 244.0 // ArtiLiveDataLandscapeMoreChartView --> tableViewWidth
+        let width = DiagBridge.liveLandscapeLeftCombineWidth // ArtiLiveDataLandscapeMoreChartView --> tableViewWidth
         let leftMargin: CGFloat = TDD_DiagBridge.isIPhoneX() ? 3.0 + 44.0 : 10.0
         let spaceWidth = TDD_DiagBridge.isPad() ? 20 : 10.0
         let btnWidth = width - leftMargin - spaceWidth
@@ -330,7 +324,7 @@ class LandscapeLiveButtonCellView: UICollectionViewCell {
     func updateWithModel(_ model: TDD_ArtiButtonModel) {
         self.model = model
         
-        var title = isShowTranslated ? TDD_DiagBridge.getLanguage(model.strTranslatedButtonText) : TDD_DiagBridge.getLanguage(model.strButtonText)
+        var title = isShowTranslated ? model.strTranslatedButtonText.TDDLocalized  : model.strButtonText.TDDLocalized
         title = title.replacingOccurrences(of: "\n", with: " ")
         title = title.replacingOccurrences(of: "\r", with: "")
         btn.titleLabel?.text = title

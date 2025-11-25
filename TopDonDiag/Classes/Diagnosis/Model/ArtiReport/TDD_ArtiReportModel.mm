@@ -43,16 +43,13 @@
 {
     self = [super init];
     if (self) {
-        NSArray * titleArr = @[@"person_save"];
+        NSArray * titleArr = @[TDDLocalized.app_cancel, TDDLocalized.person_save];
         for (int i = 0; i < titleArr.count; i ++) {
             TDD_ArtiButtonModel * buttonModel = [[TDD_ArtiButtonModel alloc] init];
-            
             buttonModel.uButtonId = i;
-            
-            buttonModel.strButtonText = [TDD_HLanguage getLanguage:titleArr[i]];
-            
+            buttonModel.strButtonText = titleArr[i];
             buttonModel.bIsEnable = YES;
-            if ([TDD_DiagnosisTools isDebug]) {
+            if ([TDD_DiagnosisTools isDebug] && [titleArr[i] isEqualToString:TDDLocalized.person_save]) {
                 buttonModel.uiTextIdentify = @"diagReportSave";
             }
             [self.buttonArr addObject:buttonModel];
@@ -120,27 +117,39 @@
     return self;
 }
 
-- (BOOL)ArtiButtonClick:(uint32_t)buttonID
-{
-    if (buttonID == 0) {
-        if (self.buttonArr.count > 0) {
-            // 点击生成报告
-            if (!self.isSaveReport) {
-                if (self.generatorTapBlock) {
-                    TDD_ArtiButtonModel *buttonModel = self.buttonArr[0];
-                    buttonModel.uiTextIdentify = @"diagReportShare";
-                    self.generatorTapBlock();
-                    self.isSaveReport = YES;
-                    [self sharePDF];
-                }
-            }
-            // 点击分享
-            else {
-                [self sharePDF];
-            }
+- (void)backClick {
+    if (self.isSaveReport) {
+        [super backClick];
+    } else {
+        if (self.isLock) {
+            self.returnID = 0;
+            [self conditionSignal];
         }
     }
-    
+}
+
+- (BOOL)ArtiButtonClick:(uint32_t)buttonID {
+    if (buttonID == 0) {
+        if (self.isSaveReport) {
+            [super backClick];
+        } else {
+            return YES;
+        }
+    } else if (buttonID == 1) {
+        if (!self.isSaveReport) {
+            // 点击生成报告
+            if (self.generatorTapBlock && self.buttonArr.count > 1) {
+                TDD_ArtiButtonModel *buttonModel = self.buttonArr[1];
+                buttonModel.uiTextIdentify = @"diagReportShare";
+                self.generatorTapBlock();
+                self.isSaveReport = YES;
+                [self sharePDF];
+            }
+        } else {
+            // 点击分享
+            [self sharePDF];
+        }
+    }
     return NO;
 }
 
@@ -210,7 +219,6 @@
     
     HLog(@"【REPORT】ArtiReportJSONs:\n adasResultJsons=%@\nadasTirePressureJson:%@\nadasWheelEyebrowJson:%@\nadasFuelJson:%@", adasResultJsons, adasTirePressureJson, adasWheelEyebrowJson, adasFuelJson);
     
-    self.reportCreateTime = self.reportCreateTime == 0 ? [NSDate tdd_getTimestampSince1970] : _reportCreateTime;
     self.describe_diagnosis_time = [NSDate tdd_getTimeStringWithInterval:self.reportCreateTime Format:@"yyyy-MM-dd HH:mm:ss"];
     self.describe_version = self.carModel.strVersion;
     self.describe_diagnosis_time_zone = [NSDate tdd_getTopdonTimeZone];
@@ -310,7 +318,7 @@
         reportTypeStr = [NSString tdd_reportTitleSystemHead];
     } else if (self.reportType == TDD_ArtiReportTypeDTC || self.reportType == TDD_ArtiReportTypeAdasDTC) {
         if (self.obdEntryType == OET_CARPAL_OBD_ENGINE_CHECK) {
-            reportTypeStr = @"engine_report_default_name".TDDLocalized;
+            reportTypeStr = TDDLocalized.engine_report_default_name;
         } else {
             reportTypeStr = TDDLocalized.fault_code_report;
         }
@@ -815,15 +823,19 @@ void ArtiReportSetAdasCaliResult(uint32_t id, const std::vector<stReportAdasResu
 -----------------------------------------------------------------------------*/
 -(uint32_t)show
 {
-    [self.condition lock];
-    
     TDD_ArtiReportGeneratorModel *generatorModel = [[TDD_ArtiReportGeneratorModel alloc] init];
     generatorModel.strTitle = TDDLocalized.generate_report;
     generatorModel.reportModel = self;
-    [generatorModel show];
-    
-    [self.condition wait];
-    [self.condition unlock];
+    generatorModel.isLock = YES;
+
+    int returnId = [generatorModel show];
+    if (returnId == 0) {
+        return [self show];
+    }
+    return returnId;
+}
+
+- (uint32_t)reportShow {
     
     return [super show];
 }
@@ -1943,6 +1955,13 @@ void ArtiReportSetAdasCaliResult(uint32_t id, const std::vector<stReportAdasResu
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSString *dateString = [dateFormatter stringFromDate:date];
     return dateString;
+}
+
+- (NSTimeInterval)reportCreateTime {
+    if (_reportCreateTime < 1) {
+        _reportCreateTime = [NSDate tdd_getTimestampSince1970];
+    }
+    return _reportCreateTime;
 }
 
 @end

@@ -37,7 +37,7 @@
         UIColor *disableBGColor = UIColor.tdd_btnDisableBackground;
         UIColor *titleColor = UIColor.tdd_btnNormalTitle;
         UIColor *titleDisableColor = UIColor.tdd_btnDisableTitle;
-        btn.frame = CGRectMake(0, 0, IS_IPad ? 160 * _scale : 100 * _scale, IS_IPad ? 50 * _scale : 35 * _scale);
+        btn.frame = CGRectMake(0, IS_IPad ? 20 * _scale : 10 * _scale, IS_IPad ? 160 * _scale : 100 * _scale, IS_IPad ? 50 * _scale : 35 * _scale);
         //btn.center = CGPointMake(btn.center.x, IS_IPad ? (100 * _scale / 2.0) : (59 * _scale / 2.0));
         btn.titleLabel.font = [[UIFont systemFontOfSize:14] tdd_adaptHD];
         [btn addTarget:self action:@selector(btnClick:) forControlEvents:UIControlEventTouchUpInside];
@@ -61,10 +61,11 @@
     self.btn = btn;
     
     [self.contentView addSubview:self.lockIcon];
+    CGFloat btnSize = (IS_IPad ? 30 : 20) * _scale;
     [_lockIcon mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.size.mas_equalTo(CGSizeMake(20 * _scale, 20 * _scale));
-        make.top.equalTo(self.btn).offset(-10 * _scale);
-        make.right.equalTo(self.btn).offset(10 * _scale);
+        make.size.mas_equalTo(CGSizeMake(btnSize, btnSize));
+        make.top.equalTo(self.btn).offset((IS_IPad ? -16 : -8) * _scale);
+        make.right.equalTo(self.btn).offset((IS_IPad ? 16 : 8) * _scale);
     }];
 }
 

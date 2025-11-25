@@ -4,24 +4,24 @@
 //#include "StdInclude.h"
 
 /*-----------------------------------------------------------------------------
-˵    �����������нӿڣ����Appû��ʵ�ִ˽ӿڹ��ܣ���JNI�����ҵ�Apk�ĺ������壬
-          ����App/Apk ȴû��ʵ�ִ˽ӿڹ��ܣ���App��֧�ֵ�ǰ���ܣ������ش�ֵ
+Àµ    √˜£∫  ”√À˘”–Ω”ø⁄£¨»Áπ˚App√ª”– µœ÷¥ÀΩ”ø⁄π¶ƒ‹£®º¥JNIø…“‘’“µΩApkµƒ∫Ø ˝∂®“Â£¨
+          µ´ «App/Apk »¥√ª”– µœ÷¥ÀΩ”ø⁄π¶ƒ‹£¨º¥App≤ª÷ß≥÷µ±«∞π¶ƒ‹£©£¨∑µªÿ¥À÷µ
 -----------------------------------------------------------------------------*/
 #define DF_APP_CURRENT_NOT_SUPPORT_FUNCTION     (0xFFFFFFEF)    // -17
 
 /*-----------------------------------------------------------------------------
-˵    �����������нӿڣ����APPû��ʵ�ִ˽ӿڣ���JNI�Ҳ���APK�ĺ������壬����
-          iOS��Appû��ע��ӿڵĻص������������ش�ֵ
+Àµ    √˜£∫  ”√À˘”–Ω”ø⁄£¨»Áπ˚APP√ª”– µœ÷¥ÀΩ”ø⁄£®º¥JNI’“≤ªµΩAPKµƒ∫Ø ˝∂®“Â£¨ªÚ’ﬂ
+          iOSµƒApp√ª”–◊¢≤·Ω”ø⁄µƒªÿµ˜∫Ø ˝£©£¨∑µªÿ¥À÷µ
 -----------------------------------------------------------------------------*/
 #define DF_FUNCTION_APP_CURRENT_NOT_SUPPORT     (0xFFFFFFF0)    // -16
 
 /*-----------------------------------------------------------------------------
-˵    �����������нӿڣ����APPû�д˶���ʵ�������ش�ֵ
+Àµ    √˜£∫  ”√À˘”–Ω”ø⁄£¨»Áπ˚APP√ª”–¥À∂‘œÛ µ¿˝£¨∑µªÿ¥À÷µ
 -----------------------------------------------------------------------------*/
 #define DF_FUNCTION_APP_OBJ_NOT_CONSTRUCTOR     (0xFFFFFFF1)    // -15
 
 /*-----------------------------------------------------------------------------
-˵    �����������нӿڣ����APPû�д˶���ʵ�������ش�ֵ
+Àµ    √˜£∫  ”√À˘”–Ω”ø⁄£¨»Áπ˚APP√ª”–¥À∂‘œÛ µ¿˝£¨∑µªÿ¥À÷µ
 -----------------------------------------------------------------------------*/
 #define STR_FUNCTION_APP_OBJ_NOT_CONSTRUCTOR     ("object not construct!")
 
@@ -37,40 +37,40 @@
 #endif
 
 
-#define DT_LEFT_TOP                 0x00000010  // ���Ͻ�
-#define DT_RIGHT_TOP                0x00000011  // ���Ͻ�
-#define DT_LEFT_BOTTOM              0x00000012  // ���½�
-#define DT_RIGHT_BOTTOM             0x00000013  // ���½�
+#define DT_LEFT_TOP                 0x00000010  // ◊Û…œΩ«
+#define DT_RIGHT_TOP                0x00000011  // ”“…œΩ«
+#define DT_LEFT_BOTTOM              0x00000012  // ◊Ûœ¬Ω«
+#define DT_RIGHT_BOTTOM             0x00000013  // ”“œ¬Ω«
 
 
 /*-----------------------------------------------------------------------------
-˵    ������������/������ ������������ʾ��
+Àµ    √˜£∫ΩÁ√Ê◊Ë»˚/∑«◊Ë»˚   ”√”⁄À˘”–œ‘ æ¿‡
 -----------------------------------------------------------------------------*/
 #define DF_MB_NONBLOCK                          0x0000
 #define DF_MB_BLOCK                             0x0100
 
 
 /*-----------------------------------------------------------------------------
-˵    �����̶���ť
+Àµ    √˜£∫πÃ∂®∞¥≈•
 -----------------------------------------------------------------------------*/
-#define DF_MB_NOBUTTON                       0x0000   //  �ް�ť�ķ�������Ϣ��
-#define DF_MB_YES                            0x0101   //  Yes ��ť��������Ϣ��
-#define DF_MB_NO                             0x0102   //  No ��ť��������Ϣ��
-#define DF_MB_YESNO                          0x0103   //  Yes/No ��ť��������Ϣ��
-#define DF_MB_OK                             0x0104   //  OK ��ť��������Ϣ��
-#define DF_MB_CANCEL                         0x0108   //  Cancel ��ť��������Ϣ��
-#define DF_MB_OKCANCEL                       0x010C   //  OK/Cancel ��ť��������Ϣ��
-#define DF_MB_NEXTEXIT                       0x010D   //  Next/Exit ��ť��������Ϣ��
+#define DF_MB_NOBUTTON                       0x0000   //  Œﬁ∞¥≈•µƒ∑«◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_YES                            0x0101   //  Yes ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_NO                             0x0102   //  No ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_YESNO                          0x0103   //  Yes/No ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_OK                             0x0104   //  OK ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_CANCEL                         0x0108   //  Cancel ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_OKCANCEL                       0x010C   //  OK/Cancel ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
+#define DF_MB_NEXTEXIT                       0x010D   //  Next/Exit ∞¥≈•µƒ◊Ë»˚œ˚œ¢øÚ
 
 
 /*-----------------------------------------------------------------------------
-˵    �������ɰ�ť���أ��������Ӱ�ť��
+Àµ    √˜£∫◊‘”…∞¥≈•ø™πÿ£®◊‘”…ÃÌº”∞¥≈•£©
 -----------------------------------------------------------------------------*/
-#define DF_MB_FREE                            0x0200  // ���ɰ�ť�ķ�������Ϣ��
+#define DF_MB_FREE                            0x0200  // ◊‘”…∞¥≈•µƒ∑«◊Ë»˚œ˚œ¢øÚ
 
 
 /*-----------------------------------------------------------------------------
-˵    �����̶���ť����ֵ
+Àµ    √˜£∫πÃ∂®∞¥≈•∑µªÿ÷µ
 -----------------------------------------------------------------------------*/
 #define DF_ID_OK                             0x00000000
 #define DF_ID_YES                            0x00000000
@@ -79,33 +79,34 @@
 #define DF_ID_BACK                           0xFFFFFFFF
 #define DF_ID_EXIT                           0xFFFFFFFF
 #define DF_ID_HELP                           0x80000001
-#define DF_ID_CLEAR_DTC                      0x80000002   // ������������
+#define DF_ID_CLEAR_DTC                      0x80000002   // µ„ª˜«Â≥˝π ’œ¬Î
 #define DF_ID_REPORT                         0x80000003
-#define DF_ID_NEXT                           0x80000010   // ��һ��
-#define DF_ID_PREV                           0x80000011   // ǰһ��
-#define DF_ID_RESTORE                        0x80000020   // �ָ�����
-#define DF_ID_SFD_THIRD                      0x80000030   // VW���ؽ������棬������������������ֵ
-                                                          // ����artiShowSpecial�ӿڵİ�ť����ֵ
+#define DF_ID_READ_DTC                       0x80000006   // µ„ª˜∂¡π ’œ¬Î
+#define DF_ID_NEXT                           0x80000010   // œ¬“ª∏ˆ
+#define DF_ID_PREV                           0x80000011   // «∞“ª∏ˆ
+#define DF_ID_RESTORE                        0x80000020   // ª÷∏¥ ˝æ›
+#define DF_ID_SFD_THIRD                      0x80000030   // VWÕ¯πÿΩ‚À¯ΩÁ√Ê£¨°∞µ⁄»˝∑Ω¥¶¿Ì°±∑µªÿ÷µ
+                                                          // ”√”⁄artiShowSpecialΩ”ø⁄µƒ∞¥≈•∑µªÿ÷µ
 
 
 /*-----------------------------------------------------------------------------
-˵    �������ɰ�ť����ֵ�����߱�ţ���ʹ���ڸ��ֿ��������Ӱ�ť�Ŀؼ�
+Àµ    √˜£∫◊‘”…∞¥≈•∑µªÿ÷µ£®ªÚ’ﬂ±‡∫≈£©£¨ π”√”⁄∏˜÷÷ø…◊‘”…ÃÌº”∞¥≈•µƒøÿº˛
 -----------------------------------------------------------------------------*/
 #define DF_ID_FREEBTN_0                      0x00000100
 #define DF_ID_FREEBTN_1                      0x00000101
 #define DF_ID_FREEBTN_2                      0x00000102
 #define DF_ID_FREEBTN_3                      0x00000103
-//#define DF_ID_FREEBTN_XX                   0x000001XX //һ��FF�����ɰ�ť
+//#define DF_ID_FREEBTN_XX                   0x000001XX //“ªπ≤FF∏ˆ◊‘”…∞¥≈•
 
 
-#define DF_ST_BTN_ENABLE                     ((uint32_t)0x00)     // ��ť״̬Ϊ�ɼ����ҿɵ��
-#define DF_ST_BTN_DISABLE                    ((uint32_t)0x01)     // ��ť״̬Ϊ�ɼ������ɵ��
-#define DF_ST_BTN_UNVISIBLE                  ((uint32_t)0x02)     // ��ť״̬Ϊ���ɼ�������
+#define DF_ST_BTN_ENABLE                     ((uint32_t)0x00)     // ∞¥≈•◊¥Ã¨Œ™ø…º˚≤¢«“ø…µ„ª˜
+#define DF_ST_BTN_DISABLE                    ((uint32_t)0x01)     // ∞¥≈•◊¥Ã¨Œ™ø…º˚µ´≤ªø…µ„ª˜
+#define DF_ST_BTN_UNVISIBLE                  ((uint32_t)0x02)     // ∞¥≈•◊¥Ã¨Œ™≤ªø…º˚£¨“˛≤ÿ
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ������ȡ�̶���ť�ı��ĺ�ֵID�����ڽӿ� GetButtonText
+Àµ    √˜£∫ªÒ»°πÃ∂®∞¥≈•Œƒ±æµƒ∫Í÷µID£¨”√”⁄Ω”ø⁄ GetButtonText
 -----------------------------------------------------------------------------*/
 #define DF_TEXT_ID_OK                             0x00000001
 #define DF_TEXT_ID_YES                            0x00000002
@@ -122,26 +123,26 @@
 
 
 /*-----------------------------------------------------------------------------
-˵    �����޲�������ֵ
+Àµ    √˜£∫Œﬁ≤Ÿ◊˜∑µªÿ÷µ
 -----------------------------------------------------------------------------*/
 #define DF_ID_NOKEY                               0x04000000
 
 
 /*-----------------------------------------------------------------------------
-˵    ����û��ѡ������һ�з���ֵ
-          ������Ӧ�ó��������SetSelectedType�ӿڣ�������ΪITEM_SELECT_DISABLED
-          ����û�е���SetDefaultSelectedRow�������
-          CArtiList��Show����ֵΪû��ѡ������һ��DF_LIST_LINE_NONE
-          ��GetSelectedRowҲ����û��ѡ������һ��DF_LIST_LINE_NONE
+Àµ    √˜£∫√ª”–—°÷–»Œ“‚“ª––∑µªÿ÷µ
+          »Áπ˚’Ô∂œ”¶”√≥Ã–Úµ˜”√¡ÀSetSelectedTypeΩ”ø⁄£¨≤¢…Ë÷√Œ™ITEM_SELECT_DISABLED
+          ≤¢«“√ª”–µ˜”√SetDefaultSelectedRow£¨«Èøˆœ¬
+          CArtiListµƒShow∑µªÿ÷µŒ™√ª”–—°÷–»Œ“‚“ª––DF_LIST_LINE_NONE
+          «“GetSelectedRow“≤∑µªÿ√ª”–—°÷–»Œ“‚“ª––DF_LIST_LINE_NONE
 -----------------------------------------------------------------------------*/
 #define DF_LIST_LINE_NONE                         0xFFFF
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ����CArtiSystem ��ť����ֵ�� Show �İ�ť����ֵ
-          ��ť������һ��ɨ�裬һ�����룬��������ϱ��棬����
-          ���磬�����һ��ɨ�衱���� DF_ID_START
+Àµ    √˜£∫CArtiSystem ∞¥≈•∑µªÿ÷µ∫Í Show µƒ∞¥≈•∑µªÿ÷µ
+          ∞¥≈•∞¸¿®£∫“ªº¸…®√Ë£¨“ªº¸«Â¬Î£¨∞Ô÷˙£¨’Ô∂œ±®∏Ê£¨∑µªÿ
+          ¿˝»Á£¨µ„ª˜°∞“ªº¸…®√Ë°±∑µªÿ DF_ID_START
 -----------------------------------------------------------------------------*/
 #define DF_ID_SYS_START                       0x80000004
 #define DF_ID_SYS_STOP                        0x80000005
@@ -154,7 +155,7 @@
 
 
 /*-----------------------------------------------------------------------------
-˵    ���� CArtiSystem ҳ���б����ֵ(Show)����ʾ������Ǹ�ϵͳ
+Àµ    √˜£∫ CArtiSystem “≥√Ê¡–±ÌœÓ∑µªÿ÷µ(Show)£¨±Ì æµ„ª˜¡Àƒ«∏ˆœµÕ≥
 -----------------------------------------------------------------------------*/
 #define DF_ID_SYS_0                         0x00000000
 #define DF_ID_SYS_1                         0x00000001
@@ -164,99 +165,99 @@
 
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-// CArtiSystem ϵͳɨ��˵��£����ADAS��(Show)����ֵ
-#define DF_ID_SYS_ADAS_0                    0x01000000      // ����˵�0��ϵͳ��ADAS
-#define DF_ID_SYS_ADAS_1                    0x01000001      // ����˵�1��ϵͳ��ADAS
-#define DF_ID_SYS_ADAS_2                    0x01000002      // ����˵�2��ϵͳ��ADAS
-#define DF_ID_SYS_ADAS_3                    0x01000003      // ����˵�3��ϵͳ��ADAS
+// CArtiSystem œµÕ≥…®√Ë≤Àµ•œ¬£¨µ„ª˜ADAS£¨(Show)∑µªÿ÷µ
+#define DF_ID_SYS_ADAS_0                    0x01000000      // µ„ª˜¡Àµ⁄0∏ˆœµÕ≥µƒADAS
+#define DF_ID_SYS_ADAS_1                    0x01000001      // µ„ª˜¡Àµ⁄1∏ˆœµÕ≥µƒADAS
+#define DF_ID_SYS_ADAS_2                    0x01000002      // µ„ª˜¡Àµ⁄2∏ˆœµÕ≥µƒADAS
+#define DF_ID_SYS_ADAS_3                    0x01000003      // µ„ª˜¡Àµ⁄3∏ˆœµÕ≥µƒADAS
 //...
 //#define DF_ID_SYS_ADAS_X
 #define DF_ID_SYS_ADAS_MASK                 0x0000FFFF
-#define DF_SYS_GET_ADAS_SYS_NO(x)           (((x) & DF_ID_SYS_DTC_MASK))   // ϵͳ���
+#define DF_SYS_GET_ADAS_SYS_NO(x)           (((x) & DF_ID_SYS_DTC_MASK))   // œµÕ≥±‡∫≈
 
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-// CArtiSystem ϵͳɨ��˵��£�������ٲ鿴�����룬(Show)����ֵ
-#define DF_ID_SYS_DTC_0                     0x00100000      // ����˵�0��ϵͳ�Ĺ�������������ť
-#define DF_ID_SYS_DTC_1                     0x00100001      // ����˵�1��ϵͳ�Ĺ�������������ť
-#define DF_ID_SYS_DTC_2                     0x00100002      // ����˵�2��ϵͳ�Ĺ�������������ť
-#define DF_ID_SYS_DTC_3                     0x00100003      // ����˵�3��ϵͳ�Ĺ�������������ť
+// CArtiSystem œµÕ≥…®√Ë≤Àµ•œ¬£¨µ„ª˜øÏÀŸ≤Èø¥π ’œ¬Î£¨(Show)∑µªÿ÷µ
+#define DF_ID_SYS_DTC_0                     0x00100000      // µ„ª˜¡Àµ⁄0∏ˆœµÕ≥µƒπ ’œ¬ÎøÏÀŸ‰Ø¿¿∞¥≈•
+#define DF_ID_SYS_DTC_1                     0x00100001      // µ„ª˜¡Àµ⁄1∏ˆœµÕ≥µƒπ ’œ¬ÎøÏÀŸ‰Ø¿¿∞¥≈•
+#define DF_ID_SYS_DTC_2                     0x00100002      // µ„ª˜¡Àµ⁄2∏ˆœµÕ≥µƒπ ’œ¬ÎøÏÀŸ‰Ø¿¿∞¥≈•
+#define DF_ID_SYS_DTC_3                     0x00100003      // µ„ª˜¡Àµ⁄3∏ˆœµÕ≥µƒπ ’œ¬ÎøÏÀŸ‰Ø¿¿∞¥≈•
 //...
 //#define DF_ID_SYS_DTC_X
 #define DF_ID_SYS_DTC_MASK                  0x0000FFFF
-#define DF_SYS_GET_DTC_SYS_NO(x)            (((x) & DF_ID_SYS_DTC_MASK))   // ϵͳ���
+#define DF_SYS_GET_DTC_SYS_NO(x)            (((x) & DF_ID_SYS_DTC_MASK))   // œµÕ≥±‡∫≈
 
 
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-// CArtiSystem ���߳�ϵͳ��ϣ�������ĸ�ϵͳ
-#define DF_ID_SYS_TH1_0                     0x00010000      // ���������Ϊ0��ϵͳ����1���߳�
-#define DF_ID_SYS_TH1_1                     0x00010001      // ���������Ϊ1��ϵͳ����1���߳�
-#define DF_ID_SYS_TH1_2                     0x00010002      // ���������Ϊ2��ϵͳ����1���߳�
+// CArtiSystem ∂‡œﬂ≥ÃœµÕ≥’Ô∂œ£¨µ„ª˜¡Àƒƒ∏ˆœµÕ≥
+#define DF_ID_SYS_TH1_0                     0x00010000      // ø™∆Ù°∞±‡∫≈Œ™0µƒœµÕ≥°±µ⁄1∏ˆœﬂ≥Ã
+#define DF_ID_SYS_TH1_1                     0x00010001      // ø™∆Ù°∞±‡∫≈Œ™1µƒœµÕ≥°±µ⁄1∏ˆœﬂ≥Ã
+#define DF_ID_SYS_TH1_2                     0x00010002      // ø™∆Ù°∞±‡∫≈Œ™2µƒœµÕ≥°±µ⁄1∏ˆœﬂ≥Ã
 //...
 //#define DF_ID_SYS_TH1_X                   0x0001000X
-#define DF_ID_SYS_TH2_1                     0x00020001      // ���������Ϊ1��ϵͳ����2���߳�
-#define DF_ID_SYS_TH3_2                     0x00030002      // ���������Ϊ2��ϵͳ����3���߳�
-#define DF_ID_SYS_TH4_3                     0x00040003      // ���������Ϊ3��ϵͳ����4���߳�
+#define DF_ID_SYS_TH2_1                     0x00020001      // ø™∆Ù°∞±‡∫≈Œ™1µƒœµÕ≥°±µ⁄2∏ˆœﬂ≥Ã
+#define DF_ID_SYS_TH3_2                     0x00030002      // ø™∆Ù°∞±‡∫≈Œ™2µƒœµÕ≥°±µ⁄3∏ˆœﬂ≥Ã
+#define DF_ID_SYS_TH4_3                     0x00040003      // ø™∆Ù°∞±‡∫≈Œ™3µƒœµÕ≥°±µ⁄4∏ˆœﬂ≥Ã
 //...
 //#define DF_ID_SYS_TH2_X
 //#define DF_ID_SYS_TH3_X
 //#define DF_ID_SYS_TH4_X
 #define DF_ID_SYS_TH_MASK                   0x000F0000
-#define DF_SYS_GET_TH_NO(x)                 (((x) & DF_ID_SYS_TH_MASK) >> 16)   // �̱߳��
+#define DF_SYS_GET_TH_NO(x)                 (((x) & DF_ID_SYS_TH_MASK) >> 16)   // œﬂ≥Ã±‡∫≈
 
 
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// CArtiSystem ϵͳɨ������
-#define DF_SST_TYPE_DEFAULT                0        // Ĭ��ϵͳ����
-#define DF_SST_TYPE_ADAS                   1        // ADASϵͳɨ������
+// CArtiSystem œµÕ≥…®√Ë¿‡–Õ
+#define DF_SST_TYPE_DEFAULT                0        // ƒ¨»œœµÕ≥¿‡–Õ
+#define DF_SST_TYPE_ADAS                   1        // ADASœµÕ≥…®√Ë¿‡–Õ
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����CArtiSystem ϵͳ״̬�꣬ uResult ָ��ϵͳ������ս��
-          ������void SetItemResult(uint16_t uIndex, uint32_t uResult);
+Àµ    √˜£∫CArtiSystem œµÕ≥◊¥Ã¨∫Í£¨ uResult ÷∏∂®œµÕ≥œÓµƒ◊Ó÷’Ω·π˚
+            ”√”⁄void SetItemResult(uint16_t uIndex, uint32_t uResult);
 -----------------------------------------------------------------------------*/
-#define DF_ENUM_UNKNOWN                     0x10000000  //δ֪
-#define DF_ENUM_NOTEXIST                    0x20000000  //������
-#define DF_ENUM_NOTSUPPORT                  0x30000000  //��֧��
-#define DF_ENUM_NODTC                       0x40000000  //����
-#define DF_ENUM_DTCNUM                      0x80000000  //����
-//DF_ENUM_DTCNUM + 1 Ϊ��1��������
+#define DF_ENUM_UNKNOWN                     0x10000000  //Œ¥÷™
+#define DF_ENUM_NOTEXIST                    0x20000000  //≤ª¥Ê‘⁄
+#define DF_ENUM_NOTSUPPORT                  0x30000000  //≤ª÷ß≥÷
+#define DF_ENUM_NODTC                       0x40000000  //Œﬁ¬Î
+#define DF_ENUM_DTCNUM                      0x80000000  //”–¬Î
+//DF_ENUM_DTCNUM + 1 Œ™”–1∏ˆπ ’œ¬Î
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����CArtiSystem ADASϵͳ״̬�꣬ uAdasResult ָ��ADASϵͳ��Ľ��
-          ������void SetItemAdas(uint16_t uIndex, uint32_t uAdasResult);
+Àµ    √˜£∫CArtiSystem ADASœµÕ≥◊¥Ã¨∫Í£¨ uAdasResult ÷∏∂®ADASœµÕ≥œÓµƒΩ·π˚
+            ”√”⁄void SetItemAdas(uint16_t uIndex, uint32_t uAdasResult);
 -----------------------------------------------------------------------------*/
-#define DF_ENUM_NO_ADAS                     0  // ������ADAS
-#define DF_ENUM_ADAS_EXIST                  1  // ����ADAS
+#define DF_ENUM_NO_ADAS                     0  // ≤ª¥Ê‘⁄ADAS
+#define DF_ENUM_ADAS_EXIST                  1  // ¥Ê‘⁄ADAS
 
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����CArtiSystem ϵͳɨ��״̬�꣬���� SetScanStatus
+Àµ    √˜£∫CArtiSystem œµÕ≥…®√Ë◊¥Ã¨∫Í£¨”√”⁄ SetScanStatus
 -----------------------------------------------------------------------------*/
-#define DF_SYS_SCAN_START                        0  // ��ʼɨ��
-#define DF_SYS_SCAN_PAUSE                        1  // ��ͣɨ��
-#define DF_SYS_SCAN_FINISH                       2  // ɨ�����
+#define DF_SYS_SCAN_START                        0  // ø™ º…®√Ë
+#define DF_SYS_SCAN_PAUSE                        1  // ‘›Õ£…®√Ë
+#define DF_SYS_SCAN_FINISH                       2  // …®√ËΩ· ¯
 
 
 /*-----------------------------------------------------------------------------
-˵    ����CArtiSystem ϵͳɨ��״̬�꣬���� SetClearStatus
+Àµ    √˜£∫CArtiSystem œµÕ≥…®√Ë◊¥Ã¨∫Í£¨”√”⁄ SetClearStatus
 -----------------------------------------------------------------------------*/
-#define DF_SYS_CLEAR_START                       0  // һ�����뿪ʼ
-#define DF_SYS_CLEAR_FINISH                      1  // һ���������
+#define DF_SYS_CLEAR_START                       0  // “ªº¸«Â¬Îø™ º
+#define DF_SYS_CLEAR_FINISH                      1  // “ªº¸«Â¬ÎΩ· ¯
 
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ��������� Show ����ֵ�������� CArtiInput ��
-          ���ְ�ť���ͣ�ȷ����ȡ�����Զ��尴��
+Àµ    √˜£∫ ‰»ÎøÚ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiInput ¿‡
+          »˝÷÷∞¥≈•¿‡–Õ£¨»∑∂®°¢»°œ˚°¢◊‘∂®“Â∞¥º¸
 -----------------------------------------------------------------------------*/
 #define DF_ID_INPUT_OK                      DF_ID_OK
 #define DF_ID_INPUT_CANCLE                  DF_ID_CANCEL
@@ -274,12 +275,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    �����˵��� Show ����ֵ�������� CArtiMenu ��
+Àµ    √˜£∫≤Àµ•œÓ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiMenu ¿‡
 -----------------------------------------------------------------------------*/
 #define DF_ID_MENU_BACK                     DF_ID_BACK
 #define DF_ID_MENU_HELP                     DF_ID_HELP
 
-#define DF_ID_MENU_TREE                     0x80000000  // �˵������֣��ݶ�
+#define DF_ID_MENU_TREE                     0x80000000  // ≤Àµ• ˜≤ø∑÷£¨‘›∂®
 
 #define DF_ID_MENU                          0x00000000
 #define DF_ID_MENU_0                        0x00000000
@@ -289,15 +290,15 @@
 //...
 //#define DF_ID_MENU_X                      0x0000XXXX
 
-#define DF_ST_MENU_NORMAL                   0x00000000  // ����״̬
-#define DF_ST_MENU_EXPIR                    0x00000001  // ��������
-#define DF_ST_MENU_DISABLE                  0x00000003  // ʧ��״̬
+#define DF_ST_MENU_NORMAL                   0x00000000  // ’˝≥£◊¥Ã¨
+#define DF_ST_MENU_EXPIR                    0x00000001  // »Ìº˛π˝∆⁄
+#define DF_ST_MENU_DISABLE                  0x00000003  //  ßƒ‹◊¥Ã¨
 
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ���������� Show ����ֵ�������� CArtiLiveData ��
+Àµ    √˜£∫ ˝æ›¡˜ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiLiveData ¿‡
 -----------------------------------------------------------------------------*/
 #define DF_ID_LIVEDATA_BACK                 DF_ID_BACK
 #define DF_ID_LIVEDATA_NEXT                 DF_ID_NEXT
@@ -309,13 +310,13 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ���������� Show ����ֵ�������� CArtiTrouble ��
+Àµ    √˜£∫π ’œ¬Î Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiTrouble ¿‡
 -----------------------------------------------------------------------------*/
 #define DF_ID_TROUBLE_BACK                       DF_ID_BACK
 #define DF_ID_TROUBLE_CLEAR                      DF_ID_CLEAR_DTC
 #define DF_ID_TROUBLE_REPORT                     DF_ID_REPORT
 
-// ������ ��� "����֡" �� Show ����ֵ�������� CArtiTrouble ��
+// π ’œ¬Î µ„ª˜ "∂≥Ω·÷°" µƒ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiTrouble ¿‡
 #define DF_ID_TROUBLE_0                          0x00000000
 #define DF_ID_TROUBLE_1                          0x00000001
 #define DF_ID_TROUBLE_2                          0x00000002
@@ -324,7 +325,7 @@
 //...
 //#define DF_ID_TROUBLE_X                        0x0000XXXX
 
-// ������ ��� "ά������" �� Show ����ֵ�������� CArtiTrouble ��
+// π ’œ¬Î µ„ª˜ "Œ¨–ﬁ◊ ¡œ" µƒ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiTrouble ¿‡
 #define DF_ID_REPAIR_MANUAL_0                    0x40000000
 #define DF_ID_REPAIR_MANUAL_1                    0x40000001
 #define DF_ID_REPAIR_MANUAL_2                    0x40000002
@@ -339,26 +340,26 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------
-˵    ������ϱ��������״̬�����ڹ�������ṹ�� stDtcNode �� uStatus
+Àµ    √˜£∫’Ô∂œ±®∏Êπ ’œ¬Î◊¥Ã¨£¨”√”⁄π ’œ¬ÎœÓ£¨Ω·ππÃÂ stDtcNode µƒ uStatus
 ----------------------------------------------------------------------------------*/
-#define DF_DTC_STATUS_NONE                 (0)            // ��״̬
-#define DF_DTC_STATUS_CURRENT              (1 << 0)       // ��ǰ������    Current
-#define DF_DTC_STATUS_HISTORY              (1 << 1)       // ��ʷ������    History
-#define DF_DTC_STATUS_PENDING              (1 << 2)       // ����������    Pending
-#define DF_DTC_STATUS_TEMP                 (1 << 3)       // ��ʱ������    Temporary
-#define DF_DTC_STATUS_NA                   (1 << 4)       // δ֪������    N/A
-#define DF_DTC_STATUS_OTHERS               (0xFFFFFFFF)   // �޷����ൽ����ö�ٷ��ֱ࣬�Ӱ�strStatus��ʾ
+#define DF_DTC_STATUS_NONE                 (0)            // Œﬁ◊¥Ã¨
+#define DF_DTC_STATUS_CURRENT              (1 << 0)       // µ±«∞π ’œ¬Î    Current
+#define DF_DTC_STATUS_HISTORY              (1 << 1)       // ¿˙ ∑π ’œ¬Î    History
+#define DF_DTC_STATUS_PENDING              (1 << 2)       // ¥˝∂®π ’œ¬Î    Pending
+#define DF_DTC_STATUS_TEMP                 (1 << 3)       // ¡Ÿ ±π ’œ¬Î    Temporary
+#define DF_DTC_STATUS_NA                   (1 << 4)       // Œ¥÷™π ’œ¬Î    N/A
+#define DF_DTC_STATUS_OTHERS               (0xFFFFFFFF)   // Œﬁ∑®πÈ¿‡µΩ“‘…œ√∂æŸ∑÷¿‡£¨÷±Ω”∞¥strStatusœ‘ æ
 
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------
-˵    ���������������1������Ϣ�ı�����������     2���������͵ĵ�����
-          ������ CArtiPopup �� InitTitle �ӿڵ� uPopupType ����
+Àµ    √˜£∫µØ≥ˆøÚ◊Èº˛£¨1°¢¥øœ˚œ¢Œƒ±æµØ≥ˆøÚ¿‡–Õ     2°¢±Ì∏Ò¿‡–ÕµƒµØ≥ˆøÚ
+            ”√”⁄ CArtiPopup µƒ InitTitle Ω”ø⁄µƒ uPopupType ≤Œ ˝
 ----------------------------------------------------------------------------------*/
-#define DF_POPUP_TYPE_MSG              0x00000001       // ����Ϣ�ı�����������
-#define DF_POPUP_TYPE_LIST             0x00000002       // �������͵ĵ�����
+#define DF_POPUP_TYPE_MSG              0x00000001       // ¥øœ˚œ¢Œƒ±æµØ≥ˆøÚ¿‡–Õ
+#define DF_POPUP_TYPE_LIST             0x00000002       // ±Ì∏Ò¿‡–ÕµƒµØ≥ˆøÚ
 
 
 
@@ -366,91 +367,91 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------
-˵    �������ڵ�������� CArtiPopup �ӿ�SetPopDirection�����õ����򵯳��ķ���
+Àµ    √˜£∫”√”⁄µØ≥ˆøÚ◊Èº˛ CArtiPopup Ω”ø⁄SetPopDirection£¨…Ë÷√µØ≥ˆøÚµØ≥ˆµƒ∑ΩœÚ
           void SetPopDirection(uint32_t uDirection);
 ----------------------------------------------------------------------------------*/
-#define DF_POPUP_DIR_TOP              0x00000000       // ��������
-#define DF_POPUP_DIR_CENTER           0x00000001       // ���е���
-#define DF_POPUP_DIR_RIGHT            0x00000002       // �Ҳ൯��
-#define DF_POPUP_DIR_BOTTOM           0x00000004       // �ײ�����
-#define DF_POPUP_DIR_LEFT             0x00000008       // ��൯��
+#define DF_POPUP_DIR_TOP              0x00000000       // ∂•≤øµØ≥ˆ
+#define DF_POPUP_DIR_CENTER           0x00000001       // æ”÷–µØ≥ˆ
+#define DF_POPUP_DIR_RIGHT            0x00000002       // ”“≤‡µØ≥ˆ
+#define DF_POPUP_DIR_BOTTOM           0x00000004       // µ◊≤øµØ≥ˆ
+#define DF_POPUP_DIR_LEFT             0x00000008       // ◊Û≤‡µØ≥ˆ
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����ͼƬ���ӷ���ֵ�����߱�ţ���ʹ����CArtiPicture��
+Àµ    √˜£∫Õº∆¨ÃÌº”∑µªÿ÷µ£®ªÚ’ﬂ±‡∫≈£©£¨ π”√”⁄CArtiPictureµƒ
 -----------------------------------------------------------------------------*/
 #define DF_ID_PICTURE_NONE                   0xFFFFFFFF
 #define DF_ID_PICTURE_0                      0x00000000
 #define DF_ID_PICTURE_1                      0x00000001
 #define DF_ID_PICTURE_2                      0x00000002
 #define DF_ID_PICTURE_3                      0x00000003
-//#define DF_ID_PICTURE_XX                   0x000000XX //һ��FF��ͼƬ
+//#define DF_ID_PICTURE_XX                   0x000000XX //“ªπ≤FF’≈Õº∆¨
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����С��̽UI���ͣ������� artiMsgBoxActTest ���β� uTestType
-          �������� CArtiLiveData �Ľӿ� SetComponentType
+Àµ    √˜£∫–°≥µÃΩUI¿‡–Õ£¨  ”√”⁄ artiMsgBoxActTest µƒ–Œ≤Œ uTestType
+          ªÚ’ﬂ”√”⁄ CArtiLiveData µƒΩ”ø⁄ SetComponentType
 -----------------------------------------------------------------------------*/
-#define DF_TYPE_ENTRY_COMMING                0x00000001     // ����ͨ���У��������������ԡ���������
-#define DF_TYPE_COMM_FAILED                  0x00000002     // ͨ��ʧ������
-#define DF_TYPE_ACT_TEST_NOT_SUPPORT         0x00000003     // ��֧�ֲ�������
-#define DF_TYPE_THROTTLE_CARBON              0x00000010     // �����Ż�̼���
-#define DF_TYPE_FULE_CORRECTION              0x00000020     // ȼ����������ϵͳ���
-#define DF_TYPE_MAF_TEST                     0x00000030     // �����������������
-#define DF_TYPE_INTAKE_PRESSURE              0x00000040     // ����ѹ�����������
-#define DF_TYPE_INTAKE_PRESSURE_ACC          0x00000041     // ����ѹ������������е��ɿ�������ʾ
-#define DF_TYPE_OXYGEN_SENSOR                0x00000050     // �����������
-#define DF_TYPE_ENGINE_TEST_NO_DTC           0x00000060     // CarPal��������⣬�޹�����ҳ��
+#define DF_TYPE_ENTRY_COMMING                0x00000001     // ’˝‘⁄Õ®–≈÷–£¨¿˝»Áµ„ª˜≤øº˛≤‚ ‘°¢ ˝æ›¡˜µ»
+#define DF_TYPE_COMM_FAILED                  0x00000002     // Õ®–≈ ß∞‹¿‡–Õ
+#define DF_TYPE_ACT_TEST_NOT_SUPPORT         0x00000003     // ≤ª÷ß≥÷≤øº˛≤‚ ‘
+#define DF_TYPE_THROTTLE_CARBON              0x00000010     // Ω⁄∆¯√≈ª˝ÃººÏ≤‚
+#define DF_TYPE_FULE_CORRECTION              0x00000020     // »º”Õ–ﬁ’˝øÿ÷∆œµÕ≥ºÏ≤‚
+#define DF_TYPE_MAF_TEST                     0x00000030     // ø’∆¯¡˜¡ø¥´∏–∆˜ºÏ≤‚
+#define DF_TYPE_INTAKE_PRESSURE              0x00000040     // Ω¯∆¯—π¡¶¥´∏–∆˜ºÏ≤‚
+#define DF_TYPE_INTAKE_PRESSURE_ACC          0x00000041     // Ω¯∆¯—π¡¶¥´∏–∆˜ºÏ≤‚÷–µƒÀ…ø™”Õ√≈Ã· æ
+#define DF_TYPE_OXYGEN_SENSOR                0x00000050     // —ı¥´∏–∆˜ºÏ≤‚
+#define DF_TYPE_ENGINE_TEST_NO_DTC           0x00000060     // CarPal∑¢∂Øª˙ºÏ≤‚£¨Œﬁπ ’œ¬Î“≥√Ê
 
 
 
 /*-----------------------------------------------------------------------------
-˵    �����������Խ��ֵ������ CArtiLiveData �Ľӿ� SetComponentResult
+Àµ    √˜£∫≤øº˛≤‚ ‘Ω·π˚÷µ£¨”√”⁄ CArtiLiveData µƒΩ”ø⁄ SetComponentResult
 -----------------------------------------------------------------------------*/
-#define DF_RESULT_THROTTLE_NORMAL            0x00000001      // ��������������������
-#define DF_RESULT_THROTTLE_LIGHT_CARBON      0x00000002      // ��������������΢��̼
-#define DF_RESULT_THROTTLE_SERIOUSLY         0x00000003      // �����Ż�̼����
+#define DF_RESULT_THROTTLE_NORMAL            0x00000001      // ∑¢∂Øª˙Ω⁄∆¯√≈‘À◊˜’˝≥£
+#define DF_RESULT_THROTTLE_LIGHT_CARBON      0x00000002      // Ω⁄∆¯√≈“…À∆”–«·Œ¢ª˝Ãº
+#define DF_RESULT_THROTTLE_SERIOUSLY         0x00000003      // Ω⁄∆¯√≈ª˝Ãº—œ÷ÿ
 
-#define DF_RESULT_FULE_NORMAL                0x00000001      // ȼ����������
-#define DF_RESULT_FULE_HIGH                  0x00000002      // ȼ������ƫŨ
-#define DF_RESULT_FULE_LOW                   0x00000003      // ȼ������ƫϡ
-#define DF_RESULT_FULE_ABNORMAL              0x00000004      // ȼ�������쳣
+#define DF_RESULT_FULE_NORMAL                0x00000001      // »º”Õ–ﬁ’˝’˝≥£
+#define DF_RESULT_FULE_HIGH                  0x00000002      // »º”Õ–ﬁ’˝∆´≈®
+#define DF_RESULT_FULE_LOW                   0x00000003      // »º”Õ–ﬁ’˝∆´œ°
+#define DF_RESULT_FULE_ABNORMAL              0x00000004      // »º”Õ–ﬁ’˝“Ï≥£
 
-#define DF_RESULT_MAF_NORMAL                 0x00000001      // ����������
-#define DF_RESULT_MAF_HIGH                   0x00000002      // ������ƫ��
-#define DF_RESULT_MAF_LOW                    0x00000003      // ������ƫС
+#define DF_RESULT_MAF_NORMAL                 0x00000001      // Ω¯∆¯¡ø’˝≥£
+#define DF_RESULT_MAF_HIGH                   0x00000002      // Ω¯∆¯¡ø∆´¥Û
+#define DF_RESULT_MAF_LOW                    0x00000003      // Ω¯∆¯¡ø∆´–°
 
-#define DF_RESULT_INTAKE_PRESSURE_NORMAL     0x00000001      // ����ѹ������
-#define DF_RESULT_INTAKE_PRESSURE_HIGH       0x00000002      // ����ѹ��ƫ��
+#define DF_RESULT_INTAKE_PRESSURE_NORMAL     0x00000001      // Ω¯∆¯—π¡¶’˝≥£
+#define DF_RESULT_INTAKE_PRESSURE_HIGH       0x00000002      // Ω¯∆¯—π¡¶∆´∏ﬂ
 
-#define DF_RESULT_OXYGEN_NORMAL              0x00000001      // ������������
-#define DF_RESULT_OXYGEN_ERROR               0x00000002      // �����������ֹ���
+#define DF_RESULT_OXYGEN_NORMAL              0x00000001      // —ı¥´∏–∆˜’˝≥£
+#define DF_RESULT_OXYGEN_ERROR               0x00000002      // —ı¥´∏–∆˜≥ˆœ÷π ’œ
 
 
 
 /*-----------------------------------------------------------------------------
-˵    ����������TAP����
+Àµ    √˜£∫µº∫Ω¿∏TAP¿‡–Õ
 -----------------------------------------------------------------------------*/
-#define DF_TAP_TYPE_IS_TOP_NAVIG           1          /* ����������     ���� */
-#define DF_TAP_TYPE_IS_MSGBOX              2          /* ArtiMsgBox     ���� */
-#define DF_TAP_TYPE_IS_INPUT               3          /* ArtiInput      ���� */
-#define DF_TAP_TYPE_IS_ACTIVE              4          /* ArtiActive     ���� */
-#define DF_TAP_TYPE_IS_ECUINFO             5          /* ArtiEcuInfo    ���� */
-#define DF_TAP_TYPE_IS_FILE_DIALOG         6          /* ArtiFileDialog ���� */
-#define DF_TAP_TYPE_IS_FREEZE              7          /* ArtiFreeze     ���� */
-#define DF_TAP_TYPE_IS_LIST                8          /* ArtiList       ���� */
-#define DF_TAP_TYPE_IS_LIVE_DATA           9          /* ArtiLiveData   ���� */
-#define DF_TAP_TYPE_IS_MENU                10         /* ArtiMenu       ���� */
-#define DF_TAP_TYPE_IS_PICTURE             11         /* ArtiPicture    ���� */
-#define DF_TAP_TYPE_IS_SYSTEM              12         /* ArtiSystem     ���� */
-#define DF_TAP_TYPE_IS_TROUBLE             13         /* ArtiTrouble    ���� */
+#define DF_TAP_TYPE_IS_TOP_NAVIG           1          /* ∂•≤øµº∫Ω¿∏     ¿‡–Õ */
+#define DF_TAP_TYPE_IS_MSGBOX              2          /* ArtiMsgBox     ¿‡–Õ */
+#define DF_TAP_TYPE_IS_INPUT               3          /* ArtiInput      ¿‡–Õ */
+#define DF_TAP_TYPE_IS_ACTIVE              4          /* ArtiActive     ¿‡–Õ */
+#define DF_TAP_TYPE_IS_ECUINFO             5          /* ArtiEcuInfo    ¿‡–Õ */
+#define DF_TAP_TYPE_IS_FILE_DIALOG         6          /* ArtiFileDialog ¿‡–Õ */
+#define DF_TAP_TYPE_IS_FREEZE              7          /* ArtiFreeze     ¿‡–Õ */
+#define DF_TAP_TYPE_IS_LIST                8          /* ArtiList       ¿‡–Õ */
+#define DF_TAP_TYPE_IS_LIVE_DATA           9          /* ArtiLiveData   ¿‡–Õ */
+#define DF_TAP_TYPE_IS_MENU                10         /* ArtiMenu       ¿‡–Õ */
+#define DF_TAP_TYPE_IS_PICTURE             11         /* ArtiPicture    ¿‡–Õ */
+#define DF_TAP_TYPE_IS_SYSTEM              12         /* ArtiSystem     ¿‡–Õ */
+#define DF_TAP_TYPE_IS_TROUBLE             13         /* ArtiTrouble    ¿‡–Õ */
 
 
 ////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ���������� Show ����ֵ�������� CArtiNavigation �� ���� CArtiTopTap ��
+Àµ    √˜£∫µº∫Ω¿∏ Show ∑µªÿ÷µ£¨  ”√”⁄ CArtiNavigation ¿‡ ªÚ’ﬂ CArtiTopTap ¿‡
 -----------------------------------------------------------------------------*/
 #define DF_ID_TAP_0                        0x00000000
 #define DF_ID_TAP_1                        0x00000001
@@ -464,48 +465,48 @@
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------
-˵    ���������� artiShowMsgBoxDs �ӿڷ���ֵ
+Àµ    √˜£∫  ”√”⁄ artiShowMsgBoxDs Ω”ø⁄∑µªÿ÷µ
 ----------------------------------------------------------------------------------*/
-#define DF_ID_ADAS_RESULT_BACK             DF_ID_BACK       // ����ˡ����ˡ�
-#define DF_ID_ADAS_RESULT_OK               DF_ID_OK         // ����ˡ���ɡ�
-#define DF_ID_ADAS_RESULT_REPORT           DF_ID_REPORT     // ����ˡ����ɱ��桱
+#define DF_ID_ADAS_RESULT_BACK             DF_ID_BACK       // µ„ª˜¡À°∞∫ÛÕÀ°±
+#define DF_ID_ADAS_RESULT_OK               DF_ID_OK         // µ„ª˜¡À°∞ÕÍ≥…°±
+#define DF_ID_ADAS_RESULT_REPORT           DF_ID_REPORT     // µ„ª˜¡À°∞…˙≥…±®∏Ê°±
 
 
 
 ///////////////////////////////////////////////////////////////////////////////////
 /*---------------------------------------------------------------------------------
-˵    ���������� CArtiHidden �� Show �ӿڷ���ֵ
+Àµ    √˜£∫  ”√”⁄ CArtiHidden µƒ Show Ω”ø⁄∑µªÿ÷µ
 ----------------------------------------------------------------------------------*/
-#define DF_ID_HIDDEN_BACK             DF_ID_BACK        // ����ˡ����ˡ�
-#define DF_ID_HIDDEN_OK               DF_ID_OK          // ����ˡ�ȷ��ִ�����á�
-#define DF_ID_HIDDEN_RESTORE_DATA     DF_ID_RESTORE     // ����ˡ��ָ����ݡ�
+#define DF_ID_HIDDEN_BACK             DF_ID_BACK        // µ„ª˜¡À°∞∫ÛÕÀ°±
+#define DF_ID_HIDDEN_OK               DF_ID_OK          // µ„ª˜¡À°∞»∑∂®÷¥––…Ë÷√°±
+#define DF_ID_HIDDEN_RESTORE_DATA     DF_ID_RESTORE     // µ„ª˜¡À°∞ª÷∏¥ ˝æ›°±
 
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------------------------
-˵    ���������� CArtiTopoGraph �� SetSvgPath �� SetUsedLocalData �ӿڷ���ֵ
+Àµ    √˜£∫  ”√”⁄ CArtiTopoGraph µƒ SetSvgPath ∫Õ SetUsedLocalData Ω”ø⁄∑µªÿ÷µ
 -------------------------------------------------------------------------------------------------*/
-#define DF_SVG_PATH_IS_INVALID      0xFFFFFFFF    // ·���Ƿ��������ļ�������
-#define DF_SVG_PATH_OK              0             // ������ȷ
-#define DF_SVG_USED_LOCAL_OK        0             // ������ȷ
-#define DF_SVG_LOCAL_NOT_SUPPORT    DF_APP_CURRENT_NOT_SUPPORT_FUNCTION  // ��ʾ����SVG�����ļ���֧��
-#define DF_SVG_API_NOT_SUPPORT      DF_FUNCTION_APP_CURRENT_NOT_SUPPORT  // ��ʾ��ǰAPP�汾��û�д˽ӿ�
+#define DF_SVG_PATH_IS_INVALID      0xFFFFFFFF    // ¬∑æ∂∑«∑®£¨ªÚ’ﬂŒƒº˛≤ª¥Ê‘⁄
+#define DF_SVG_PATH_OK              0             // …Ë÷√’˝»∑
+#define DF_SVG_USED_LOCAL_OK        0             // …Ë÷√’˝»∑
+#define DF_SVG_LOCAL_NOT_SUPPORT    DF_APP_CURRENT_NOT_SUPPORT_FUNCTION  // ±Ì æ±æµÿSVG ˝æ›Œƒº˛≤ª÷ß≥÷
+#define DF_SVG_API_NOT_SUPPORT      DF_FUNCTION_APP_CURRENT_NOT_SUPPORT  // ±Ì æµ±«∞APP∞Ê±æªπ√ª”–¥ÀΩ”ø⁄
 
 ////////////////////////////////////////////////////////////////////////////////////
 /*-----------------------------------------------------------------------------
-˵    ����ϵͳ���Ժ궨�壬����stSysReportItemEx�ṹ���е�ϵͳ����uSysProp
+Àµ    √˜£∫œµÕ≥ Ù–‘∫Í∂®“Â£¨”√”⁄stSysReportItemExΩ·ππÃÂ÷–µƒœµÕ≥ Ù–‘uSysProp
 -----------------------------------------------------------------------------*/
-#define DF_SYS_PROP_DEFAULT                0x00000000   // Ĭ�ϣ�����
-#define DF_SYS_PROP_ADAS                   0x00000001   // ����ADAS��������
-#define DF_SYS_PROP_TPMS                   0x00000002   // ����̥ѹ��������
+#define DF_SYS_PROP_DEFAULT                0x00000000   // ƒ¨»œ£¨≥£πÊ
+#define DF_SYS_PROP_ADAS                   0x00000001   // æﬂ”–ADASπ¶ƒ‹ Ù–‘
+#define DF_SYS_PROP_TPMS                   0x00000002   // æﬂ”–Ã•—ππ¶ƒ‹ Ù–‘
 
 
 ////////////////////////////////////////////////////////////////////////////////////
 /*-------------------------------------------------------------------------------
-˵    ����ϵͳִ�н��״̬�궨�壬����stSysReportItemEx�ṹ���е�ִ��״̬uStatus
+Àµ    √˜£∫œµÕ≥÷¥––Ω·π˚◊¥Ã¨∫Í∂®“Â£¨”√”⁄stSysReportItemExΩ·ππÃÂ÷–µƒ÷¥––◊¥Ã¨uStatus
 -------------------------------------------------------------------------------*/
-#define DF_SYS_STATUS_ADAS_DEFAULT         0x00000000     // ADAS���ܲ���ִ�У��հף�
-#define DF_SYS_STATUS_ADAS_OK              0x00000001     // ADAS����ִ��OK���ִ�У�Yes��
-#define DF_SYS_STATUS_ADAS_FAILED          0x00000002     // ADAS����ִ��ʧ��
+#define DF_SYS_STATUS_ADAS_DEFAULT         0x00000000     // ADASπ¶ƒ‹≤ªø…÷¥––£®ø’∞◊£©
+#define DF_SYS_STATUS_ADAS_OK              0x00000001     // ADASπ¶ƒ‹÷¥––OKªÚø…÷¥––£®Yes£©
+#define DF_SYS_STATUS_ADAS_FAILED          0x00000002     // ADASπ¶ƒ‹÷¥–– ß∞‹
 #endif

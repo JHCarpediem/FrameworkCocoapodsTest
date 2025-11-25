@@ -17,6 +17,7 @@
 @property (nonatomic, strong) UIView    *enterbgView;   //  输入框背景
 @property (nonatomic, strong) UIButton  *downbtn;
 //@property (nonatomic, strong) UITextField   *enterText;
+@property (nonatomic,strong)TDD_VXXScrollLabel *innerTipsLabel;
 @property (nonatomic, strong) TDD_CustomTextView *textView;
 @property (nonatomic, strong) UIButton *clearButton;
 @property (nonatomic, copy) NSString    *value;
@@ -52,7 +53,7 @@
     _viewTopSpace = 12 * _scale;
     CGFloat hScale = IS_IPad ? (50.0 / 32.0) : 1;
     CGFloat viewLeftSpace = (IS_IPad ? 16 : 10) * _scale;
-    CGFloat downBtnSize = 20 *_scale;
+    CGFloat downBtnSize = (IS_IPad ? 20 : 12) *_scale;
     TDD_CustomLabel * titleLab = ({
         TDD_CustomLabel * label = [[TDD_CustomLabel alloc] init];
         label.font = IS_IPad ? [[UIFont systemFontOfSize:18 weight:UIFontWeightSemibold] tdd_adaptHD] : [[UIFont systemFontOfSize:15] tdd_adaptHD];
@@ -86,36 +87,23 @@
     
    
     self.downbtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [self.downbtn setImage:kImageNamed(@"input_down_arrow") forState:UIControlStateNormal];
-    [self.downbtn setImage:kImageNamed(@"input_up_arrow") forState:UIControlStateSelected];
+    [self.downbtn setBackgroundImage:kImageNamed(@"input_down_arrow") forState:UIControlStateNormal];
+    [self.downbtn setBackgroundImage:kImageNamed(@"input_up_arrow") forState:UIControlStateSelected];
     [self.enterbgView addSubview:self.downbtn];
     [self.downbtn addTarget:self action:@selector(downList) forControlEvents:UIControlEventTouchUpInside];
     [self.downbtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(self.enterbgView.mas_right).offset(-viewLeftSpace);
-        make.top.equalTo(@(13 * hScale));
+        make.top.equalTo(@(16 * hScale));
         make.size.mas_equalTo(CGSizeMake(downBtnSize, downBtnSize));
     }];
     self.downbtn.tdd_hitEdgeInsets = UIEdgeInsetsMake(-15, -15, -15, -15);
     
-//    self.enterText = [[TDD_CustomTextField alloc]init];
-//    self.enterText.delegate = self;
-//    self.enterText.keyboardType = UIKeyboardTypeDefault;
-//    self.enterText.clearButtonMode = UITextFieldViewModeWhileEditing;
-//    self.enterText.textColor = [UIColor tdd_title];
-//    self.enterText.font = [[UIFont systemFontOfSize:15] tdd_adaptHD];
-//    if (isKindOfTopVCI){
-//        UIButton *clearButton = [self.enterText valueForKey:@"_clearButton"];
-//        if (clearButton){
-//            [clearButton setImage:kImageNamed(@"textfiled_clear") forState:UIControlStateNormal];
-//        }
-//    }
-    
-
     // 初始化UITextView
     self.textView = [[TDD_CustomTextView alloc] init];
     self.textView.delegate = self;
     self.textView.backgroundColor = [UIColor clearColor];
     self.textView.textContainerInset = UIEdgeInsetsMake(8, 0, 8, IS_IPad ? 60 : 30); // 添加右侧留空以放置按钮
+    self.textView.textContainer.lineFragmentPadding = 0;
     self.textView.textColor = [UIColor tdd_title];
     self.textView.font = [[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium] tdd_adaptHD];
     
@@ -140,7 +128,13 @@
         make.top.equalTo(self.enterbgView).offset(6 * hScale);
         make.bottom.equalTo(self.enterbgView).offset(-6);
     }];
-    
+    [self.textView addSubview:self.innerTipsLabel];
+    [_innerTipsLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.enterbgView).offset(16 * _scale);
+        make.right.equalTo(self.downbtn.mas_left).offset(0);
+        make.height.mas_equalTo((IS_IPad ? 50 : 32));
+        make.centerY.equalTo(self.enterbgView);
+    }];
     [self.clearButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(self.downbtn);
         make.width.height.equalTo(IS_IPad ? @22 : @16);
@@ -189,8 +183,12 @@
     
     if (self.isShowTranslated) {
         self.titleLab.text = itemModel.strTranslatedTips;
+        NSString *innerTipStr = [itemModel.strTranslatedInnerTips stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        self.innerTipsLabel.text = innerTipStr;
     }else {
         self.titleLab.text = itemModel.strTips;
+        NSString *innerTipStr = [itemModel.strInnerTips stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        self.innerTipsLabel.text = innerTipStr;
     }
     
     NSString * buttonTitle = itemModel.strText;
@@ -204,7 +202,7 @@
         buttonTitle = [buttonTitle substringWithRange:NSMakeRange(0, MIN(self.itemModel.strMask.length, buttonTitle.length))];
     }
     [self.textView setText:buttonTitle];
-    [self updateTextViewHeightWithOneLine:NO];
+    [self updateTextViewHeightWithOneLine:NO needUpdateHeight:false];
 
     NSString *type = [self getKeyboardType];
     self.textView.inputView = nil;
@@ -255,6 +253,11 @@
         make.width.height.equalTo(IS_IPad ? @22 : @16);
         make.right.equalTo(self.downbtn.hidden ? self.enterbgView.mas_right :self.downbtn.mas_left).offset(space);
     }];
+    if ([NSString tdd_isEmpty:self.innerTipsLabel.text] || ![NSString tdd_isEmpty:self.textView.text]) {
+        self.innerTipsLabel.hidden = true;
+    }else {
+        self.innerTipsLabel.hidden = false;
+    }
 }
 
 - (BOOL )hadHistoryRecord {
@@ -274,16 +277,24 @@
     self.saveView.itemModel = self.itemModel;
 //    [self updateTextViewHeightWithOneLine:self.downbtn.selected];
 
-    if (self.heightDidChange) {
-        self.heightDidChange();
-    }
+//    if (self.heightDidChange) {
+//        self.heightDidChange();
+//    }
 }
 
 
 #pragma mark - UITextView输入响应事件
+- (void)handlePlaceholder {
+    if ([NSString tdd_isEmpty:self.innerTipsLabel.text] || ![NSString tdd_isEmpty:self.textView.text] || [self.textView.text containsString:@" "]) {
+        self.innerTipsLabel.hidden = true;
+    }else {
+        self.innerTipsLabel.hidden = false;
+    }
+}
 - (void)clearText {
     self.textView.text = self.itemModel.strText = @"";
     [self updateTextViewHeightWithOneLine:NO];
+
 }
 
 - (void)textViewDidChange:(TDD_CustomTextView *)textView {
@@ -326,10 +337,11 @@
     
     // 2. 处理粘贴操作（text.length > 1 时为粘贴内容）
     if ([text containsString:@"\n"] || text.length > 1) { // 简单判断是否为粘贴
-        
         // 3. 计算粘贴后的新文本
         NSString *currentText = textView.text;
-        NSString *newText = [currentText stringByReplacingCharactersInRange:range withString:text];
+        NSString *newText = [self.itemModel filterTextMatch:text];
+        newText = [currentText stringByReplacingCharactersInRange:range withString:newText];
+        
         NSUInteger newTextLength = newText.length;
         
         // 4. 超限则截断
@@ -341,8 +353,19 @@
                 dispatch_async(dispatch_get_main_queue(), ^{
                     textView.text = newText;
                     textView.selectedRange = newRange;
+                    [self updateTextViewHeightWithOneLine:NO];
                 });
             }
+
+            return NO; // 阻止默认粘贴行为
+        }else {
+            if ([self checkTextMatch:newText]) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    textView.text = newText;
+                    [self updateTextViewHeightWithOneLine:NO];
+                });
+            }
+
             return NO; // 阻止默认粘贴行为
         }
     }
@@ -385,7 +408,7 @@
     return YES;
 }
 
-- (void)updateTextViewHeightWithOneLine:(BOOL)oneLine {
+- (void)updateTextViewHeightWithOneLine:(BOOL)oneLine needUpdateHeight:(BOOL)needUpdateHeight {
     CGFloat oneLightHeight = (IS_IPad ? 50 : 32) * _scale;
     if (oneLine) {
         // 设置 TextView 的内容显示属性
@@ -417,9 +440,19 @@
     [self layoutIfNeeded];
     
     // 如果高度变化，则触发回调以更新表格行的高度
-     if (self.heightDidChange) {
-         self.heightDidChange();
-     }
+    if (needUpdateHeight) {
+        if (self.heightDidChange) {
+            self.heightDidChange();
+        }
+    }
+
+    [self handlePlaceholder];
+    
+}
+
+- (void)updateTextViewHeightWithOneLine:(BOOL)oneLine {
+    [self updateTextViewHeightWithOneLine:oneLine needUpdateHeight:true];
+   
 }
 
 #pragma mark - UITextField输入响应事件
@@ -581,4 +614,14 @@
     return _saveView;
 }
 
+- (TDD_VXXScrollLabel *)innerTipsLabel {
+    if (!_innerTipsLabel) {
+        _innerTipsLabel = [[TDD_VXXScrollLabel alloc] init];
+        _innerTipsLabel.hidden = YES;
+        _innerTipsLabel.font = [[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium] tdd_adaptHD];
+        _innerTipsLabel.textColor = [UIColor placeholderTextColor];
+        _innerTipsLabel.backgroundColor = UIColor.tdd_viewControllerBackground;
+    }
+    return _innerTipsLabel;
+}
 @end

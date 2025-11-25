@@ -47,9 +47,14 @@
     
     [self.liveDataSelectModel setEditBtnTitle];
     
+    if (self.liveDataSelectModel) {
+        self.emptyView.hidden = self.liveDataSelectModel.showItems.count > 0;
+    }else {
+        NSArray *arr = self.liveDataChartSelectModel.isSearch ? self.liveDataChartSelectModel.showItems  : self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.itemArr;
+        self.emptyView.hidden = arr.count > 0;
+    }
     [self.tableView reloadData];
-    
-    self.emptyView.hidden = self.liveDataSelectModel.showItems.count > 0;
+
 
 }
 
@@ -60,8 +65,12 @@
     self.selectItmes = nil;
     
     [self.tableView reloadData];
-    
-    self.emptyView.hidden = self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.selectItmes.count > 0;
+    if (self.liveDataSelectModel) {
+        self.emptyView.hidden = self.liveDataSelectModel.showItems.count > 0;
+    }else {
+        NSArray *arr = self.liveDataChartSelectModel.isSearch ? self.liveDataChartSelectModel.showItems  : self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.itemArr;
+        self.emptyView.hidden = arr.count > 0;
+    }
 
 }
 
@@ -70,7 +79,7 @@
      // 1.0 横竖屏切换来不及取到正确的宽高
      // _scale = IS_IPad ? HD_Height : H_Height;
     _scale = 1.0;
-    _cellHeight = (IS_IPad ? 62 : 60) * _scale;
+    _cellHeight = (IS_IPad ? 62 : 50) * _scale;
     _leftSpace = (IS_IPad ? 40 : 14) * _scale;
     
     UITableView *tableView = [[UITableView alloc] initWithFrame:self.bounds style:UITableViewStyleGrouped];
@@ -112,6 +121,10 @@
     }
 
     [self addSubview:self.emptyView];
+    [_emptyView mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.right.top.equalTo(self);
+        make.bottom.equalTo(self).offset(- NavigationHeight - 60);
+    }];
 
 }
 
@@ -121,7 +134,7 @@
     if (self.liveDataSelectModel) {
         return self.liveDataSelectModel.showItems.count;
     }else {
-        return self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.selectItmes.count;
+        return self.liveDataChartSelectModel.isSearch ? self.liveDataChartSelectModel.showItems.count  : self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.itemArr.count;
     }
     
 }
@@ -170,7 +183,7 @@
             btn.tag = 1001;
             btn.frame = CGRectMake(0, 0, 42 * _scale, 42 * _scale);
             [btn addTarget:self action:@selector(selectButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-            [btn setImage:kImageNamed(@"test_result_cell_select") forState:UIControlStateNormal];
+            [btn setImage:[UIImage tdd_imageCheckboxSquareNormal] forState:UIControlStateNormal];
             [btn setImageEdgeInsets:UIEdgeInsetsMake(10 * _scale, 10 * _scale, 10 * _scale, 10 * _scale)];
             btn;
         });
@@ -206,7 +219,7 @@
     if (self.liveDataSelectModel) {
         selectItmes = self.liveDataSelectModel.showItems;
     }else {
-        selectItmes = self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.selectItmes;
+        selectItmes = self.liveDataChartSelectModel.isSearch ? self.liveDataChartSelectModel.showItems  : self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.itemArr;
     }
     
     if (row >= selectItmes.count) {
@@ -219,23 +232,23 @@
     
     selectButton.enabled = YES;
     
-    [selectButton setImage:kImageNamed(@"test_result_cell_select") forState:UIControlStateNormal];
+    [selectButton setImage:[UIImage tdd_imageCheckboxSquareNormal] forState:UIControlStateNormal];
     [self.selectItmes enumerateObjectsUsingBlock:^(TDD_ArtiLiveDataItemModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
         if (obj.index == itemModel.index) {
-            [selectButton setImage:[UIImage tdd_imageCheckDidSelect] forState:UIControlStateNormal];
+            [selectButton setImage:[UIImage tdd_imageCheckboxSquareSelected] forState:UIControlStateNormal];
             *stop = YES;
         }
     }];
     
 //    if ([self.selectItmes containsObject:itemModel]) {
-//        [selectButton setImage:[UIImage tdd_imageCheckDidSelect] forState:UIControlStateNormal];
+//        [selectButton setImage:[UIImage tdd_imageCheckboxSquareSelected] forState:UIControlStateNormal];
 //    }else {
-//        [selectButton setImage:kImageNamed(@"test_result_cell_select") forState:UIControlStateNormal];
+//        [selectButton setImage:[UIImage tdd_imageCheckboxSquareSelected] forState:UIControlStateNormal];
 //    }
     
     if (self.liveDataChartSelectModel && ![NSString tdd_isNum:itemModel.strChangeValue]) {
         selectButton.enabled = NO;
-        [selectButton setImage:[UIImage tdd_imageDiagCellSelectNO] forState:UIControlStateNormal];
+        [selectButton setImage:[UIImage tdd_imageCheckboxSquareUnselectDisabled] forState:UIControlStateNormal];
     }
 }
 
@@ -257,7 +270,7 @@
             TDD_CustomLabel * label = [[TDD_CustomLabel alloc] init];
             label.tag = 100;
             label.font = [[UIFont systemFontOfSize:13] tdd_adaptHD];
-            label.textColor = [UIColor tdd_title];
+            label.textColor = [UIColor tdd_subTitle];
             label.numberOfLines = 0;
             label.text = TDDLocalized.liveData_chart_tip;
             label.textAlignment = NSTextAlignmentLeft;
@@ -266,7 +279,9 @@
         [header.contentView addSubview:titleLabel];
         
         [titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(header.contentView);
+            make.top.bottom.equalTo(header.contentView);
+            make.left.equalTo(header.contentView).offset(20 * _scale);
+            make.right.equalTo(header.contentView).offset(-20 * _scale);
         }];
     }
     
@@ -311,7 +326,7 @@
     if (self.liveDataSelectModel) {
         selectItmes = self.liveDataSelectModel.showItems;
     }else {
-        selectItmes = self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.selectItmes;
+        selectItmes = self.liveDataChartSelectModel.isSearch ? self.liveDataChartSelectModel.showItems  : self.liveDataChartSelectModel.liveDataMoreChartModel.liveDataModel.itemArr;
     }
     
     int row = (int)indexPath.row;
@@ -326,10 +341,16 @@
         if (![NSString tdd_isNum:itemModel.strChangeValue]) {
             return;
         }
+        __block BOOL isContain = NO;
+        [self.selectItmes enumerateObjectsUsingBlock:^(TDD_ArtiLiveDataItemModel *obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (obj.index == itemModel.index) {
+                [self.selectItmes removeObject:obj];
+                isContain = YES;
+                *stop = YES;
+            }
+        }];
         
-        if ([self.selectItmes containsObject:itemModel]) {
-            [self.selectItmes removeObject:itemModel];
-        }else {
+        if (!isContain) {
             if (self.selectItmes.count >= 4) {
                 NSString * tipStr = TDDLocalized.most_select;
                 tipStr = [tipStr stringByReplacingOccurrencesOfString:@"$" withString:@"4"];
@@ -338,6 +359,7 @@
                 [self.selectItmes addObject:itemModel];
             }
         }
+        
     }else {
         
         __block BOOL isContain = NO;
@@ -390,6 +412,7 @@
         _emptyView = [[TDD_EmptyView alloc] initWithFrame:CGRectMake(0, 0, IphoneWidth, IphoneHeight - NavigationHeight - 60)];
         [_emptyView setEmptyImageWidth:200 height:200];
         _emptyView.hidden = YES;
+        _emptyView.backgroundColor = UIColor.tdd_viewControllerBackground;
     }
     return _emptyView;
 }

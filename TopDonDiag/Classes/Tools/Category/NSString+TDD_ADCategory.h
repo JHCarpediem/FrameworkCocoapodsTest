@@ -56,8 +56,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray *)tdd_convertDecimalToBinary:(NSString *)decimalString arrCount:(NSInteger)arrCount;
 
 //将二进制字符串数组[@"0",@"1"]转换成十进制字符串
+///限制 64 位
 + (NSString *)tdd_converBinaryArrToDecimal:(NSArray *)binaryArr;
-
+///无限制
++ (NSString *)tdd_decimalStringFromBinaryString:(NSArray *)binaryArr;
 //去掉前后空格
 + (NSString *)tdd_removeWhiteSpaceFromPreOrSuff:(NSString *)originalStr;
 

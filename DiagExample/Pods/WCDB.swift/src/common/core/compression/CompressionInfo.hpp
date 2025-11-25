@@ -36,14 +36,17 @@
 namespace WCDB {
 
 class HandleStatement;
+class CompressionTableInfo;
 
-enum class CompressionType {
+enum class CompressionType : char {
     Normal,
     Dict,
     VariousDict,
 };
 
 class CompressionColumnInfo {
+    friend CompressionTableInfo;
+
 public:
     using DictId = ZSTDDict::DictId;
     using Integer = ColumnTypeInfo<ColumnType::Integer>::UnderlyingType;
@@ -52,16 +55,18 @@ public:
     CompressionColumnInfo(const Column &column, const Column &matchColumn);
     CompressionColumnInfo(const CompressionColumnInfo &other);
     CompressionColumnInfo(CompressionColumnInfo &&other);
+    CompressionColumnInfo &operator=(const CompressionColumnInfo &other);
+    CompressionColumnInfo &operator=(CompressionColumnInfo &&other);
 
-    const Column &getColumn() const;
+    StringView getColumn() const;
     void setColumnIndex(uint16_t index) const;
     uint16_t getColumnIndex() const;
 
-    const Column &getTypeColumn() const;
+    const StringView &getTypeColumn() const;
     void setTypeColumnIndex(uint16_t index) const;
     uint16_t getTypeColumnIndex() const;
 
-    const Column &getMatchColumn() const;
+    const StringView &getMatchColumn() const;
     void setMatchColumnIndex(uint16_t index) const;
     uint16_t getMatchColumnIndex() const;
 
@@ -73,11 +78,10 @@ public:
     void addMatchDict(const Integer &matchValue, DictId dictId);
 
 private:
-    Column m_column;
     mutable std::atomic_ushort m_columnIndex;
-    Column m_typeColumn;
+    StringView m_typeColumn;
     mutable std::atomic_ushort m_typeColumnIndex;
-    Column m_matchColumn;
+    StringView m_matchColumn;
     mutable std::atomic_ushort m_matchColumnIndex;
 
     CompressionType m_compressionType;
@@ -91,15 +95,22 @@ public:
     bool shouldCompress() const;
     const StringView &getTable() const;
 
+    typedef const std::list<CompressionColumnInfo> ColumnInfoList;
+    ColumnInfoList &getColumnInfos() const;
+
 protected:
     StringView m_table;
     std::list<CompressionColumnInfo> m_compressingColumns;
+    bool m_replaceCompression;
 };
 
 class CompressionTableUserInfo : public CompressionTableBaseInfo {
 public:
     CompressionTableUserInfo(const UnsafeStringView &table);
+    CompressionTableUserInfo(const UnsafeStringView &table,
+                             const std::list<CompressionColumnInfo> &columns);
     void addCompressingColumn(const CompressionColumnInfo &info);
+    void enableReplaceCompresssion();
 };
 
 class CompressionTableInfo : public CompressionTableBaseInfo {
@@ -109,15 +120,14 @@ public:
     CompressionTableInfo(const CompressionTableUserInfo &userInfo);
     void addCompressingColumn(const CompressionColumnInfo &info);
 
-    typedef const std::list<CompressionColumnInfo> ColumnInfoList;
-    typedef const std::list<const CompressionColumnInfo *> ColumnInfoPtrList;
-    ColumnInfoList &getColumnInfos() const;
-
     void setMinCompressedRowid(int64_t rowid) const;
     int64_t getMinCompressedRowid() const;
 
     bool needCheckColumns() const;
     void setNeedCheckColumns(bool needCheck) const;
+
+    StringView getCompressionDescription() const;
+    bool shouldReplaceCompression() const;
 
 private:
     mutable int64_t m_minCompressedRowid;
@@ -125,14 +135,15 @@ private:
 
 #pragma mark - Compress Statements
 public:
+    typedef const std::list<const CompressionColumnInfo *> ColumnInfoPtrList;
     /*
      SELECT rowid FROM compressingTable
      WHERE rowid < ?
      (WCDB_CT_compressingColumnA IS NULL OR WCDB_CT_compressingColumnB IS NULL ...)
      ORDER BY rowid DESC
-     LIMIT 100
+     LIMIT 10
      */
-    StatementSelect getSelectUncompressRowIdStatement() const;
+    StatementSelect getSelectNeedCompressRowIdStatement() const;
 
     /*
      SELECT * FROM compressingTable WHERE rowid = ?
@@ -165,9 +176,33 @@ public:
      WHERE rowid == ?1
      */
     StatementUpdate
-    getUpdateUncompressRowStatement(ColumnInfoPtrList *columnList = nullptr) const;
+    getUpdateCompressColumnStatement(ColumnInfoPtrList *columnList = nullptr) const;
 
     bool stepSelectAndUpdateUncompressRowStatement(HandleStatement *select,
+                                                   HandleStatement *update,
+                                                   int64_t rowid,
+                                                   ColumnInfoPtrList *columnList
+                                                   = nullptr) const;
+
+#pragma mark - Revert compression
+public:
+    /*
+     SELECT rowid FROM compressingTable
+     WHERE rowid < ? AND (WCDB_CT_compressingColumnA NOTNULL OR WCDB_CT_compressingColumnB NOTNULL ...)
+     ORDER BY rowid DESC
+     */
+    StatementSelect getSelectCompressedRowIdStatement(int64_t maxRowId) const;
+
+    /*
+     SELECT wcdb_decompress(compressingColumnA, WCDB_CT_compressingColumnA),
+     wcdb_decompress(compressingColumnB, WCDB_CT_compressingColumnB) ...
+     FROM compressingTable
+     WHERE rowid == ?
+     */
+    StatementSelect
+    getSelectCompressedRowStatement(ColumnInfoPtrList *columnList = nullptr) const;
+
+    bool stepSelectAndUpdateCompressedRowStatement(HandleStatement *select,
                                                    HandleStatement *update,
                                                    int64_t rowid,
                                                    ColumnInfoPtrList *columnList

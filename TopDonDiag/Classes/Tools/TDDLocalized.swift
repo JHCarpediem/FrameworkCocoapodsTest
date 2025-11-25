@@ -1,9 +1,10 @@
 
 @objc public extension NSString {
-    var TDDLocalized: String {
+    @objc public var TDDLocalized: String {
         let key = self as String
-        let lan = UserDefaults.standard.string(forKey: "AppleTDDHLanguages") ?? "en"
-                    
+        var lan = UserDefaults.standard.string(forKey: "AppleTDDHLanguages") ?? "en"
+        lan = "Localized" + "/" + lan
+                
         let framework = Bundle(for: TDD_ArtiMenuModel.self)
                     
         guard let url = framework.url(forResource: "TopdonDiagnosis", withExtension: "bundle"), let bundle = Bundle(url: url) else{
@@ -14,7 +15,7 @@
         }
         let localStr = Bundle(path: path)?.localizedString(forKey: key, value: nil, table: nil)
         guard let localStr = localStr, localStr.count > 0 else {
-            guard let enPath = Bundle.main.path(forResource: "en", ofType: "lproj") else {
+            guard let enPath = bundle.path(forResource: "en", ofType: "lproj") else {
                 return key
 
             }
@@ -27,17 +28,7 @@
         }
         return localStr
     }
-    var cnLocalized: String {
-        let key = self as String
-        guard let cnPath = Bundle.main.path(forResource: "zh-Hans", ofType: "lproj") else {
-            return key
-        }
-        let cnDefaultStr = Bundle(path: cnPath)?.localizedString(forKey: key, value: nil, table: nil)
-        guard let cnDefaultStr = cnDefaultStr, cnDefaultStr.count > 0  else {
-            return key
-        }
-        return cnDefaultStr
-    }
+
 }
 @objc public class TDDLocalized: NSObject {
 
@@ -824,7 +815,7 @@
     /** 解锁使用次数统计规则 */
     @objc public static var unlock_count_rule: String { "unlock_count_rule".TDDLocalized }
 
-    /** 电话 */
+    /** 联系电话 */
     @objc public static var contact_number: String { "contact_number".TDDLocalized }
 
     /** 续费 */
@@ -956,7 +947,7 @@
     /** 1.本次解锁仅为一个网关解锁的演示过程，所有数据均为虚拟。\n\n2.是否需要解锁根据车辆而定，当前FCA、VAG、Nissan、Renault等品牌需要解锁。\n\n3.相关网关解锁权限需要从软件商城购买。 */
     @objc public static var demo_gateway_hint: String { "demo_gateway_hint".TDDLocalized }
 
-    /** 1.识别到该车配备了SGW(安全网关)模块，部分功能需要解锁该功能才能进行。\n\n2.解锁安全网关需要您的设备连接到网络并登录有解锁权限的账号。\n\n3.该功能需要进行双重身份验证。您需要在个人中心或有功能提示时按照指示进行身份验证。正常情况下，一旦解锁模块，同一次APP运行过程中将保持90分钟，在此过程中无需重复解锁。 */
+    /** 1.识别到该车配备了SGW(安全网关)模块，部分功能需要解锁该功能才能进行。\n\n2.解锁安全网关需要您的设备连接到网络并登录有解锁权限的账号。 */
     @objc public static var fca_gateway_hint_deepscan: String { "fca_gateway_hint_deepscan".TDDLocalized }
 
     /** 1.安全网关当前处于锁定状态，请先进行网关解锁以便执行如特殊功能、主动测试以及向ECU写入存储数据等高阶诊断功能。\n\n2.解锁安全网关需要您的设备连接到网络并登录有解锁权限的账号。\n\n3.雷诺网关解锁包的有效期为一年。并且对于同一车辆识别码（VIN）在 24 小时内的三次连接仅做一次计费（从法国时间当天零点至晚上 23:59）。 */
@@ -1027,5 +1018,32 @@
 
     /** 操作指引 */
     @objc public static var operation_guide: String { "operation_guide".TDDLocalized }
+
+    /** 当前诊断功能使用权限已过期，您可以继续使用全车诊断的部分功能，如需使用完整的诊断功能，请进入商城进行续费 */
+    @objc public static var software_fuction_expire_tip_detail: String { "software_fuction_expire_tip_detail".TDDLocalized }
+
+    /** 过期提醒 */
+    @objc public static var expiration_tips: String { "expiration_tips".TDDLocalized }
+
+    /** 当前诊断功能使用权限已过期，您仍可使用故障码读取功能，如有需要请执行底部扫描功能后再点击故障查看。继续使用请联系供应商进行购买。 */
+    @objc public static var software_is_out_of_date_custom_new: String { "software_is_out_of_date_custom_new".TDDLocalized }
+
+    /** 当前诊断功能使用权限已过期，您仍可使用故障码读取功能，如有需要请执行底部扫描功能后再点击故障查看。您也可以进入商城进行续费以使用完整的诊断功能 */
+    @objc public static var software_fuction_expire_tip_un_scan: String { "software_fuction_expire_tip_un_scan".TDDLocalized }
+
+    /** 诊断功能使用权限已过期，仅支持部分功能的使用 */
+    @objc public static var expiration_reminder: String { "expiration_reminder".TDDLocalized }
+
+    /** 记住密码 */
+    @objc public static var login_remember: String { "login_remember".TDDLocalized }
+
+    /** 忘记密码 */
+    @objc public static var login_forgotten: String { "login_forgotten".TDDLocalized }
+
+    /** 完成 */
+    @objc public static var mine_device_connect_done: String { "mine_device_connect_done".TDDLocalized }
+
+    /** 当前APP登录账号与网关解锁账号不一致,为保护您的用户权益,我们将进行身份验证流程。请以%1$s账号登录APP并使用当前网关功能开启验证流程 */
+    @objc public static var tips_authentication_account_error_new: String { "tips_authentication_account_error_new".TDDLocalized }
 
 }

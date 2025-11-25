@@ -6,7 +6,8 @@
 //
 
 #import "UIImage+TDD_ADCategory.h"
-#define DiagShareManageColorType [TDD_DiagnosisManage sharedManage].viewColorType
+#import <TopdonDiagnosis/TopdonDiagnosis-Swift.h>
+@import TDUIProvider;
 @implementation UIImage (TDD_ADCategory)
 
 
@@ -67,699 +68,230 @@
 
 #pragma mark - 动态配图
 + (UIImage *)tdd_imageDiagReportHeader {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Blue:
-            return kImageNamed(@"section_title_bg");
-        default:
-            return [kImageNamed(@"section_title_bg") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
-    }
+    return [[UIImage tdd_diagReportHeader] tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
 }
 
 + (UIImage *)tdd_imageDiagReportPageFooter {
-    switch ([TDD_DiagnosisManage sharedManage].currentSoftware) {
-        case TDDSoftwareKeyNow:
-            return kImageNamed(@"arti_reportTable_foot_keyNow");
-            break;
-        case TDDSoftwareCarPal:
-        case TDDSoftwareCarPalGuru:
-            return kImageNamed(@"arti_reportTable_foot_carpal");
-        case TDDSoftwareTopVci:
-            return kImageNamed(@"arti_reportTable_foot_topVCI");
-        case TDDSoftwareTopVciPro:
-            return kImageNamed(@"arti_reportTable_foot_topVCIpro");
-        case TDDSoftwareDeepScan:
-            return kImageNamed(@"arti_reportTable_foot_deepscan");
-        case TDDSoftwareTopScanHD:
-            return kImageNamed(@"arti_reportTable_foot_topscan_hd");
-        case TDDSoftwareTopScanBMW:
-            return kImageNamed(@"arti_reportTable_foot_topscan_BMW");
-        case TDDSoftwareTopScanVAG:
-            return kImageNamed(@"arti_reportTable_foot_topscan_VAG");
-
-        default:
-            return kImageNamed(@"arti_reportTable_foot");
-            break;
-    }
-    
-    
-    return kImageNamed(@"arti_reportTable_foot");
+    return [UIImage tdd_diagReportPageFooter];
 }
 
 + (UIImage *)tdd_imageDiagReportPageHeader {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Orange:
-            return kImageNamed(@"arti_reportTable_head_keyNow");
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"arti_reportTable_head_topVCI");
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"arti_reportTable_head_carpal");
-        default:
-            return kImageNamed(@"arti_reportTable_head");
-    }
+    return [UIImage tdd_diagReportPageHeader];
 }
 
 + (UIImage *)tdd_imageLiveDataSetNumLegend {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artLive_show_type_one");
-            break;
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artLive_show_type_one_carpal");
-            break;
-        default:
-            return kImageNamed(@"artLive_show_type_one_default");
-            break;
-    }
-    
+    return [UIImage tdd_liveDataSetNumLegend];
 }
 
 + (UIImage *)tdd_imageLiveDataSetNumChartLegend {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artLive_show_type_two");
-            break;
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artLive_show_type_two_carpal");
-            break;
-        default:
-            return kImageNamed(@"artLive_show_type_two_default");
-            break;
-    }
-    
+    return [UIImage tdd_liveDataSetNumChartLegend];
 }
 
 + (UIImage *)tdd_imageLiveDataSetDialLegend {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artLive_show_type_three");
-            break;
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artLive_show_type_three_carpal");
-            break;
-        default:
-            return kImageNamed(@"artLive_show_type_three_default");
-            break;
-    }
-    
+    return [UIImage tdd_liveDataSetDialLegend];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectText {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artiLiveData_select_text_black");
-            break;
-        default:
-            return kImageNamed(@"artiLiveData_select_text");
-            break;
-    }
+    return [UIImage tdd_diagLiveDataSetSelectText];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectChart {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artiLiveData_select_chart_black");
-            break;
-        default:
-            return kImageNamed(@"artiLiveData_select_chart");
-            break;
-    }
+    return [UIImage tdd_diagLiveDataSetSelectChart];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectDial {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artiLiveData_select_dial_black");
-            break;
-        default:
-            return kImageNamed(@"artiLiveData_select_dial");
-            break;
-    }
+    return [UIImage tdd_diagLiveDataSetSelectDial];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectTextHL {
-    return kImageNamed(@"artiLiveData_select_text_select");
+    return [UIImage tdd_diagLiveDataSetSelectTextHL];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectChartHL {
-    return kImageNamed(@"artiLiveData_select_chart_select");
+    return [UIImage tdd_diagLiveDataSetSelectChartHL];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataSetSelectDialHL {
-    return kImageNamed(@"artiLiveData_select_dial_select");
+    return [UIImage tdd_diagLiveDataSetSelectDialHL];
 }
 
 + (UIImage *)tdd_imageDiagLiveDataMore {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"artiLiveData_more_black");
-            break;
-        default:
-            return [kImageNamed(@"artiLiveData_more") tdd_imageByTintColor:UIColor.tdd_title];
-            break;
-    }
+    return [UIImage tdd_diagLiveDataMore];
 }
 
-+ (UIImage *)tdd_imageCheckDidSelect {
-    
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return [kImageNamed(@"test_result_cell_select_yes") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
-            //return kImageNamed(@"test_result_cell_select_yes_blue");
-        default:
-            return [kImageNamed(@"test_result_cell_select_yes") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
-    }
-    
++ (UIImage *)tdd_imageCheckboxSquareSelected {
+    return [UIImage tdd_checkboxSquareSelected];
 }
 
-+ (UIImage *)tdd_imageSingleCheckUnSelect {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"test_result_cell_select_single_black");
-        default:
-            return kImageNamed(@"test_result_cell_select_single");
-    }
++ (UIImage *)tdd_imageCheckboxRoundNormal {
+    return [UIImage tdd_checkboxRoundNormal];
 }
 
-+ (UIImage *)tdd_imageSingleCheckDidSelect {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return[kImageNamed(@"test_result_cell_select_single_yes") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
-        default:
-            return [kImageNamed(@"test_result_cell_select_single_yes") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme];
-    }
-    
-}
-
-+ (UIImage *)tdd_imageAlertCheckboxNormal {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"checkbox_btn_normal_gray");
-        default:
-            return kImageNamed(@"checkbox_btn_nor");
-    }
-}
-
-+ (UIImage *)tdd_imageAlertCheckboxSelect {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"checkbox_btn_se_blue");
-        default:
-            return kImageNamed(@"checkbox_btn_sel");
-    }
++ (UIImage *)tdd_imageCheckboxRoundSelect {
+    return [UIImage tdd_checkboxRoundSelect];
 }
 
 + (UIImage *)tdd_imageDiagReportInfo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Blue:
-            return kImageNamed(@"topdon_report_bg");
-        case TDD_DiagViewColorType_Orange:
-            return kImageNamed(@"topdon_report_bg_orange");
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"topdon_report_bg_carpal");
-        default:
-            return kImageNamed(@"topdon_report_bg_topVCI");
-    }
+    return [UIImage tdd_diagReportInfo];
 }
 
 + (UIImage *)tdd_imageDiagKeyboardHightlightBG {
-    
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"keyboard_hightlight_black");
-        default:
-            return kImageNamed(@"keyboard_hightlight_white");
-    }
-    
-}
-
-+ (UIImage *)tdd_imageDiagNumKeyboardHightlightBG {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"keyboard_num_hightlight_black");
-        default:
-            return kImageNamed(@"keyboard_num_hightlight_white");
-    }
+    return [UIImage tdd_diagKeyboardHightlightBG];
 }
 
 + (UIImage *)tdd_imageDiagKeyboardDelete {
-    
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"keyboard_exit");
-        default:
-            return [kImageNamed(@"keyboard_exit") tdd_imageByTintColor:[UIColor tdd_colorDiagTheme]];
-    }
-    
+    return [UIImage tdd_diagKeyboardDelete];
 }
 
 + (UIImage *)tdd_imageDiagUpArrow {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return [kImageNamed(@"trouble_icon_up_arrow") tdd_imageByTintColor:[UIColor whiteColor]];
-        default:
-            return kImageNamed(@"trouble_icon_up_arrow");
-    }
-    
+    return [UIImage tdd_diagUpArrow];
 }
 
 + (UIImage *)tdd_imageDiagDownArrow {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return [kImageNamed(@"trouble_icon_down_arrow") tdd_imageByTintColor:[UIColor whiteColor]];
-        default:
-            return kImageNamed(@"trouble_icon_down_arrow");
-    }
-    
+    return [UIImage tdd_diagDownArrow];
 }
 
 + (UIImage *)tdd_imageDiagBottomTipIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"trouble_icon_note_black");
-        default:
-            return kImageNamed(@"trobule_icon_note");
-    }
+    return [UIImage tdd_diagBottomTipIcon];
 }
 
 + (UIImage *)tdd_imageDiagBottomNoteIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"trouble_small_icon_note_black");
-        default:
-            return kImageNamed(@"trouble_small_icon_note");
-    }
-    
+    return [UIImage tdd_diagBottomNoteIcon];
 }
 
 + (UIImage *)tdd_imageDiagBottomCloseIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"close_icon_black");
-        default:
-
-            return [kImageNamed(@"close_icon") tdd_imageByTintColor:UIColor.blackColor];
-    }
+    return [UIImage tdd_diagBottomCloseIcon];
 }
 
 + (UIImage *)tdd_imageDiagHelpUnableIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artiFreeze_no_help_black");
-        default:
-            return kImageNamed(@"artiFreeze_no_help");
-    }
+    return [UIImage tdd_diagHelpUnableIcon];
 }
 
++ (UIImage *)tdd_imageDiagAuthAreaArrow {
+    return kImageNamed(@"artiInput_down");
+}
 + (UIImage *)tdd_imageDiagFileDictIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"dialog_dict_blue");
-        default:
-            return kImageNamed(@"arti_diag_log_dict");
-    }
+    return [UIImage tdd_diagFileDictIcon];
 }
 
-+ (UIImage *)tdd_imageDiagCellSelect {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"test_result_cell_select_black");
-        default:
-            return kImageNamed(@"test_result_cell_select");
-    }
++ (UIImage *)tdd_imageCheckboxSquareNormal {
+    return [UIImage tdd_checkboxSquareNormal];
 }
 
-+ (UIImage *)tdd_imageDiagCellSelectNO {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"test_result_cell_select_no_black");
-        default:
-            return kImageNamed(@"test_result_cell_select_no");
-    }
++ (UIImage *)tdd_imageCheckboxSquareUnselectDisabled {
+    return [UIImage tdd_checkboxSquareUnselectDisabled];
 }
 
 + (UIImage *)tdd_imageDiagAIIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"trouble_button_ai_beta");
-        default:
-            return kImageNamed(@"trouble_button_ai_beta_white");
-    }
-    
+    return [UIImage tdd_diagAIIcon];
 }
 
++ (UIImage *)tdd_imageDiagAuthAreaArrowDisable {
+    return [TDD_UIProvider imageWith:@"artiInput_down_disable"];
+}
 + (UIImage *)tdd_imageDiagAIDisableIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"trouble_button_ai_beta_disable");
-        default:
-            return kImageNamed(@"trouble_button_ai_beta_disable_white");
-    }
-    
+    return [UIImage tdd_diagAIDisableIcon];
 }
 
 + (UIImage *)tdd_imageDiagGuildAIIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_trouble_ai_guild_icon_black");
-        default:
-            return kImageNamed(@"diag_trouble_ai_guild_icon");
-    }
-    
+    return [UIImage tdd_diagGuildAIIcon];
+}
+
++ (UIImage *)tdd_imageDiagGuildAIArrow {
+    return [TDD_UIProvider imageWith:@"icon_diag_arrow"];
 }
 
 + (UIImage *)tdd_imageDiagBtnLockIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_btn_lock_black");
-        default:
-            return kImageNamed(@"diag_btn_lock");
-    }
-    
+    return [UIImage tdd_diagBtnLockIcon];
 }
 
 /// 网关
 + (UIImage *)tdd_imageDiageGateWayToBuyImage {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_gateway_purchase_black");
-            break;
-            
-        default:
-            return kImageNamed(@"diag_gateway_purchase_bg");
-            break;
-    }
-    
+    return [UIImage tdd_diageGateWayToBuyImage];
 }
 
 + (UIImage *)tdd_imageDiageGateWayToBuyArrow {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_arrow_blue");
-            break;
-            
-        default:
-            return kImageNamed(@"diag_arrow_red");
-            break;
-    }
-
+    return [UIImage tdd_diageGateWayToBuyArrow];
 }
 
 + (UIImage *)tdd_imageDiageGateWayChangeAccount {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_change_account_blue");
-            break;
-            
-        default:
-            return kImageNamed(@"diag_change_account");
-            break;
-    }
-    
+    return [UIImage tdd_diageGateWayChangeAccount];
 }
 
 + (UIImage *)tdd_imageDiageGateWayRefresh {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"diag_refresh_blue");
-            break;
-            
-        default:
-            return kImageNamed(@"diag_refresh");
-            break;
-    }
-    
+    return [UIImage tdd_diageGateWayRefresh];
 }
 
 + (UIImage *)tdd_imageDiagGateWayFCATopDonLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"FCA_topdon_logo_black");
-            break;
-            
-        default:
-            return kImageNamed(@"FCA_topdon_logo");
-            break;
-    }
+    return [UIImage tdd_diagGateWayFCATopDonLogo];
 }
 + (UIImage *)tdd_imageDiagGateWayRenualtLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"FCA_Logo_renualt_black");
-            break;
-            
-        default:
-            return kImageNamed(@"FCA_Logo_renualt");
-            break;
-    }
+    return [UIImage tdd_diagGateWayRenualtLogo];
 }
 + (UIImage *)tdd_imageDiagGateWayNissanLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"FCA_Logo_nissan_black");
-            break;
-            
-        default:
-            return kImageNamed(@"FCA_Logo_nissan");
-            break;
-    }
+    return [UIImage tdd_diagGateWayNissanLogo];
 }
 + (UIImage *)tdd_imageDiagGateWayVWSFDLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"vw_sfd_logo_black");
-            break;
-            
-        default:
-            return kImageNamed(@"vw_sfd_logo");
-            break;
-    }
+    return [UIImage tdd_diagGateWayVWSFDLogo];
 }
 + (UIImage *)tdd_imageDiagGateWayDEMOLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"gateway_demo_logo_black");
-            break;
-            
-        default:
-            return kImageNamed(@"gateway_demo_logo");
-            break;
-    }
+    return [UIImage tdd_diagGateWayDEMOLogo];
 }
 
 + (UIImage *)tdd_imageDiagGateWaySwitchBG {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"gateway_switch_unlock_type_black");
-            break;
-            
-        default:
-            return kImageNamed(@"gateway_switch_unlock_type");
-            break;
-    }
-    
+    return [UIImage tdd_diagGateWaySwitchBG];
 }
 
 + (UIImage *)tdd_imageSFDSharePopBG {
-    
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artiList_share_back_black");
-            break;
-            
-        default:
-            return kImageNamed(@"artiList_share_back");
-            break;
-    }
-    
+    return [UIImage tdd_SFDSharePopBG];
 }
 
 + (UIImage *)tdd_imageSFDQrIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artiList_share_qr_black");
-            break;
-            
-        default:
-            return kImageNamed(@"artiList_share_qr");
-            break;
-    }
+    return [UIImage tdd_SFDQrIcon];
 }
 
 + (UIImage *)tdd_imageSFDEmailIcon {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Black:
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"artiList_share_email_black");
-            break;
-            
-        default:
-            return kImageNamed(@"artiList_share_email");
-            break;
-    }
+    return [UIImage tdd_SFDEmailIcon];
 }
 
 + (UIImage *)tdd_imageDiagVCIConnect {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_Blue:
-            return kImageNamed(@"navi_vci_connect_blue");
-        case TDD_DiagViewColorType_Orange:
-            return kImageNamed(@"navi_vci_connect_orange");
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"navi_vci_connect_topVCI");
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_vci_connect_carpal");
-        default:
-            return kImageNamed(@"navi_vci_connect_blue");
-    }
-    
+    return [UIImage tdd_diagVCIConnect];
 }
 
 + (UIImage *)tdd_imageDiagVCIUnConnect {
-    
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"navi_vci_unconnect_topVCI");
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_vci_unconnect_carpal");
-        default:
-            return kImageNamed(@"navi_vci_unconnect");
-    }
+    return [UIImage tdd_diagVCIUnConnect];
 }
 
 + (UIImage *)tdd_imageDiagNavFeedBack {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_feedback_diagnosis_white");
-            break;
-            
-        default:
-            return kImageNamed(@"navi_feedback_diagnosis");
-            break;
-    }
-    
+    return [UIImage tdd_diagNavFeedBack];
 }
 
 + (UIImage *)tdd_imageDiagNavMore {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_more_diagnosis_white");
-            break;
-            
-        default:
-            return kImageNamed(@"navi_more_diagnosis");
-            break;
-    }
+    return [UIImage tdd_diagNavMore];
 }
 
 + (UIImage *)tdd_imageDiagNavTranslate {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_translate_normal_white");
-            break;
-            
-        default:
-            return kImageNamed(@"navi_translate_normal");
-            break;
-    }
+    return [UIImage tdd_diagNavTranslate];
 }
 
 + (UIImage *)tdd_imageDiagNavTranslateFinish {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"navi_translate_finish_white");
-            break;
-            
-        default:
-            return kImageNamed(@"navi_translate_finish_black");
-            break;
-    }
+    return [UIImage tdd_diagNavTranslateFinish];
 }
 
 + (UIImage *)tdd_imageDiagNavSearch {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"nav_search_ic_white");
-            break;
-            
-        default:
-            return kImageNamed(@"nav_search_ic");
-            break;
-    }
+    return [UIImage tdd_diagNavSearch];
 }
 
 + (UIImage *)tdd_imageDiagNavMoreBG {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"diagnosis_navipop_icon_bg_black");
-            break;
-            
-        default:
-            return kImageNamed(@"diagnosis_navipop_icon_bg");
-            break;
-    }
+    return [UIImage tdd_diagNavMoreBG];
 }
 
 + (nullable UIImage *)tdd_imageDiagReportHeaderLogo {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"pdf_car_check_logo");
-        default:
-            return nil;
-    }
+    return [UIImage tdd_diagReportHeaderLogo];
 }
 
 + (nullable UIImage *)tdd_imageDiagReportPageWatermark {
-    switch (DiagShareManageColorType) {
-        case TDD_DiagViewColorType_GradientBlack:
-            return kImageNamed(@"pdf_fullscreen_watermark");
-        case TDD_DiagViewColorType_Black:
-            return kImageNamed(@"pdf_fullscreen_watermark");
-        default:
-            return nil;
-    }
+    return [UIImage tdd_diagReportPageWatermark];
 }
 
 

@@ -44,7 +44,9 @@ open class TDD_HChartViewNew: UIView {
     
     private var scaleX: CGFloat = 1.0
     
-    private let kMinScaleX: CGFloat = 0.5
+    private var lastLayoutBounds: CGRect = CGRectZero
+    
+    let kMinScaleX: CGFloat = 0.175
     private let kMaxScaleX: CGFloat = 3.0
     private let kMinScaleY: CGFloat = 1.0
     private let kMaxScaleY: CGFloat = 3.0
@@ -57,7 +59,18 @@ open class TDD_HChartViewNew: UIView {
         delegator.masterChartView = self
         return delegator
     }()
-    
+    open override func layoutSubviews() {
+        super.layoutSubviews()
+        
+        guard lineChartView.data != nil && self.isHidden != true else { return }
+        // 只在尺寸真正变化时检查
+        if bounds != lastLayoutBounds {
+            lastLayoutBounds = bounds
+            // 防止反向坐标
+            fixReversedVisibleRangeIfNeeded()
+        }
+
+    }
     // MARK: - UI Components
     private(set) lazy var lineChartView: LineChartView = {
         let chartView = LineChartView()
@@ -249,6 +262,11 @@ open class TDD_HChartViewNew: UIView {
             set2.clear()
         }
         
+        // 2条水平直线用到下面3个属性
+        var combinedMin = Double.greatestFiniteMagnitude
+        var combinedMax = -Double.greatestFiniteMagnitude
+        var isAllSameCount = 0
+        
         // Process data
         for j in 0..<min(valueArr.count, 2) {
             guard let arr = valueArr[j] as? [Any] else { continue }
@@ -339,7 +357,13 @@ open class TDD_HChartViewNew: UIView {
                         //let scalXMax = max(xMin, scaleX * xMax)
                         let scalXMax: Double
                         if scaleX < 1.0 {
-                            scalXMax = max(xMin, xMax / scaleX)
+                            let gap = xMax - xMin
+                            if gap > 0 {
+                                scalXMax = max(xMin, xMax + (gap / scaleX))
+                            } else {
+                                scalXMax = xMax
+                            }
+                            // scalXMax = max(xMin, xMax / scaleX)
                         } else {
                             scalXMax = xMax
                         }
@@ -357,6 +381,12 @@ open class TDD_HChartViewNew: UIView {
             // 安全检查：确保Y轴值是有效的
             let safeMinY = minY.isFinite ? minY : 0.0
             let safeMaxY = maxY.isFinite ? maxY : 1.0
+            
+            if dataArr.isAllSameValue() {
+                combinedMin = min(combinedMin, safeMinY)
+                combinedMax = max(combinedMax, safeMaxY)
+                isAllSameCount += 1
+            }
             
             if j == 0 {
                 safeSetAxisMinMax(axis: lineChartView.leftAxis, min: safeMinY, max: safeMaxY)
@@ -386,6 +416,16 @@ open class TDD_HChartViewNew: UIView {
                 set.replaceEntries(dataArr)
             }
             
+        }
+        
+        if showType == .more && (valueArr.count >= 2) && (isAllSameCount == 2){
+            var minY = combinedMin
+            var maxY = combinedMax
+            if !minY.isFinite { minY = 0.0 }
+            if !maxY.isFinite || maxY <= minY { maxY = minY + 1.0 }
+
+            safeSetAxisMinMax(axis: lineChartView.leftAxis, min: minY, max: maxY)
+            safeSetAxisMinMax(axis: lineChartView.rightAxis, min: minY, max: maxY)
         }
         
         setLineChartXAxisGranularity()
@@ -419,37 +459,50 @@ open class TDD_HChartViewNew: UIView {
     func applyXAxisScaling(scaleX: Double, scaleY: Double, location: CGPoint) {
         logBluetoothAD200("scaleY: \(scaleY), scaleX: \(scaleX)")
         guard hasData() else { return }
+        guard let viewPortHandler = lineChartView.viewPortHandler else { return }
+        
+        // 限制 scale 范围 + 有效性
+        guard scaleX.isFinite, scaleY.isFinite else { return }
         
         let limitedScaleX = max(kMinScaleX, min(scaleX, kMaxScaleX))
         
-        // 应用X轴缩放变换，直接操作视图端口处理器
-        guard let viewPortHandler = lineChartView.viewPortHandler else { return }
-        
+        // 设置最小最大缩放限制
         viewPortHandler.setMinMaxScaleX(minScaleX: kMinScaleX, maxScaleX: kMaxScaleX)
         viewPortHandler.setMinMaxScaleY(minScaleY: kMinScaleY, maxScaleY: kMaxScaleY)
         
-        // 与当前变换矩阵合并，Y轴保持原样，只对X轴进行缩放
+        // 获取当前矩阵并进行计算
         let currentMatrix = viewPortHandler.touchMatrix
         
-        let newMatrixA = currentMatrix.a * CGFloat(limitedScaleX) // X轴缩放
-        let newA = fixupLimitX(value: newMatrixA)
+        // 原 X 方向缩放因子
+        var newA = currentMatrix.a * CGFloat(limitedScaleX)
+        
+        // 修正过大或反向的 scale 值
+        newA = fixupLimitX(value: newA)
+        if newA.isNaN || newA < 0.0001 {
+            // 避免反向或 0 缩放
+            newA = CGFloat(kMinScaleX)
+        }
         self.scaleX = newA
         
-        let newMatrix = CGAffineTransform(
+        // 重建矩阵（保持 Y 不变）
+        var newMatrix = CGAffineTransform(
             a: newA,
             b: currentMatrix.b,
             c: currentMatrix.c,
-            d: 1.0, // Y轴保持不变
+            d: max(currentMatrix.d, 0.0001), // 保证正向 Y
             tx: currentMatrix.tx,
             ty: currentMatrix.ty
         )
         
-        // 应用新矩阵并重绘
+        // 修复反向（a 或 d 为负时取绝对值）
+        if newMatrix.a < 0 { newMatrix.a = abs(newMatrix.a) }
+        if newMatrix.d < 0 { newMatrix.d = abs(newMatrix.d) }
+        
+        // 应用并刷新
         viewPortHandler.refresh(newMatrix: newMatrix, chart: lineChartView, invalidate: true)
         
-        //        setLineChartXAxisGranularity()
-        //        lineChartView.setVisibleXRangeMinimum(Double(mScaleX))
-        //        lineChartView.setVisibleXRangeMaximum(Double(mScaleX))
+        // 坐标安全检测（防止 highestVisibleX < lowestVisibleX）
+        fixReversedVisibleRangeIfNeeded()
     }
     
     func applyYAxisScaling(scaleY: Double, scaleX: Double, location: CGPoint) {
@@ -500,6 +553,22 @@ open class TDD_HChartViewNew: UIView {
         // 缩放后重新启用自动吸附
         shouldAutoAdjustToXAxis = true
     }
+    
+    /// 修正坐标反向的情况
+    private func fixReversedVisibleRangeIfNeeded() {
+        let minX = lineChartView.lowestVisibleX
+        let maxX = lineChartView.highestVisibleX
+        
+        if minX > maxX {
+            // 强制修正显示范围
+            logBluetoothAD200("强制修正显示范围 minX: \(minX), maxX: \(maxX)")
+            let newMin = min(minX, maxX)
+            let newMax = max(minX, maxX)
+            lineChartView.setVisibleXRange(minXRange: newMax - newMin, maxXRange: newMax - newMin)
+            lineChartView.moveViewToX(newMax)
+        }
+    }
+
     
     func update(translationX: CGFloat, translationY: CGFloat) {
         guard hasData() else { return }
@@ -656,7 +725,7 @@ open class TDD_HChartViewNew: UIView {
         }
         
         lineChartView.lineData?.notifyDataChanged()
-        lineChartView.notifyDataSetChanged()
+        self.safeNotifyDataSetChanged()
         safeSetAxisMinMax(axis: lineChartView.leftAxis, min: lineChartView.leftAxis.axisMinimum, max: lineChartView.leftAxis.axisMaximum)
         safeSetAxisMinMax(axis: lineChartView.rightAxis, min: lineChartView.rightAxis.axisMinimum, max: lineChartView.rightAxis.axisMaximum)
     }
@@ -711,6 +780,7 @@ open class TDD_HChartViewNew: UIView {
         let safeMax = max.isFinite ? max : (safeMin + 1.0)
         axis.axisMinimum = safeMin
         axis.axisMaximum = safeMax > safeMin ? safeMax : (safeMin + 1.0)
+        axis.granularity = (safeMax - safeMin) / (Double(axis.labelCount) * 1.0)
     }
     
     private func setLineChartXAxisGranularity() {
@@ -756,7 +826,9 @@ open class TDD_HChartViewNew: UIView {
         // 确保标签间距不会太小导致重叠
         let minGranularity = visibleRange / Double(maxLabels)
         granularity = max(granularity, minGranularity)
-        
+        if granularity.isInfinite || granularity.isNaN {
+            granularity = TDD_DiagBridge.isKindOfTopVCIValue() ? 10 : 5
+        }
         xAxis.granularity = granularity
         xAxis.setLabelCount(labelCount, force: false)
         
@@ -779,7 +851,7 @@ open class TDD_HChartViewNew: UIView {
             return
         }
         
-        yAxis.setLabelCount(5, force: false)
+        yAxis.setLabelCount(5, force: true)
         
         if lineData.yMax == lineData.yMin {
             if index == 2 || index == 3 {
@@ -787,7 +859,6 @@ open class TDD_HChartViewNew: UIView {
             }
         }
         
-        yAxis.granularity = 10.0
         yAxis.granularity = 10.0
         
         if lineData.yMax == lineData.yMin {
@@ -816,14 +887,17 @@ open class TDD_HChartViewNew: UIView {
                         let newMax = lineData.yMax * 1.2
                         yAxis.axisMinimum = newMin.isFinite ? newMin : 0.0
                         yAxis.axisMaximum = newMax.isFinite ? newMax : 1.0
+                        yAxis.granularity = (yAxis.axisMaximum - yAxis.axisMinimum ) / (Double(yAxis.labelCount) * 1.0)
                     }
                 } else {
                     yAxis.axisMinimum = 0
                     let newMax = lineData.yMax * 2.0
                     yAxis.axisMaximum = newMax.isFinite ? newMax : 2.0
+                    yAxis.granularity = (yAxis.axisMaximum - yAxis.axisMinimum) / (Double(yAxis.labelCount) * 1.0)
                 }
             }
         } else {
+            yAxis.granularity = (yAxis.axisMaximum - yAxis.axisMinimum) / (Double(yAxis.labelCount) * 1.0)
             yAxis.resetCustomAxisMin()
             yAxis.resetCustomAxisMax()
         }
@@ -875,7 +949,60 @@ extension TDD_HChartViewNew {
     
 }
 
+extension TDD_HChartViewNew {
+    /// 安全刷新，避免 computeAxisValues 崩溃
+        func safeNotifyDataSetChanged() {
+            guard let data = self.lineChartView.data else {
+                self.lineChartView.notifyDataSetChanged()
+                return
+            }
+
+            // 收集所有 y 值
+            var yValues: [Double] = []
+
+            for dataSet in data.dataSets {
+                for i in 0..<dataSet.entryCount {
+                    if let e = dataSet.entryForIndex(i) {
+                        yValues.append(e.y)
+                    }
+                }
+            }
+
+            if let minVal = yValues.min(), let maxVal = yValues.max() {
+                if minVal == maxVal {
+                    let padding = max(1.0, abs(minVal * 0.1))
+
+                    self.lineChartView.leftAxis.axisMinimum = minVal - padding
+                    self.lineChartView.leftAxis.axisMaximum = maxVal + padding
+
+                    self.lineChartView.rightAxis.axisMinimum = minVal - padding
+                    self.lineChartView.rightAxis.axisMaximum = maxVal + padding
+                    
+                }
+            }
+
+            // labelCount 保底
+            self.lineChartView.leftAxis.labelCount = max(2, self.lineChartView.leftAxis.labelCount)
+        
+            self.lineChartView.rightAxis.labelCount = max(2, self.lineChartView.rightAxis.labelCount)
+
+            self.lineChartView.xAxis.labelCount = max(2, self.lineChartView.xAxis.labelCount)
+
+            self.lineChartView.notifyDataSetChanged()
+        }
+}
+
 fileprivate extension Array where Element == ChartDataEntry {
+    
+    /// 判断该序列中所有 y 是否相等；支持可选容差
+    func isAllSameValue(tolerance: Double = 0.0) -> Bool {
+        guard let firstY = self.first?.y else { return true }
+        if tolerance > 0 {
+            return self.allSatisfy { abs($0.y - firstY) <= tolerance }
+        } else {
+            return self.allSatisfy { $0.y == firstY }
+        }
+    }
     
     func tdd_getMinMaxvalue() -> (minY: Double, maxY: Double, minX: Double, maxX: Double) {
         // 如果数组为空，返回默认值避免NaN

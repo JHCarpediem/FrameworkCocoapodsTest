@@ -7,6 +7,7 @@
 
 #import "TDD_ArtiReportPrintHeaderView.h"
 #import "TDD_ArtiReportModel.h"
+@import TDBasis;
 
 @interface TDD_ArtiReportPrintHeaderView()
 
@@ -55,6 +56,9 @@
     self.serialLabel = serialLabel;
     self.timeLabel = dateLabel;
     
+    [self addSubview:self.snLabel];
+    [self addSubview:self.topdonIdLabel];
+    
     [bgImageView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self);
     }];
@@ -80,6 +84,16 @@
         make.bottom.equalTo(@0);
     }];
     
+    [self.snLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self).offset(374);
+        make.top.equalTo(serialLabel);
+    }];
+    
+    [self.topdonIdLabel mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.snLabel);
+        make.top.equalTo(dateLabel);
+    }];
+    
     NSTimeInterval stampTime = [NSDate tdd_getTimestampSince1970];
     
     if ([TDD_DiagnosisManage sharedManage].currentSoftware == TDDSoftwareDeepScan) {
@@ -89,6 +103,25 @@
     }
     
     dateLabel.text = [NSString stringWithFormat:@"%@ : %@",TDDLocalized.report_head_create_date, [NSDate tdd_getTimeStringWithInterval:stampTime Format:@"yyyy-MM-dd"]];
+    
+    NSString *serialNum = [TDD_EADSessionController sharedController].SN;
+    if ([NSString tdd_isEmpty:serialNum]) {
+        serialNum = [TDD_DiagnosisTools selectedVCISerialNum];
+    }
+    if ([NSString tdd_isEmpty:serialNum]) {
+        serialNum = @"--";
+    }
+    
+    self.snLabel.text = [NSString stringWithFormat:@"SN: %@", serialNum];
+    NSString *topdonId = [TDUserModel current].topdonId;
+    if ([NSString tdd_isEmpty:[TDUserModel current].topdonId]) {
+        topdonId = @"--";
+    }
+    if ([TDD_DiagnosisManage sharedManage].currentSoftware == TDDSoftwareDeepScan) {
+        self.topdonIdLabel.text = [NSString stringWithFormat:@"ID: %@", topdonId];
+    } else {
+        self.topdonIdLabel.text = [NSString stringWithFormat:@"TOPDON ID: %@", topdonId];
+    }
 }
 
 - (void)setReportModel:(TDD_ArtiReportModel *)reportModel
@@ -122,5 +155,25 @@
     }
     return _logoImageView;
 }
+
+- (TDD_CustomLabel *)snLabel {
+    if (!_snLabel) {
+        _snLabel = [[TDD_CustomLabel alloc] init];
+        _snLabel.font = [UIFont systemFontOfSize:10];
+        _snLabel.textColor = [UIColor whiteColor];
+    }
+    return _snLabel;
+}
+
+- (TDD_CustomLabel *)topdonIdLabel {
+    if (!_topdonIdLabel) {
+        _topdonIdLabel = [[TDD_CustomLabel alloc] init];
+        _topdonIdLabel.font = [UIFont systemFontOfSize:10];
+        _topdonIdLabel.textColor = [UIColor whiteColor];
+    }
+    return _topdonIdLabel;
+}
+
+
 
 @end

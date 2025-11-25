@@ -41,6 +41,8 @@ extern NSString *EADSessionDataReceivedNotification;
 @property (nonatomic, assign) BOOL noMoreShowBatteryVoltLowTip; //不在提醒电压过低弹窗
 @property (nonatomic, strong) NSData *closeData;//不通讯返回-1
 @property (nonatomic, readonly) TDD_VCIInitializeModel *vciInitModel;
+/// 是否关闭 session，替代 session = nil
+@property (nonatomic, assign) BOOL isCloseSession;
 #pragma mark -- 埋点使用
 /// 是否连接过设备
 @property (nonatomic, assign) BOOL isPreviousConnected;

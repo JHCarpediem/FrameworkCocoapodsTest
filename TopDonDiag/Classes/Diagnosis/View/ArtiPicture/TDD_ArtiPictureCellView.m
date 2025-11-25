@@ -188,7 +188,7 @@
         _bottomLabel.text = @"";
     }
     NSString *suff = [itemModel.picturePath pathExtension];
-    NSArray *imgArr = @[@"PNG", @"JPEG", @"JPG", @"GIF", @"WEBP", @"APNG"];
+    NSArray *imgArr = @[@"PNG", @"JPEG", @"JPG", @"GIF", @"WEBP", @"APNG", @"BMP"];
     BOOL showImage = NO;
     if ([imgArr containsObject:suff.uppercaseString]){
         _bgImageView.hidden = NO;

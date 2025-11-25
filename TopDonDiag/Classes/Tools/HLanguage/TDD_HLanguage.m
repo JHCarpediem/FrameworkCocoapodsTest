@@ -6,7 +6,7 @@
 //
 
 #import "TDD_HLanguage.h"
-
+#import <TopdonDiagnosis/TopdonDiagnosis-Swift.h>
 #define STANDARD_USER_DEFAULT  [NSUserDefaults standardUserDefaults]
 #define AppleTDDHLanguages  @"AppleTDDHLanguages" //用于保存语言
 NSString * const HAppLanguageDidChangeNotification = @"h.topdon.languagedidchange";
@@ -45,21 +45,8 @@ NSString * const HAppLanguageDidChangeNotification = @"h.topdon.languagedidchang
 }
 
 + (NSString *)getLanguage:(NSString *)str{
-    
-    NSString * language = [STANDARD_USER_DEFAULT valueForKeyPath:AppleTDDHLanguages];
-    
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    
-    NSString *path = [bundle pathForResource:[NSString stringWithFormat:@"TopdonDiagnosis.bundle/%@", language] ofType:@"lproj"];
-    
-    NSString *string = [[NSBundle bundleWithPath:path] localizedStringForKey:str value:nil table:nil];
+    return str.TDDLocalized;
 
-    if ([string isEqualToString:str] || string.length == 0) {
-        NSString *path = [bundle pathForResource:@"TopdonDiagnosis.bundle/en" ofType:@"lproj"];
-        
-        string = [[NSBundle bundleWithPath:path] localizedStringForKey:str value:nil table:nil];
-    }
-    return string;
 }
 
 + (NSArray *)getAllLanguage{

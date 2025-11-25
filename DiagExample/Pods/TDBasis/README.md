@@ -1,6 +1,56 @@
 TDBasis
 ==============
 
+## V5.00 新增全局 App 配置
+
+* 读取钉钉配置文件，生成 `AppConfig` 全局配置，可以使用 `TDAppConfiguration` 来获取全局配置。
+
+新增 `TDAppConfiguration` 类，提供了全局访问的方式。
+
+* 使用方式：
+    
+```swift
+// 第一种，直接通过 AppType 获取对应的配置
+TDAppConfiguration.topguru.topdonPlatform.appKey;
+
+//第二种 先 设置当前 App 类型 然后通过 TDAppConfiguration.current
+TDAppConfiguration.appType = TopdonAppTypeTopGuru;
+TDAppConfiguration.current.topdonPlatform.appKey;
+```
+
+⚠️注意：请在使用前确保已设置 `TDAppConfiguration.appType`，否则会导致 fatalError。
+
+建议：
+App 配置 分 3 个模块 TopdonPlatform : 中台信息、AppleStore： 商店信息、ThirdVendor：第三方 SDK 配置
+可以在 App 中使用全局属性或者 OC 的宏定义来缩短访问路径，例如：
+
+```swift
+let TopGuruPlatform = TDAppConfiguration.topguru.topdonPlatform
+let TopGuruAppleStore = TDAppConfiguration.topguru.appleStore
+let TopGuruThirdVendor = TDAppConfiguration.topguru.thirdVendor
+
+// 后续使用
+let appKey = TopGuruPlatform.appKey
+let bundleId = TopGuruAppleStore.bundleId
+let jPushKey = TopGuruThirdVendor.JPushKey
+```
+
+* 配置更新方式：
+    1. 从钉钉上下载最新的配置文件 xxx.xlsx 文件到 `{TDBasis 根目录}/buildConfig` 目录下。
+    2. cd {TDBasis 根目录}/buildConfig
+    3. 执行 run_build_config.sh 脚本：
+    ```bash
+    sh run_build_config.sh
+    ```
+    3. 发布到 cocoapods：执行发布脚本 
+    ```bash
+    cd ../
+    sh publish.sh
+    ```
+⚠️注意：执行完 run_build_config.sh 脚本生成配置文件后，要确保代码的正确性，例如枚举值有无发生改变，App 类型的枚举值是通过 xlsx 文件中的 sheet 名来生成的。
+如果有新增的项目配置，会生成新的枚举，请在 `TDAppConfiguration` 中添加对应的全局属性。
+
+
 ## V4.30 更新日志
 
 * TDLogger 集成 TopdonLog 库

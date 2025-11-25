@@ -16,4 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface TDD_ArtiReportAttachementImageCollectionCell : UICollectionViewCell
+
+@property (nonatomic, strong) UIImageView *attachementImageView;
+
+@property (nonatomic, assign) BOOL isA4;
+
+- (void)fillCellWithAttachementImage:(UIImage *)image isA4:(BOOL)isA4;
+
+@end
+
 NS_ASSUME_NONNULL_END

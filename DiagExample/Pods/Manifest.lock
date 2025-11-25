@@ -187,45 +187,45 @@ PODS:
   - SocketRocket (0.6.0)
   - SSZipArchive (2.4.3)
   - SwiftyBeaver (1.9.5)
-  - TDBasis (5.00.022):
-    - TDBasis/Config (= 5.00.022)
-    - TDBasis/DB (= 5.00.022)
-    - TDBasis/Extensions (= 5.00.022)
-    - TDBasis/Logger (= 5.00.022)
-    - TDBasis/Protocol (= 5.00.022)
-    - TDBasis/UIPackage (= 5.00.022)
-  - TDBasis/Config (5.00.022)
-  - TDBasis/DB (5.00.022):
+  - TDBasis (5.00.054):
+    - TDBasis/Config (= 5.00.054)
+    - TDBasis/DB (= 5.00.054)
+    - TDBasis/Extensions (= 5.00.054)
+    - TDBasis/Logger (= 5.00.054)
+    - TDBasis/Protocol (= 5.00.054)
+    - TDBasis/UIPackage (= 5.00.054)
+  - TDBasis/Config (5.00.054)
+  - TDBasis/DB (5.00.054):
     - FMDB
     - TDBasis/Config
     - TDBasis/Extensions
     - TDBasis/Logger
-  - TDBasis/Extensions (5.00.022):
+  - TDBasis/Extensions (5.00.054):
     - TDBasis/Config
     - TDBasis/Protocol
-  - TDBasis/Logger (5.00.022):
+  - TDBasis/Logger (5.00.054):
     - TDBasis/Extensions
     - TopdonLog
-  - TDBasis/Protocol (5.00.022)
-  - TDBasis/UIPackage (5.00.022):
+  - TDBasis/Protocol (5.00.054)
+  - TDBasis/UIPackage (5.00.054):
     - TDBasis/Config
     - TDBasis/Extensions
-  - TDTheme (4.00.006):
+  - TDTheme (5.00.001):
     - TDBasis
-    - TDTheme/Core (= 4.00.006)
-    - TDTheme/SwiftTheme (= 4.00.006)
-  - TDTheme/Core (4.00.006):
+    - TDTheme/Core (= 5.00.001)
+    - TDTheme/SwiftTheme (= 5.00.001)
+  - TDTheme/Core (5.00.001):
     - TDBasis
     - TDTheme/SwiftTheme
-  - TDTheme/SwiftTheme (4.00.006):
+  - TDTheme/SwiftTheme (5.00.001):
     - TDBasis
-  - TDUIProvider (2.10.002):
+  - TDUIProvider (2.10.022):
     - MJRefresh
     - SnapKit
     - TDBasis
     - TDTheme
-  - TDWCDB (0.00.005):
-    - WCDB.swift (= 2.1.4)
+  - TDWCDB (0.00.006):
+    - WCDB.swift (~> 2.1.11)
   - Texture (3.1.0):
     - Texture/AssetsLibrary (= 3.1.0)
     - Texture/Core (= 3.1.0)
@@ -246,7 +246,7 @@ PODS:
     - Texture/Core
   - Texture/Video (3.1.0):
     - Texture/Core
-  - TopdonDiagnosis (2.09.066):
+  - TopdonDiagnosis (2.09.119):
     - Firebase/AnalyticsWithoutAdIdSupport
     - Firebase/Crashlytics
     - FMDB (= 2.7.5)
@@ -264,19 +264,19 @@ PODS:
     - YBImageBrowser (= 3.0.9)
     - YYModel (= 1.0.4)
     - YYText (= 1.0.7)
-  - TopdonLog (1.60.001):
+  - TopdonLog (1.60.011):
     - KSCrash (= 1.17.6)
     - SSZipArchive (= 2.4.3)
     - SwiftyBeaver (= 1.9.5)
-    - TDWCDB (= 0.00.005)
+    - TDWCDB
   - TZImagePickerController (3.8.6):
     - TZImagePickerController/Basic (= 3.8.6)
     - TZImagePickerController/Location (= 3.8.6)
   - TZImagePickerController/Basic (3.8.6)
   - TZImagePickerController/Location (3.8.6)
-  - WCDB.swift (2.1.4):
-    - WCDBOptimizedSQLCipher (= 1.4.4)
-  - WCDBOptimizedSQLCipher (1.4.4)
+  - WCDB.swift (2.1.14):
+    - WCDBOptimizedSQLCipher (= 1.4.7)
+  - WCDBOptimizedSQLCipher (1.4.7)
   - YBImageBrowser (3.0.9):
     - YBImageBrowser/Core (= 3.0.9)
   - YBImageBrowser/Core (3.0.9):
@@ -297,8 +297,8 @@ DEPENDENCIES:
   - SnapKit
   - SocketRocket (~> 0.6.0)
   - SSZipArchive (~> 2.4.2)
-  - TDBasis (= 5.00.022)
-  - TDUIProvider
+  - TDBasis (= 5.00.054)
+  - TDUIProvider (= 2.10.022)
   - Texture (= 3.1.0)
   - TopdonDiagnosis (from `../`)
   - YBImageBrowser (= 3.0.9)
@@ -385,21 +385,21 @@ SPEC CHECKSUMS:
   SocketRocket: fccef3f9c5cedea1353a9ef6ada904fde10d6608
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   SwiftyBeaver: 84069991dd5dca07d7069100985badaca7f0ce82
-  TDBasis: d98ada277b262e392c8ed300dd02a551cd89bf32
-  TDTheme: 9f289e25ff2d053356b60397794cca59194a8ad3
-  TDUIProvider: c8a3cf125225e99c82de9e8e0c63601ae030af81
-  TDWCDB: e725ce3c0ddfff4daf053620e610fbd91c36121c
+  TDBasis: 801d9290f3d65ef267b9ba3d5573ce7f51e246ff
+  TDTheme: 5990cca12d15585611a6b2726b9dc11eb8bba586
+  TDUIProvider: 71bca2b2b43224dea28f51e653ab42283be541b5
+  TDWCDB: 78229253c9fee043b66f2cd97a3baeeb6285fa26
   Texture: 2e8ab2519452515f7f5a520f5a8f7e0a413abfa3
-  TopdonDiagnosis: 5edb8167e326af5c5bfea85d304e3032ba6d8b13
-  TopdonLog: ac67860245574dc0eff08ddb893a6f73e4fb247a
+  TopdonDiagnosis: 7320fc0dc8d975c14c4deb5b5b3ba53628c3d12f
+  TopdonLog: 7cc51d574dc26bd4679c723be96529cb91a019dd
   TZImagePickerController: a013c186415f6044914bb0d0dd960a884cff46ec
-  WCDB.swift: c3b1d120543d2de29e4752d2fb438395461cf83f
-  WCDBOptimizedSQLCipher: 7f03bb7c94ad164996f0fa87d0f76026f5ab0f92
+  WCDB.swift: 0b09667a7c162989c0b0055d59d78d790deccec0
+  WCDBOptimizedSQLCipher: 9bceac087eff9625b151838d3a30364f53f71ad9
   YBImageBrowser: 7ecc8bf33ffa5f3b94c397c29b4f3638dd37f527
   YYImage: 1e1b62a9997399593e4b9c4ecfbbabbf1d3f3b54
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
 
-PODFILE CHECKSUM: 8e4612944536d3bfa02bdf3705c0ad42fc2c49ad
+PODFILE CHECKSUM: 97c51f548d3ac87170705bec799a60f593a1ef47
 
 COCOAPODS: 1.15.2

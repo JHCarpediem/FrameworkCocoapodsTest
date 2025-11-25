@@ -59,7 +59,9 @@
 // 分享和二维码按钮弹窗
 - (void)configUI {
     
-    self.popImageView = [[UIImageView alloc] initWithImage:[UIImage tdd_imageSFDSharePopBG]];
+    self.popImageView = [[UIImageView alloc] init];
+    UIImage *image = [[UIImage tdd_imageSFDSharePopBG] resizableImageWithCapInsets:UIEdgeInsetsMake(0, 70, 0, 30) resizingMode:UIImageResizingModeStretch];
+    self.popImageView.image = [UIImage tdd_imageSFDSharePopBG];
     self.popImageView.userInteractionEnabled = YES;
     
     UIButton *qrBtn = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -93,9 +95,9 @@
             CGFloat centerX = model.clickPoint.x;
             pointCenter = centerX;
             if (centerX > IphoneWidth - 70) {
-                pointCenter = IphoneWidth - 70;
+                pointCenter = 0;
             }
-            if (centerX < 70) {
+            if (centerX <= 70) {
                 pointCenter = 70;
             }
             break;
@@ -103,14 +105,19 @@
     }
     
     [self.popImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.width.equalTo(@140);
-        make.height.equalTo(@106);
+        make.width.greaterThanOrEqualTo(@140);
         make.bottom.equalTo(@(-kSafeBottomHeight - 55));
-        make.centerX.equalTo(self.mas_left).offset(pointCenter);
+        if (pointCenter == 0) {
+            make.right.equalTo(@0);
+        } else if (pointCenter == 70) {
+            make.left.equalTo(@0);
+        } else {
+            make.centerX.equalTo(self.mas_left).offset(pointCenter);
+        }
     }];
     [qrBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(@30);
-        make.right.equalTo(@-25);
+        make.right.lessThanOrEqualTo(@-30);
         make.top.equalTo(@10);
         make.height.equalTo(@40);
     }];
@@ -122,9 +129,10 @@
     }];
     [emailBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(@30);
-        make.right.equalTo(@-25);
+        make.right.lessThanOrEqualTo(@-30);
         make.top.equalTo(line.mas_bottom).offset(0);
         make.height.equalTo(@40);
+        make.bottom.equalTo(@-16);
     }];
 }
 

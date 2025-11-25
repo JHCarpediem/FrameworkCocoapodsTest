@@ -36,6 +36,7 @@
 #import "TDD_ArtiInstanceView.h"
 #import "TDD_UserdefaultManager.h"
 #import "TDD_JKDBHelper.h"
+#import "TDD_DeviceTools.h"
 
 @implementation TDD_ArtiGlobalModel
 {
@@ -1011,7 +1012,8 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].vehicleLogPath = @[];
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].softIsExpire = false;
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].autoVinEntryType = AVET_APP_NOT_SUPPORT;
-    [TDD_ArtiGlobalModel sharedArtiGlobalModel].vehInfoModel  = nil;
+    [TDD_ArtiGlobalModel sharedArtiGlobalModel].vehInfoModel = nil;
+    [TDD_ArtiGlobalModel sharedArtiGlobalModel].setVinModel = nil;
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].carPaths = [NSMutableArray array];
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand = @"";
     [TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel = @"";
@@ -1262,7 +1264,7 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 {
     NSString * documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     
-    NSString * path = [NSString stringWithFormat:@"%@/%@/AD200/UserData/%@/%@", documentsPath,[TDD_DiagnosisManage sharedManage].documentSubpath, TDD_DiagnosisManage.sharedManage.carModel.strType, TDD_DiagnosisManage.sharedManage.carModel.strVehicle];
+    NSString * path = [NSString stringWithFormat:@"%@/%@/UserData/%@/%@", documentsPath,[TDD_DeviceTools docPathName], TDD_DiagnosisManage.sharedManage.carModel.strType, TDD_DiagnosisManage.sharedManage.carModel.strVehicle];
     
     HLog(@"%@ - 获取当前车型的用户数据路径:%@", [self class], path);
     
@@ -1330,6 +1332,13 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
     [[FIRCrashlytics crashlytics] setCustomValue:strVin forKey:@"VIN"];
     
     [self sharedArtiGlobalModel].CarVIN = strVin;
+    
+    NSTimeInterval time =  [NSDate tdd_getTimestampSince1970];
+    TDD_SetVinModel *setVinModel = [[TDD_SetVinModel alloc] init];
+    setVinModel.setTime = time * 1000;
+    setVinModel.vinStr = strVin?:@"";
+    setVinModel.didSave = false;
+    [self sharedArtiGlobalModel].setVinModel = setVinModel;
 }
 
 /*-----------------------------------------------------------------------------
@@ -1475,6 +1484,13 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 {
     HLog(@"%@ - 获取当前app应用的产品名称 - %d", [self class],[TDD_DiagnosisTools appProduct]);
     return [TDD_DiagnosisTools appProduct];
+}
+
++ (NSString *)getHwProductModel {
+    NSString *productModel = [TDD_DiagnosisTools selectedVCIProductModel];
+    HLog(@"%@ - 获取当前选中 VCI 的中台产品型号 - %@", [self class],productModel);
+    return productModel;
+    
 }
 
 /*-----------------------------------------------------------------------------
@@ -1705,6 +1721,7 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
         [param setValue:strEcuCanId?:@"" forKey:@"ecuCANID"];
         [param setValue:strEcuSN?:@"" forKey:@"sgwSN"];
         [param setValue:strEcuPolicyType?:@"" forKey:@"ecuPolicyType"];
+        //这个接口只有 FCA 用，brand 只有 1 和 5
         if ([TDD_ArtiGlobalModel sharedArtiGlobalModel].authUnlockType == 1) {
             [param setValue:@(5) forKey:@"brand"];
             
@@ -1870,12 +1887,18 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
     [param setValue:[TDD_ArtiGlobalModel sharedArtiGlobalModel].softCode?:@"" forKey:@"softCode"];
     [param setValue:@([[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthBrand]) forKey:@"brand"];
     
-    if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel] authUnlockType] == 0) {
-
-        [param setValue:@(1) forKey:@"source"];
+    if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthBrand] == 4) {
+        //大众 SFD source 统一用 0
+        [param setValue:@(0) forKey:@"source"];
     }else {
-        [param setValue:@(2) forKey:@"source"];
+        if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel] authUnlockType] == 0) {
+
+            [param setValue:@(1) forKey:@"source"];
+        }else {
+            [param setValue:@(2) forKey:@"source"];
+        }
     }
+
     NSString *snStr = [TDD_EADSessionController sharedController].SN;
     if (![NSString tdd_isEmpty:snStr]) {
         [param setValue:snStr forKey:@"sn"];
@@ -2109,9 +2132,9 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
     }
     
     [TDD_Statistics event:idStr attributes:MDict eventType:TDD_EventType_Car];
-    
+    //设置车型路径到日志的数据库
     TDD_VehInfoModel *vehicleInfoModel = [TDD_ArtiGlobalModel sharedArtiGlobalModel].vehInfoModel;
-    if (!vehicleInfoModel.didSave) {
+    if (vehicleInfoModel && !vehicleInfoModel.didSave) {
         if ([[TDD_DiagnosisManage sharedManage].manageDelegate respondsToSelector:@selector(insertMessageToTopDonLog:time:type:)]) {
             [[TDD_DiagnosisManage sharedManage].manageDelegate insertMessageToTopDonLog:vehicleInfoModel.vehInfo time:vehicleInfoModel.setTime type:0];
             
@@ -2123,6 +2146,15 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
                 }
                 [[TDD_ArtiGlobalModel sharedArtiGlobalModel].carPaths addObject:[NSString stringWithFormat:@"%@:%@", @(vehicleInfoModel.setTime), vehicleInfoModel.vehInfo]];
             }
+        }
+    }
+    //设置 VIN到日志的数据库
+    TDD_SetVinModel *setVinModel = [TDD_ArtiGlobalModel sharedArtiGlobalModel].setVinModel;
+    if (setVinModel && !setVinModel.didSave) {
+        if ([[TDD_DiagnosisManage sharedManage].manageDelegate respondsToSelector:@selector(insertMessageToTopDonLog:time:type:)]) {
+            [[TDD_DiagnosisManage sharedManage].manageDelegate insertMessageToTopDonLog:setVinModel.vinStr time:setVinModel.setTime type:1];
+            setVinModel.didSave = YES;
+            
         }
     }
 
@@ -2299,26 +2331,32 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 
 - (NSString *)getSaveAuthPassword {
     NSString *passwordStr = @"";
-    if (_authUnlockType > 0) {
-        passwordStr = _authPasswordSaveDict[[NSString stringWithFormat:@"%ld_%ld",_authType,_authUnlockType]];
-    }else {
+    passwordStr = _authPasswordSaveDict[[NSString stringWithFormat:@"%ld_%ld",_authType,_authUnlockType]];
+    if ([NSString tdd_isEmpty:passwordStr] && _authUnlockType == 0) {
         passwordStr = _authPasswordSaveDict[[NSString tdd_strFromInterger:_authType]];
     }
-    
     if (![NSString tdd_isEmpty:passwordStr]) {
         return passwordStr;
     }
     return @"";
 }
 
+- (void)saveAutoAuthPassword:(NSString *)encryptionPWD {
+    [TDD_UserdefaultManager setAuthPassword:encryptionPWD type:_authType unlockType:_authUnlockType];
+
+}
+
+- (NSString *)getAutoAuthPassword {
+    
+    return [TDD_UserdefaultManager getAuthPassword:_authType unlockType:_authUnlockType];
+}
+
 - (NSString *)getAuthAccount{
     NSString *accountStr = @"";
-    if (self.authUnlockType > 0) {
-        accountStr = self.authAccountDict[[NSString stringWithFormat:@"%u_%ld",_authType,_authUnlockType]];
-    }else {
+    accountStr = _authAccountDict[[NSString stringWithFormat:@"%ld_%ld",_authType,_authUnlockType]];
+    if ([NSString tdd_isEmpty:accountStr] && _authUnlockType == 0) {
         accountStr = self.authAccountDict[[NSString tdd_strFromInterger:_authType]];
     }
-    
     if (![NSString tdd_isEmpty:accountStr]) {
         return accountStr;
     }
@@ -2355,10 +2393,9 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 
 - (NSString *)getAuthPassword {
     NSString *passwordStr = @"";
-    if (_authUnlockType > 0) {
-        passwordStr = self.authPasswordDict[[NSString stringWithFormat:@"%ld_%ld",_authType,_authUnlockType]];
-    }else {
-        passwordStr = self.authPasswordDict[[NSString tdd_strFromInterger:_authType]];
+    passwordStr = _authPasswordDict[[NSString stringWithFormat:@"%ld_%ld",_authType,_authUnlockType]];
+    if ([NSString tdd_isEmpty:passwordStr] && _authUnlockType == 0) {
+        passwordStr = _authPasswordDict[[NSString tdd_strFromInterger:_authType]];
     }
 
     if (![NSString tdd_isEmpty:passwordStr]) {
@@ -2370,13 +2407,13 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 - (NSInteger )getAuthBrand {
     switch (_authType) {
         case SST_FUNC_FCA_AUTH:
-            return (_authUnlockType == 0) ? 1 : 5;
+            return (_authUnlockType == 1) ? 5 : 1;
             break;
         case SST_FUNC_RENAULT_AUTH:
             return 2;
             break;
         case SST_FUNC_NISSAN_AUTH:
-            return  (_authUnlockType == 0) ? 6 : 3;
+            return  (_authUnlockType == 1) ? 3 : 6;
             break;
         case SST_FUNC_VW_SFD_AUTH:
             return 4;
@@ -2395,6 +2432,10 @@ static uint32_t const ArtiGlobalModelGetCurUnitMode()
 - (NSMutableDictionary *)authPasswordDict {
     if (!_authPasswordDict) {
         _authPasswordDict = [[NSMutableDictionary alloc] init];
+        [_authPasswordDict setValue:[TDD_UserdefaultManager getAuthPassword:SST_FUNC_FCA_AUTH] forKey:@"0"];
+        [_authPasswordDict setValue:[TDD_UserdefaultManager getAuthPassword:SST_FUNC_FCA_AUTH  unlockType:2] forKey:@"0_2"];
+        [_authPasswordDict setValue:[TDD_UserdefaultManager getAuthPassword:SST_FUNC_NISSAN_AUTH unlockType:0] forKey:@"2_0"];
+        [_authPasswordDict setValue:[TDD_UserdefaultManager getAuthPassword:SST_FUNC_NISSAN_AUTH unlockType:2] forKey:@"2_2"];
     }
     return _authPasswordDict;
 }

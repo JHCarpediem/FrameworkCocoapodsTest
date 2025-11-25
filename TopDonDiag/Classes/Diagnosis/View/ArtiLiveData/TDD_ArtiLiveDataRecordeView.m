@@ -155,6 +155,11 @@
 }
 
 - (void)unInit {
+    if (self.timer) {
+        [self.timer invalidate];
+        self.timer = nil;
+        
+    }
     [self.topView removeFromSuperview];
     [self.bottomView removeFromSuperview];
     [self.stopButton removeFromSuperview];

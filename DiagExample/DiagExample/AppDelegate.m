@@ -7,6 +7,8 @@
 
 #import "AppDelegate.h"
 #import "ViewController.h"
+@import TopdonDiagnosis;
+@import TDUIProvider;
 @interface AppDelegate ()
 
 @end
@@ -20,6 +22,9 @@
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     self.window.rootViewController = nav;
     [self.window makeKeyAndVisible];
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"TopGuru" ofType:@"bundle"];
+    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    [TDDUIConfig setupConfigWith:@"Theme_Diag.json" in:bundle imagePath:@"DiagImages"];
     return YES;
 }
 

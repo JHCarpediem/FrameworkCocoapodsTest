@@ -15,6 +15,7 @@
 #import "TDD_ArtiLiveDataMoreChartModel.h"
 #import "TDD_ButtonTableView.h"
 #import "TDD_ArtiLiveDataRecordeSaveModel.h"
+#import "TDD_ArtiLiveDataRecordeChangeModel.h"
 
 #import "TDD_HChartModel.h"
 #import "TDD_BaseViewController.h"
@@ -146,12 +147,19 @@
     cell.backgroundColor = [UIColor clearColor];
     TDD_ArtiLiveDataCellView * cellView = [cell.contentView viewWithTag:1000];
     if (!cellView) {
+        //_tableViewUI还未初始化完成，frame 都是 0 的时候来到这里会打印约束警告
+        if (_tableView.tdd_width == 0) {
+            _tableView.tdd_width = IphoneWidth;
+        }
         cellView = [[TDD_ArtiLiveDataCellView alloc] init];
         cellView.tag = 1000;
         cellView.delegate = self;
         [cell.contentView addSubview:cellView];
         [cellView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(cell.contentView);
+            make.left.equalTo(cell.contentView);
+            make.right.equalTo(cell.contentView);
+            make.top.equalTo(cell.contentView);
+            make.bottom.equalTo(cell.contentView);
         }];
         
     }
@@ -215,17 +223,25 @@
     if (self.isRecorde) {
         NSString *createTime = self.dataFlowModel.createTime;
         NSString *recordChangeDictStr = [liveDataModel.recordChangeDict yy_modelToJSONString];
-        NSString *recordChangeItemDictStr = [liveDataModel.recordChangeItemDict yy_modelToJSONString];
         @autoreleasepool {
             TDD_ArtiLiveDataRecordeModel *recordMode = [[TDD_ArtiLiveDataRecordeModel alloc] init];
             recordMode.createTime = createTime;
             //保存录制过程中修改的数据
             recordMode.recordChangeDictStr = recordChangeDictStr;
-            recordMode.recordChangeItemDictStr = [liveDataModel.recordChangeItemDict yy_modelToJSONString];
+            //recordMode.recordChangeItemDictStr = [liveDataModel.recordChangeItemDict yy_modelToJSONString];
+            recordMode.chartTime = [NSString stringWithFormat:@"%f",liveDataModel.chartTime];
+            [recordMode save];
+            for (NSString *index in liveDataModel.recordChangeItemDict.allKeys) {
+                TDD_ArtiLiveDataRecordeChangeModel *changeModel = [liveDataModel.recordChangeItemDict valueForKey:index];
+                if (changeModel && [changeModel isKindOfClass:[TDD_ArtiLiveDataRecordeChangeModel class]]) {
+                    changeModel.recordModelPK = recordMode.pk;
+                    changeModel.createTime = recordMode.createTime;
+                }
+                [changeModel save];
+            }
             //缓存后重置
             liveDataModel.recordChangeDict = @{}.mutableCopy;
             liveDataModel.recordChangeItemDict = @{}.mutableCopy;
-            [recordMode save];
         }
     }
 
@@ -238,7 +254,7 @@
         self->_liveDataModel.delegate = self;
         
     }
-    
+    [self layoutIfNeeded];
     [self.tableView reloadData];
     if (isScroll && liveDataModel.showItems.count > 0) {
         //数据刷新滚动到首行
@@ -281,6 +297,7 @@
         _freezeModel = freezeModel;
         
     }
+    [self layoutIfNeeded];
     [self.tableView reloadData];
     
     self.emptyView.hidden = self.freezeModel.groupArr.count > 0;
@@ -453,7 +470,7 @@
         dataFlowModel.vehicle_name = self.carModel.strVehicle;
         dataFlowModel.vehicle_version = self.carModel.strVersion;
         dataFlowModel.firstStrData = [model yy_modelToJSONString];
-        dataFlowModel.dataVersion = @"V2.00";
+        dataFlowModel.dataVersion = @"V3.00";
         self.dataFlowModel = dataFlowModel;
         self.isRecorde = YES;
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -495,49 +512,45 @@
                 @autoreleasepool {
                     //分页读取 数据库数据 防止数据量过大 导致OOM 内存过大崩溃
                     NSArray * saveArr = [TDD_ArtiLiveDataRecordeModel findByCriteria:[NSString stringWithFormat:@"where createTime = '%@' LIMIT (%d * %d) , %d", self.dataFlowModel.createTime, index, pageSize, pageSize]];
-                    if (!success) {
-                        [TDD_ArtiLiveDataRecordeModel deleteObjects:saveArr];
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [TDD_HTipManage deallocView];
-                            if (isBack){
-                                //返回上一页
-                                TDD_BaseViewController *diagVC = (TDD_BaseViewController *)[UIViewController tdd_topViewController];
-                                if ([diagVC isKindOfClass:[TDD_BaseViewController class]]) {
-                                    [diagVC backClick];
-                                }
-                                
-                            }
-                        });
-                        return;
-                    }
+                    NSArray * changeSaveArr = [TDD_ArtiLiveDataRecordeChangeModel findByCriteria:[NSString stringWithFormat:@"where createTime = '%@' LIMIT (%d * %d) , %d", self.dataFlowModel.createTime, index, pageSize, pageSize]];
+                    [TDD_ArtiLiveDataRecordeModel deleteObjects:saveArr];
+                    [TDD_ArtiLiveDataRecordeChangeModel deleteObjects:changeSaveArr];
+
                     // 当取出的数组数量不满一页 表示数据全部取完了 退出循环
-                    if (saveArr.count < pageSize) {
+                    if (saveArr.count < pageSize && changeSaveArr.count < pageSize) {
                         break;
                     }
                 }
                 index += 1;
             }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [TDD_HTipManage deallocView];
+                [recordView unInit];
+                if (isBack){
+                    //返回上一页
+                    TDD_BaseViewController *diagVC = (TDD_BaseViewController *)[UIViewController tdd_topViewController];
+                    if ([diagVC isKindOfClass:[TDD_BaseViewController class]]) {
+                        [diagVC backClick];
+                    }
+                    
+                }
+            });
         }else {
             if (!isSaved) {
                 isSave = [self.dataFlowModel save];
                 isSaved = YES;
             }
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (isSave) {
-                [TDD_HTipManage deallocView];
-                [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.tip_save_success];
-                [recordView unInit];
-            }else {
-                [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.liveData_save_error];
-            }
-            if (isBack){
-                TDD_BaseViewController *diagVC = (TDD_BaseViewController *)[UIViewController tdd_topViewController];
-                if ([diagVC isKindOfClass:[TDD_BaseViewController class]]) {
-                    [diagVC backClick];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (isSave) {
+                    [TDD_HTipManage deallocView];
+                    [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.tip_save_success];
+                    [recordView unInit];
+                }else {
+                    [TDD_HTipManage showBottomTipViewWithTitle:TDDLocalized.liveData_save_error];
                 }
-            }
-        });
+            });
+        }
+
     });
 }
 
@@ -578,6 +591,9 @@
 - (void)dealloc
 {
     self.liveDataModel.delegate = nil;
+    if (self.recordeView && [TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+        [self.recordeView unInit];
+    }
     HLog(@"%s", __func__);
 }
 

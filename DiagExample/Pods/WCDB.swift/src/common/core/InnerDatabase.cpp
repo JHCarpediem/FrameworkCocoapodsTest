@@ -41,9 +41,11 @@
 #include "CompressingHandleDecorator.hpp"
 #include "MigratingHandleDecorator.hpp"
 
+#include "AutoVacuumConfig.hpp"
+#include "BasicConfig.hpp"
 #include "BusyRetryConfig.hpp"
 #include "CipherHandle.hpp"
-#include "Core.hpp"
+#include "CommonCore.hpp"
 #include "DBOperationNotifier.hpp"
 #include "DecorativeHandle.hpp"
 #include "SQLite.h"
@@ -58,8 +60,9 @@ InnerDatabase::InnerDatabase(const UnsafeStringView &path)
 , m_initialized(false)
 , m_closing(0)
 , m_tag(Tag::invalid())
+, m_isReadOnly(false)
 , m_fullSQLTrace(false)
-, m_autoCheckpoint(true)
+, m_liteModeEnable(false)
 , m_factory(path)
 , m_needLoadIncremetalMaterial(false)
 , m_migration(this)
@@ -95,9 +98,9 @@ Tag InnerDatabase::getTag() const
 
 bool InnerDatabase::canOpen()
 {
-    Core::shared().skipIntegrityCheck(getPath());
+    CommonCore::shared().skipIntegrityCheck(getPath());
     auto handle = getHandle();
-    Core::shared().skipIntegrityCheck(nullptr);
+    CommonCore::shared().skipIntegrityCheck(nullptr);
     return handle != nullptr;
 }
 
@@ -144,9 +147,17 @@ void InnerDatabase::close(const ClosedCallback &onClosed)
             handle->suspend(true);
         }
     }
-    Core::shared().stopAllDatabaseEvent(getPath());
+    CommonCore::shared().stopAllDatabaseEvent(getPath());
     drain(onClosed);
     --m_closing;
+}
+
+void InnerDatabase::setReadOnly()
+{
+    close([this] {
+        m_isReadOnly = true;
+        CommonCore::shared().enableAutoCheckpoint(this, false);
+    });
 }
 
 bool InnerDatabase::isOpened() const
@@ -176,7 +187,7 @@ InnerDatabase::InitializedGuard InnerDatabase::initialize()
             m_initialized = true;
             continue;
         }
-        Core::shared().setThreadedErrorPath(path);
+        CommonCore::shared().setThreadedErrorPath(path);
         if (!FileManager::createDirectoryWithIntermediateDirectories(Path::getDirectory(path))) {
             assignWithSharedThreadedError();
             break;
@@ -207,7 +218,7 @@ InnerDatabase::InitializedGuard InnerDatabase::initialize()
             assignWithSharedThreadedError();
             break;
         }
-        Core::shared().setThreadedErrorPath(nullptr);
+        CommonCore::shared().setThreadedErrorPath(nullptr);
         m_initialized = true;
     } while (true);
     return nullptr;
@@ -239,13 +250,23 @@ void InnerDatabase::setFullSQLTraceEnable(bool enable)
     m_fullSQLTrace = enable;
 }
 
-void InnerDatabase::setAutoCheckpointEnable(bool enable)
+void InnerDatabase::setLiteModeEnable(bool enable)
 {
-    m_autoCheckpoint = enable;
+    if (m_liteModeEnable != enable) {
+        close([&] {
+            m_liteModeEnable = enable;
+            CommonCore::shared().enableAutoCheckpoint(this, !m_liteModeEnable);
+        });
+    }
+}
+
+bool InnerDatabase::liteModeEnable()
+{
+    return m_liteModeEnable;
 }
 
 #pragma mark - Handle
-RecyclableHandle InnerDatabase::getHandle(bool writeHint)
+RecyclableHandle InnerDatabase::getHandle(bool writeHint, bool threaded)
 {
     HandleType type = HandleType::Normal;
     if (m_isInMemory) {
@@ -255,21 +276,11 @@ RecyclableHandle InnerDatabase::getHandle(bool writeHint)
         }
         return RecyclableHandle(m_sharedInMemoryHandle, nullptr);
     }
-    // Additional shared lock is not needed because the threadedHandles is always empty when it's blocked. So threaded handles is thread safe.
-    auto handle = m_transactionedHandles.getOrCreate();
-    if (handle.get() != nullptr) {
-        handle->configTransactionEvent(this);
-        WCTAssert(m_concurrency.readSafety());
-        return handle;
-    }
     InitializedGuard initializedGuard = initialize();
     if (!initializedGuard.valid()) {
         return nullptr;
     }
-    handle = flowOut(type, writeHint);
-    if (handle != nullptr) {
-        handle->configTransactionEvent(this);
-    }
+    auto handle = flowOut(type, writeHint, threaded);
     return handle;
 }
 
@@ -367,14 +378,17 @@ bool InnerDatabase::willReuseSlotedHandle(HandleType type, InnerHandle *handle)
 bool InnerDatabase::setupHandle(HandleType type, InnerHandle *handle)
 {
     WCTAssert(handle != nullptr);
-
+    if (m_isReadOnly) {
+        handle->setReadOnly();
+    }
     handle->setTag(getTag());
     handle->setType(type);
+    handle->setLiteModeEnable(m_liteModeEnable);
     handle->setFullSQLTraceEnable(m_fullSQLTrace);
-    handle->setBusyTraceEnable(Core::shared().isBusyTraceEnable());
+    handle->setBusyTraceEnable(CommonCore::shared().isBusyTraceEnable());
     HandleSlot slot = slotOfHandleType(type);
-    handle->enableWriteMainDB(slot == HandleSlotAutoTask || slot == HandleSlotAssemble
-                              || slot == HandleSlotVacuum);
+    handle->enableWriteMainDB(m_liteModeEnable || slot == HandleSlotAutoTask
+                              || slot == HandleSlotAssemble || slot == HandleSlotVacuum);
     handle->markAsCanBeSuspended(false);
     handle->markErrorAsUnignorable(99); //Clear all ignorable code
 
@@ -457,29 +471,14 @@ bool InnerDatabase::setupHandle(HandleType type, InnerHandle *handle)
     return true;
 }
 
-#pragma mark - Threaded
-void InnerDatabase::markHandleAsTransactioned(InnerHandle *handle)
-{
-    WCTAssert(m_transactionedHandles.getOrCreate().get() == nullptr);
-    RecyclableHandle currentHandle = getHandle();
-    WCTAssert(currentHandle.get() == handle);
-    m_transactionedHandles.getOrCreate() = currentHandle;
-    WCTAssert(m_transactionedHandles.getOrCreate().get() != nullptr);
-}
-
-void InnerDatabase::markHandleAsUntransactioned()
-{
-    WCTAssert(m_transactionedHandles.getOrCreate().get() != nullptr);
-    m_transactionedHandles.getOrCreate() = nullptr;
-    WCTAssert(m_transactionedHandles.getOrCreate().get() == nullptr);
-}
-
 #pragma mark - Transaction
 bool InnerDatabase::isInTransaction()
 {
-    WCTAssert(m_transactionedHandles.getOrCreate().get() == nullptr
-              || m_transactionedHandles.getOrCreate().get()->isInTransaction());
-    return m_transactionedHandles.getOrCreate().get() != nullptr;
+    auto threadedHandle = getHandle(false, true);
+    if(threadedHandle.get() == nullptr || !threadedHandle->isInTransaction()) {
+        return false;
+    }
+    return true;
 }
 
 bool InnerDatabase::beginTransaction()
@@ -554,6 +553,8 @@ bool InnerDatabase::removeFiles()
         if (!result) {
             assignWithSharedThreadedError();
         }
+        m_migration.purge();
+        m_compression.purge();
     });
     return result;
 }
@@ -632,12 +633,6 @@ void InnerDatabase::tryLoadIncremetalMaterial()
     if (!m_needLoadIncremetalMaterial) {
         return;
     }
-    auto config = Core::shared().getABTestConfig("clicfg_wcdb_incremental_backup");
-    if (config.failed() || config.value().length() == 0
-        || atoi(config.value().data()) != 1) {
-        m_needLoadIncremetalMaterial = false;
-        return;
-    }
 
     const StringView &databasePath = getPath();
     StringView materialPath
@@ -667,7 +662,7 @@ void InnerDatabase::tryLoadIncremetalMaterial()
     }
     if (useMaterial) {
         if (material->pages.size() < BackupMaxAllowIncrementalPageCount) {
-            Core::shared().tryRegisterIncrementalMaterial(getPath(), material);
+            CommonCore::shared().tryRegisterIncrementalMaterial(getPath(), material);
         } else {
             FileManager::removeItem(materialPath);
             Error error(Error::Code::Error, Error::Level::Warning, "Remove large incremental material");
@@ -705,12 +700,10 @@ bool InnerDatabase::backup(bool interruptible)
     WCTRemedialAssert(
     !isInTransaction(), "Backup can't be run in transaction.", return false;);
 
-    RecyclableHandle backupReadHandle = flowOut(HandleType::BackupRead);
-    if (backupReadHandle == nullptr) {
-        return false;
-    }
-    RecyclableHandle backupWriteHandle = flowOut(HandleType::BackupWrite);
-    if (backupWriteHandle == nullptr) {
+    WCTRemedialAssert(!m_liteModeEnable, "Backup can't run in lite mode.", return false;);
+
+    RecyclableHandle backupHandle = flowOut(HandleType::Backup);
+    if (backupHandle == nullptr) {
         return false;
     }
 
@@ -718,30 +711,22 @@ bool InnerDatabase::backup(bool interruptible)
     if (backupCipherHandle == nullptr) {
         return false;
     }
-    WCTAssert(backupReadHandle.get() != backupCipherHandle.get());
-    WCTAssert(backupReadHandle.get() != backupWriteHandle.get());
-    WCTAssert(backupWriteHandle.get() != backupCipherHandle.get());
+    WCTAssert(backupHandle.get() != backupCipherHandle.get());
 
     if (interruptible) {
-        backupReadHandle->markAsCanBeSuspended(true);
-        backupWriteHandle->markAsCanBeSuspended(true);
+        backupHandle->markAsCanBeSuspended(true);
         if (checkShouldInterruptWhenClosing(ErrorTypeBackup)) {
             return false;
         }
     }
 
-    Core::shared().setThreadedErrorPath(path);
+    CommonCore::shared().setThreadedErrorPath(path);
 
     Repair::FactoryBackup backup = m_factory.backup();
-    Repair::BackupHandleOperator &backupReadOperator
-    = backupReadHandle.getDecorative()->getOrCreateOperator<Repair::BackupHandleOperator>(
-    OperatorBackup);
-    backup.setBackupSharedDelegate(&backupReadOperator);
-
-    Repair::BackupHandleOperator &backupWriteOperator
-    = backupWriteHandle.getDecorative()->getOrCreateOperator<Repair::BackupHandleOperator>(
-    OperatorBackup);
-    backup.setBackupExclusiveDelegate(&backupWriteOperator);
+    Repair::BackupHandleOperator &backupOperator
+    = backupHandle.getDecorative()->getOrCreateOperator<Repair::BackupHandleOperator>(OperatorBackup);
+    backup.setBackupSharedDelegate(&backupOperator);
+    backup.setBackupExclusiveDelegate(&backupOperator);
     WCTAssert(dynamic_cast<CipherHandle *>(backupCipherHandle.get()) != nullptr);
     backup.setCipherDelegate(static_cast<CipherHandle *>(backupCipherHandle.get()));
 
@@ -753,7 +738,7 @@ bool InnerDatabase::backup(bool interruptible)
             setThreadedError(backup.getError());
         }
     }
-    Core::shared().setThreadedErrorPath("");
+    CommonCore::shared().setThreadedErrorPath("");
     return succeed;
 }
 
@@ -769,12 +754,8 @@ bool InnerDatabase::deposit()
             return;
         }
 
-        RecyclableHandle backupReadHandle = flowOut(HandleType::AssembleBackupRead);
-        if (backupReadHandle == nullptr) {
-            return;
-        }
-        RecyclableHandle backupWriteHandle = flowOut(HandleType::AssembleBackupWrite);
-        if (backupWriteHandle == nullptr) {
+        RecyclableHandle backupHandle = flowOut(HandleType::AssembleBackup);
+        if (backupHandle == nullptr) {
             return;
         }
         RecyclableHandle assemblerHandle = flowOut(HandleType::Assemble);
@@ -785,24 +766,19 @@ bool InnerDatabase::deposit()
         if (cipherHandle == nullptr) {
             return;
         }
-        WCTAssert(backupReadHandle.get() != backupWriteHandle.get());
-        WCTAssert(backupReadHandle.get() != assemblerHandle.get());
-        WCTAssert(backupWriteHandle.get() != assemblerHandle.get());
-        WCTAssert(backupReadHandle.get() != cipherHandle.get());
-        WCTAssert(backupWriteHandle.get() != cipherHandle.get());
+        WCTAssert(backupHandle.get() != assemblerHandle.get());
+        WCTAssert(backupHandle.get() != cipherHandle.get());
         WCTAssert(assemblerHandle.get() != cipherHandle.get());
 
-        WCTAssert(!backupReadHandle->isOpened());
-        WCTAssert(!backupWriteHandle->isOpened());
+        WCTAssert(!backupHandle->isOpened());
         WCTAssert(!assemblerHandle->isOpened());
 
-        Core::shared().setThreadedErrorPath(path);
+        CommonCore::shared().setThreadedErrorPath(path);
 
         Repair::FactoryRenewer renewer = m_factory.renewer();
-        Repair::BackupHandleOperator backupReadOperator(backupReadHandle.get());
-        renewer.setBackupSharedDelegate(&backupReadOperator);
-        Repair::BackupHandleOperator backupWriteOperator(backupWriteHandle.get());
-        renewer.setBackupExclusiveDelegate(&backupWriteOperator);
+        Repair::BackupHandleOperator backupOperator(backupHandle.get());
+        renewer.setBackupSharedDelegate(&backupOperator);
+        renewer.setBackupExclusiveDelegate(&backupOperator);
         AssembleHandleOperator assembleOperator(assemblerHandle.get());
         renewer.setAssembleDelegate(&assembleOperator);
         WCTAssert(dynamic_cast<CipherHandle *>(cipherHandle.get()) != nullptr);
@@ -810,7 +786,7 @@ bool InnerDatabase::deposit()
         // Prepare a new database from material at renew directory and wait for moving
         if (!renewer.prepare()) {
             setThreadedError(renewer.getError());
-            Core::shared().setThreadedErrorPath("");
+            CommonCore::shared().setThreadedErrorPath("");
             return;
         }
         Repair::FactoryDepositor depositor = m_factory.depositor();
@@ -822,13 +798,13 @@ bool InnerDatabase::deposit()
         // At next time this database launchs, the retrieveRenewed method will do the remaining work. So data will never lost.
         if (!renewer.work()) {
             setThreadedError(renewer.getError());
-            Core::shared().setThreadedErrorPath("");
+            CommonCore::shared().setThreadedErrorPath("");
         } else {
             result = true;
         }
         cipherHandle->close();
     });
-    Core::shared().setThreadedErrorPath("");
+    CommonCore::shared().setThreadedErrorPath("");
     return result;
 }
 
@@ -862,12 +838,8 @@ double InnerDatabase::retrieve(const ProgressCallback &onProgressUpdated)
             return;
         }
 
-        RecyclableHandle backupReadHandle = flowOut(HandleType::AssembleBackupRead);
-        if (backupReadHandle == nullptr) {
-            return;
-        }
-        RecyclableHandle backupWriteHandle = flowOut(HandleType::AssembleBackupWrite);
-        if (backupWriteHandle == nullptr) {
+        RecyclableHandle backupHandle = flowOut(HandleType::AssembleBackup);
+        if (backupHandle == nullptr) {
             return;
         }
         RecyclableHandle assemblerHandle = flowOut(HandleType::Assemble);
@@ -879,24 +851,19 @@ double InnerDatabase::retrieve(const ProgressCallback &onProgressUpdated)
         if (cipherHandle == nullptr) {
             return;
         }
-        WCTAssert(backupReadHandle.get() != backupWriteHandle.get());
-        WCTAssert(backupReadHandle.get() != assemblerHandle.get());
-        WCTAssert(backupWriteHandle.get() != assemblerHandle.get());
-        WCTAssert(backupReadHandle.get() != cipherHandle.get());
-        WCTAssert(backupWriteHandle.get() != cipherHandle.get());
+        WCTAssert(backupHandle.get() != assemblerHandle.get());
+        WCTAssert(backupHandle.get() != cipherHandle.get());
         WCTAssert(assemblerHandle.get() != cipherHandle.get());
 
-        WCTAssert(!backupReadHandle->isOpened());
-        WCTAssert(!backupWriteHandle->isOpened());
+        WCTAssert(!backupHandle->isOpened());
         WCTAssert(!assemblerHandle->isOpened());
 
-        Core::shared().setThreadedErrorPath(path);
+        CommonCore::shared().setThreadedErrorPath(path);
 
         Repair::FactoryRetriever retriever = m_factory.retriever();
-        Repair::BackupHandleOperator backupReadOperator(backupReadHandle.get());
-        retriever.setBackupSharedDelegate(&backupReadOperator);
-        Repair::BackupHandleOperator backupWriteOperator(backupWriteHandle.get());
-        retriever.setBackupExclusiveDelegate(&backupWriteOperator);
+        Repair::BackupHandleOperator backupOperator(backupHandle.get());
+        retriever.setBackupSharedDelegate(&backupOperator);
+        retriever.setBackupExclusiveDelegate(&backupOperator);
         AssembleHandleOperator assembleOperator(assemblerHandle.get());
         retriever.setAssembleDelegate(&assembleOperator);
         WCTAssert(dynamic_cast<CipherHandle *>(cipherHandle.get()) != nullptr);
@@ -906,49 +873,8 @@ double InnerDatabase::retrieve(const ProgressCallback &onProgressUpdated)
             result = retriever.getScore().value();
         }
         setThreadedError(retriever.getError()); // retriever may have non-critical error even if it succeeds.
-        Core::shared().setThreadedErrorPath("");
+        CommonCore::shared().setThreadedErrorPath("");
         cipherHandle->close();
-    });
-    return result;
-}
-
-bool InnerDatabase::vacuum(const ProgressCallback &onProgressUpdated)
-{
-    if (m_isInMemory) {
-        return true;
-    }
-    bool result = false;
-    close([&result, &onProgressUpdated, this]() {
-        InitializedGuard initializedGuard = initialize();
-        if (!initializedGuard.valid()) {
-            return;
-        }
-
-        RecyclableHandle vacuumHandle = flowOut(HandleType::Vacuum);
-        if (vacuumHandle == nullptr) {
-            return;
-        }
-
-        Core::shared().setThreadedErrorPath(path);
-
-        Repair::FactoryVacuum vacuummer = m_factory.vacuumer();
-        VacuumHandleOperator vacuumOperator(vacuumHandle.get());
-        vacuummer.setVacuumDelegate(&vacuumOperator);
-        vacuummer.setProgressCallback(onProgressUpdated);
-
-        if (!vacuummer.prepare()) {
-            setThreadedError(vacuummer.getError());
-            Core::shared().setThreadedErrorPath("");
-            return;
-        }
-
-        if (!vacuummer.work()) {
-            setThreadedError(vacuummer.getError());
-            Core::shared().setThreadedErrorPath("");
-            return;
-        }
-        Core::shared().setThreadedErrorPath("");
-        result = true;
     });
     return result;
 }
@@ -988,6 +914,75 @@ void InnerDatabase::checkIntegrity(bool interruptible)
     }
 }
 
+#pragma mark - Vacuum
+
+bool InnerDatabase::vacuum(const ProgressCallback &onProgressUpdated)
+{
+    if (m_isInMemory) {
+        return true;
+    }
+    bool result = false;
+    close([&result, &onProgressUpdated, this]() {
+        InitializedGuard initializedGuard = initialize();
+        if (!initializedGuard.valid()) {
+            return;
+        }
+
+        RecyclableHandle vacuumHandle = flowOut(HandleType::Vacuum);
+        if (vacuumHandle == nullptr) {
+            return;
+        }
+
+        CommonCore::shared().setThreadedErrorPath(path);
+
+        Repair::FactoryVacuum vacuummer = m_factory.vacuumer();
+        VacuumHandleOperator vacuumOperator(vacuumHandle.get());
+        vacuummer.setVacuumDelegate(&vacuumOperator);
+        vacuummer.setProgressCallback(onProgressUpdated);
+
+        if (!vacuummer.prepare()) {
+            setThreadedError(vacuummer.getError());
+            CommonCore::shared().setThreadedErrorPath("");
+            return;
+        }
+
+        if (!vacuummer.work()) {
+            setThreadedError(vacuummer.getError());
+            CommonCore::shared().setThreadedErrorPath("");
+            return;
+        }
+        CommonCore::shared().setThreadedErrorPath("");
+        result = true;
+    });
+    return result;
+}
+
+void InnerDatabase::enableAutoVacuum(bool incremental)
+{
+    setConfig(AutoVacuumConfigName,
+              std::static_pointer_cast<WCDB::Config>(
+              std::make_shared<WCDB::AutoVacuumConfig>(incremental)),
+              Configs::Priority::Highest);
+}
+
+bool InnerDatabase::incrementalVacuum(int pages)
+{
+    InitializedGuard initializedGuard = initialize();
+    if (!initializedGuard.valid()) {
+        return false; // mark as succeed if it's not an auto initialize action.
+    }
+    RecyclableHandle handle = flowOut(HandleType::AutoVacuum);
+    if (!handle->prepare(StatementPragma().pragma(Pragma::incrementalVacuum()).with(pages))) {
+        return false;
+    }
+    bool succeed = false;
+    do {
+        succeed = handle->step();
+    } while (succeed && !handle->done());
+    handle->finalize();
+    return succeed;
+}
+
 #pragma mark - Migration
 Optional<bool> InnerDatabase::stepMigration(bool interruptible)
 {
@@ -1022,9 +1017,13 @@ Optional<bool> InnerDatabase::stepMigration(bool interruptible)
 
 void InnerDatabase::didMigrate(const MigrationBaseInfo *info)
 {
-    SharedLockGuard lockGuard(m_memory);
-    if (m_migratedCallback != nullptr) {
-        m_migratedCallback(this, info);
+    MigratedCallback callback = nullptr;
+    {
+        SharedLockGuard lockGuard(m_memory);
+        callback = m_migratedCallback;
+    }
+    if (callback != nullptr) {
+        callback(this, info);
     }
 }
 
@@ -1038,12 +1037,16 @@ void InnerDatabase::addMigration(const UnsafeStringView &sourcePath,
                                  const UnsafeData &sourceCipher,
                                  const MigrationTableFilter &filter)
 {
-    StringView sourceDatabase;
-    if (sourcePath.compare(getPath()) != 0) {
-        sourceDatabase = sourcePath;
+    StringView sourceDatabase = Path::normalize(sourcePath);
+    if (sourceDatabase.compare(getPath()) != 0) {
+        close([=]() {
+            m_migration.addMigration(sourceDatabase, sourceCipher, filter);
+        });
+    } else {
+        close([=]() {
+            m_migration.addMigration(UnsafeStringView(), sourceCipher, filter);
+        });
     }
-    close(
-    [=]() { m_migration.addMigration(sourceDatabase, sourceCipher, filter); });
 }
 
 bool InnerDatabase::isMigrated() const
@@ -1091,9 +1094,13 @@ Optional<bool> InnerDatabase::stepCompression(bool interruptible)
 
 void InnerDatabase::didCompress(const CompressionTableBaseInfo *info)
 {
-    SharedLockGuard lockGuard(m_memory);
-    if (m_compressedCallback != nullptr) {
-        m_compressedCallback(this, info);
+    CompressedCallback callback = nullptr;
+    {
+        SharedLockGuard lockGuard(m_memory);
+        callback = m_compressedCallback;
+    }
+    if (callback != nullptr) {
+        callback(this, info);
     }
 }
 
@@ -1116,6 +1123,34 @@ void InnerDatabase::setCanCompressNewData(bool canCompress)
 bool InnerDatabase::isCompressed() const
 {
     return m_compression.isCompressed();
+}
+
+bool InnerDatabase::rollbackCompression(const ProgressCallback &callback)
+{
+    WCTRemedialAssert(
+    !isInTransaction(), "Can't revert compression in transaction.", return false;);
+
+    bool ret = false;
+    close([&]() {
+        InitializedGuard initializedGuard = initialize();
+        if (!initializedGuard.valid()) {
+            return; // mark as succeed if it's not an auto initialize action.
+        }
+
+        m_compression.setProgressCallback(callback);
+
+        RecyclableHandle handle = flowOut(HandleType::Compress);
+        if (handle != nullptr) {
+            CompressHandleOperator &compressOperator
+            = handle.getDecorative()->getOrCreateOperator<CompressHandleOperator>(OperatorCompress);
+
+            ret = m_compression.rollbackCompression(compressOperator);
+            if (ret) {
+                CommonCore::shared().enableAutoCompress(this, false);
+            }
+        }
+    });
+    return ret;
 }
 
 #pragma mark - Checkpoint

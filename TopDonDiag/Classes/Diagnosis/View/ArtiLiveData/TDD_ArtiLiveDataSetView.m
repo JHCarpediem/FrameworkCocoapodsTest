@@ -24,6 +24,7 @@
 @property (nonatomic,strong) NSMutableArray *unitArr;//单位数组
 @property (nonatomic,assign) NSInteger selectUnitIndex;//选中单位数组的哪一个
 @property (nonatomic,assign) CGFloat maxUnitTextWidth;//单位最长文本宽度
+@property (nonatomic,assign) CGFloat unitTableViewH;//单位tableView高度
 @property (nonatomic,strong) TDD_CustomLabel * unitCountSetLabel; // 单位设置范围
 @property (nonatomic,strong) TDD_CustomLabel * unitCountMinLabel; // 单位最小值
 @property (nonatomic,strong) TDD_CustomLabel * unitCountMaxLabel; // 单位最大值
@@ -58,6 +59,10 @@
     if (self) {
         
         self.backgroundColor = [UIColor tdd_liveDataSetBackground];
+        if (self.tdd_width == 0) {
+            self.tdd_width = IphoneWidth;
+            self.tdd_height = IphoneHeight - NavigationHeight - 55 - kSafeBottomHeight;
+        }
     }
     
     return self;
@@ -69,7 +74,7 @@
     TDD_UnitConversionModel *imperial = [TDD_UnitConversion diagUnitConversionWithUnit:setModel.itemModel.strUnit value:setModel.itemModel.strValue unitConversionType:TDD_UnitConversionType_Imperial];
     
     //公制单位
-    if (![NSString tdd_isEmpty:metric.unit] && ![setModel.itemModel.strUnit isEqualToString:metric.unit]) {
+    if (![NSString tdd_isEmpty:metric.unit]) {
         TDD_ArtiLiveUnitModel *model = [[TDD_ArtiLiveUnitModel alloc] init];
         model.type = TDD_UnitConversionType_Metric;
         model.unit = metric.unit;
@@ -80,7 +85,7 @@
     }
     
     //英制单位
-    if (![NSString tdd_isEmpty:imperial.unit] && ![setModel.itemModel.strUnit isEqualToString:imperial.unit]) {
+    if (![NSString tdd_isEmpty:imperial.unit] && ![metric.unit isEqualToString:imperial.unit]) {
         TDD_ArtiLiveUnitModel *model = [[TDD_ArtiLiveUnitModel alloc] init];
         model.type = TDD_UnitConversionType_Imperial;
         model.unit = imperial.unit;
@@ -91,13 +96,17 @@
     }
     
     //车型默认单位，仅有公制/英制单位时增加车型默认单位的切换
-    if (self.unitArr.count >0 && self.unitArr.count < 2 && ![NSString tdd_isEmpty:setModel.itemModel.strUnit]) {
-        TDD_ArtiLiveUnitModel *model = [[TDD_ArtiLiveUnitModel alloc] init];
-        model.type = TDD_UnitConversionType_Car;
-        model.unit = setModel.itemModel.strUnit;
-        model.strMin = setModel.itemModel.strMin;
-        model.strMax = setModel.itemModel.strMax;
-        [self.unitArr insertObject:model atIndex:0];
+    if (self.unitArr.count == 1 && ![NSString tdd_isEmpty:setModel.itemModel.strUnit]) {
+        TDD_ArtiLiveUnitModel *firstModel = self.unitArr.firstObject;
+        if (![firstModel.unit isEqualToString:setModel.itemModel.strUnit]) {
+            TDD_ArtiLiveUnitModel *model = [[TDD_ArtiLiveUnitModel alloc] init];
+            model.type = TDD_UnitConversionType_Car;
+            model.unit = setModel.itemModel.strUnit;
+            model.strMin = setModel.itemModel.strMin;
+            model.strMax = setModel.itemModel.strMax;
+            [self.unitArr insertObject:model atIndex:0];
+        }
+
     }
     
     if (_setModel.itemModel.originalUnitConversionType == TDD_UnitConversionType_None) {
@@ -157,7 +166,7 @@
     self.nameLabel.text = self.setModel.itemModel.strName; // 数据流名称
     self.helpBackView.hidden = [NSString tdd_isEmpty:self.setModel.itemModel.strHelpText];
     self.helpLabel.text = self.setModel.itemModel.strHelpText;// 帮助
-    [self.contentView mas_updateConstraints:^(MASConstraintMaker *make) {
+    [self.contentView mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self.scrollView);
         make.width.equalTo(@(IphoneWidth));
         make.bottom.equalTo(self.helpBackView.hidden?self.showStyleBackView.mas_bottom:self.helpBackView.mas_bottom).offset(self.helpBackView.hidden?_topSpace * 2 :10);
@@ -215,7 +224,12 @@
         self.setModel.itemModel.strChangeMax = self.currentItemModel.strChangeMax;
         self.setModel.itemModel.strChangeMin = self.currentItemModel.strChangeMin;
         self.setModel.itemModel.strChangeUnit = self.currentItemModel.strChangeUnit;
+        //新文的 TDD_HChartViewNew 的修改单位时valueArr必须有值
+        self.setModel.itemModel.strValue = self.setModel.itemModel.strValue;
     }
+    self.setModel.itemModel.minProgress = _tapNotInMin ? _minProgress : 0;
+    self.setModel.itemModel.maxProgress = _tapNotInMax ? _maxProgress : 1;
+
     self.setModel.itemModel.UIType = self.currentItemModel.UIType;
     self.setModel.itemModel.setStrMin = self.currentItemModel.setStrMin;
     self.setModel.itemModel.setStrMax = self.currentItemModel.setStrMax;
@@ -375,19 +389,19 @@
     CGPoint point = [self.unitSelCol convertPoint:CGPointMake(0,0) toView:[UIApplication sharedApplication].windows.lastObject];
     CGFloat leftSpace = (IS_IPad ? 40 : 20) * _scale;
     if (point.y > IphoneHeight - point.y - 40) {
-        self.tableView.frame = CGRectMake(IphoneWidth - leftSpace - _maxUnitTextWidth, point.y - 87, _maxUnitTextWidth, 83);
+        self.tableView.frame = CGRectMake(IphoneWidth - leftSpace - _maxUnitTextWidth, point.y - 87, _maxUnitTextWidth, _unitTableViewH);
     } else {
-        self.tableView.frame = CGRectMake(IphoneWidth - leftSpace - _maxUnitTextWidth, point.y + 47, _maxUnitTextWidth, 83);
+        self.tableView.frame = CGRectMake(IphoneWidth - leftSpace - _maxUnitTextWidth, point.y + 47, _maxUnitTextWidth, _unitTableViewH);
     }
     [self.popView addSubview:self.tableView];
     [FLT_APP_WINDOW addSubview:self.popView];
-    [self.unitArrow setImage:kImageNamed(@"up_arrow")];
+    [self.unitArrow setImage:kImageNamed(@"input_up_arrow")];
 }
 
 - (void)popViewTap
 {
     [self.popView removeFromSuperview];
-    [self.unitArrow setImage:kImageNamed(@"down_arrow")];
+    [self.unitArrow setImage:kImageNamed(@"input_down_arrow")];
 }
 
 #pragma mark -- UITableViewDelegate, UITableViewDataSource
@@ -398,23 +412,32 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"EngineRateCellId"];
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"unitCellId"];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    TDD_CustomLabel *label = [[TDD_CustomLabel alloc] initWithFrame:CGRectMake(20 * _scale, 0, _maxUnitTextWidth - 40 * _scale, 40)];
+    TDD_CustomLabel *label = [[TDD_CustomLabel alloc] init];
     TDD_ArtiLiveUnitModel *unitModel = self.unitArr[indexPath.row];
     label.text = unitModel.unit;
     label.textColor = [UIColor tdd_title];
     label.textAlignment = NSTextAlignmentCenter;
-    label.font = [UIFont systemFontOfSize:14 weight:UIFontWeightMedium];
-    cell.backgroundColor = label.backgroundColor = [UIColor tdd_alertBg];
-    [cell addSubview:label];
+    label.font = [UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium];
+    label.numberOfLines = 0;
+    label.layer.borderColor = [UIColor clearColor].CGColor;
+    cell.backgroundColor  = [UIColor tdd_alertBg];
+    [cell.contentView addSubview:label];
+    [label mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(cell).offset(20 * _scale);
+        make.centerX.equalTo(cell);
+        make.width.mas_equalTo(_maxUnitTextWidth - 40 * _scale);
+        make.top.equalTo(cell.contentView).offset(8 * _scale);
+        make.bottom.equalTo(cell.contentView).offset(-8 * _scale);
+    }];
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     [self.popView removeFromSuperview];
-    [self.unitArrow setImage:kImageNamed(@"down_arrow")];
+    [self.unitArrow setImage:kImageNamed(@"input_down_arrow")];
     self.selectUnitIndex = indexPath.row;
     TDD_ArtiLiveUnitModel *unitModel = self.unitArr[indexPath.row];
     if (![self.unitLabel.text isEqualToString:unitModel.unit]) {
@@ -520,11 +543,15 @@
     BOOL hadUnit = self.unitArr.count >=2;
     if (hadUnit) {
         //计算单位的最长宽度
+        _unitTableViewH = 0;
         for (TDD_ArtiLiveUnitModel *model in self.unitArr) {
-            CGFloat w =  [NSString tdd_getWidthWithText:model.unit height:CGFLOAT_MAX fontSize:[UIFont systemFontOfSize:14 weight:UIFontWeightMedium]];
+            CGFloat w =  [NSString tdd_getWidthWithText:model.unit height:CGFLOAT_MAX fontSize:[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium]];
             _maxUnitTextWidth = MAX(w + 40 * _scale, _maxUnitTextWidth);
+            _maxUnitTextWidth = MIN((IS_IPad ? 460 * _scale : IphoneWidth - leftSpace * 2), _maxUnitTextWidth);
+            CGFloat h = [NSString tdd_getHeightWithText:model.unit width:_maxUnitTextWidth - 40 * _scale fontSize:[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightMedium]] + 16 * _scale;
+            _unitTableViewH += h;
         }
-        _maxUnitTextWidth = MIN(IphoneWidth - leftSpace * 2, _maxUnitTextWidth);
+
     }
     
     UIScrollView * scrollView = [[UIScrollView alloc] init];
@@ -619,7 +646,7 @@
         [self.unitArrow mas_makeConstraints:^(MASConstraintMaker *make) {
             make.right.mas_equalTo(-leftSpace);
             make.centerY.equalTo(self.unitLabel);
-            make.size.mas_equalTo(CGSizeMake(14 * _scale, 14 * _scale));
+            make.size.mas_equalTo(CGSizeMake((IS_IPad? 16 : 12 ) * _scale, (IS_IPad? 16 : 12 ) * _scale));
         }];
         [unitBackView addSubview:self.unitSelCol];
         [_unitSelCol mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -879,7 +906,10 @@
             btn.backgroundColor = [UIColor tdd_keyboardItemDisableBackground];
             btn.layer.cornerRadius = 4;
             [btn addTarget:self action:@selector(modelButtonClick:) forControlEvents:UIControlEventTouchUpInside];
-            [btn setImage:imageSeletedArr[i] forState:UIControlStateNormal];
+            [btn setImage:isKindOfTopVCI ? imageSeletedArr[i] : imageArr[i] forState:UIControlStateNormal];
+            if (!isKindOfTopVCI) {
+                [btn setImage:imageSeletedArr[i] forState:UIControlStateSelected];
+            }
             
             btn;
         });
@@ -930,7 +960,7 @@
     [self.helpBackView addSubview:helpTipView];
     
     TDD_CustomLabel * helpTipLabel = [[TDD_CustomLabel alloc] init];
-    helpTipLabel.font = [UIFont systemFontOfSize:14];
+    helpTipLabel.font = [UIFont systemFontOfSize:IS_IPad ? 20 : 14];
     helpTipLabel.textColor = [UIColor tdd_title];
     helpTipLabel.text = TDDLocalized.diagnosis_help;
     [self.helpBackView addSubview:helpTipLabel];
@@ -941,19 +971,19 @@
         make.top.equalTo(showBackView.mas_bottom).offset(10);
     }];
     [helpTipView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.mas_equalTo(20 * _scale);
-        make.top.equalTo(self.helpBackView).offset(16.5 * _scale);
-        make.size.mas_equalTo(CGSizeMake(4 * _scale, 14 * _scale));
+        make.left.mas_equalTo(IS_IPad ? 40 * _scale : 20 * _scale);
+        make.top.equalTo(self.helpBackView).offset(IS_IPad ? 25 * _scale : 16.5 * _scale);
+        make.size.mas_equalTo(IS_IPad ? CGSizeMake(6 * _scale, 20 * _scale) : CGSizeMake(4 * _scale, 14 * _scale));
     }];
     [helpTipLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(helpTipView.mas_right).offset(8 * _scale);
+        make.left.equalTo(helpTipView.mas_right).offset(IS_IPad ? 16 * _scale : 8 * _scale);
         make.centerY.equalTo(helpTipView);
     }];
     [self.helpLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(helpTipLabel.mas_bottom).offset(10 * _scale);
-        make.left.mas_equalTo(20 * _scale);
+        make.top.equalTo(helpTipLabel.mas_bottom).offset(IS_IPad ? 25 * _scale : 8 * _scale);
+        make.left.mas_equalTo(IS_IPad ? 40 * _scale : 20 * _scale);
         make.centerX.equalTo(self.helpBackView);
-        make.bottom.equalTo(self.helpBackView).offset(-20 * _scale);
+        make.bottom.equalTo(self.helpBackView).offset(IS_IPad ? -38 * _scale : -18 * _scale);
     }];
 
     //====恢复默认值====
@@ -1044,7 +1074,7 @@
 
 - (UIImageView *)unitArrow {
     if (!_unitArrow) {
-        _unitArrow = [[UIImageView alloc] initWithImage:kImageNamed(@"down_arrow")];
+        _unitArrow = [[UIImageView alloc] initWithImage:kImageNamed(@"input_down_arrow")];
     }
     return _unitArrow;
 }
@@ -1122,7 +1152,7 @@
 - (TDD_CustomLabel *)helpLabel {
     if (!_helpLabel) {
         _helpLabel = [[TDD_CustomLabel alloc] init];
-        _helpLabel.font = [UIFont systemFontOfSize:12 weight:UIFontWeightRegular];
+        _helpLabel.font = [UIFont systemFontOfSize:IS_IPad ? 18 : 12 weight:UIFontWeightRegular];
         _helpLabel.textColor = [UIColor tdd_title];
         _helpLabel.numberOfLines = 0;
     }
@@ -1134,11 +1164,15 @@
         _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, 0, 130, 80) style:UITableViewStylePlain];
         _tableView.showsVerticalScrollIndicator = NO;
         _tableView.showsHorizontalScrollIndicator = NO;
+        _tableView.bounces = false;
         _tableView.backgroundColor = [UIColor tdd_alertBg];
         _tableView.delegate = self;
         _tableView.dataSource = self;
         _tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-        _tableView.rowHeight = 40;
+        //设行高为自动计算
+        _tableView.rowHeight = UITableViewAutomaticDimension;
+        //预计行高
+        _tableView.estimatedRowHeight = 40 * _scale;
     }
     return _tableView;
 }
@@ -1146,7 +1180,7 @@
 - (UIView *)popView {
     if (!_popView) {
         _popView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, IphoneWidth, IphoneHeight)];
-        _popView.backgroundColor = [UIColor tdd_colorWithHex:0x000000 alpha:0.08];
+        _popView.backgroundColor = [UIColor tdd_colorWithHex:0x000000 alpha:0.2];
         
         UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(popViewTap)];
         tap.delegate = self;

@@ -30,6 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 // 地址
 @property (nonatomic, strong) TDD_CustomLabel * addressLabel;
 
+// SN
+@property (nonatomic, strong) TDD_CustomLabel * snLabel;
+
+// topdonId
+@property (nonatomic, strong) TDD_CustomLabel * topdonIdLabel;
+
 @property (nonatomic, strong) TDD_ArtiReportModel * reportModel;
 
 /// 右上角 App Logo 图片

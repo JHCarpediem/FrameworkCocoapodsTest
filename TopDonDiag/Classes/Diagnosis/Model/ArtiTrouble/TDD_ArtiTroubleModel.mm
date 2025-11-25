@@ -305,46 +305,52 @@ uint32_t ArtiTroubleShow(uint32_t id)
     TDD_ArtiTroubleRepairInfoModle * infoModel = [[TDD_ArtiTroubleRepairInfoModle alloc] init];
     for (int i = 0; i < vctDtcInfo.size(); i ++) {
         if (vctDtcInfo[i].eType == 0) {
-            infoModel.RIT_DTC_CODE = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            infoModel.RIT_DTC_CODE = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue]?:@"";
         }
         
         if (vctDtcInfo[i].eType == 1) {
-            
-            if (![NSString tdd_isEmpty:infoModel.RIT_VEHICLE_BRAND]) {
-                infoModel.RIT_VEHICLE_BRAND = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
-                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carBrand = infoModel.RIT_VEHICLE_BRAND;
+            NSString *brand = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            if (![NSString tdd_isEmpty:brand]) {
+                infoModel.RIT_VEHICLE_BRAND = brand;
+                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carBrand = brand;
             }else {
                 infoModel.RIT_VEHICLE_BRAND = TDD_ArtiGlobalModel.sharedArtiGlobalModel.carBrand?:@"";
             }
         }
         
         if (vctDtcInfo[i].eType == 2) {
-            if (![NSString tdd_isEmpty:infoModel.RIT_VEHICLE_MODEL]) {
-                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carModel = infoModel.RIT_VEHICLE_MODEL;
-                infoModel.RIT_VEHICLE_MODEL = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            NSString *model = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            if (![NSString tdd_isEmpty:model]) {
+                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carModel = model;
+                infoModel.RIT_VEHICLE_MODEL = model;
             }else {
                 infoModel.RIT_VEHICLE_MODEL = TDD_ArtiGlobalModel.sharedArtiGlobalModel.carModel?:@"";
             }
         }
         
         if (vctDtcInfo[i].eType == 3) {
-            if (![NSString tdd_isEmpty:infoModel.RIT_VEHICLE_YEAR]) {
-                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carYear = infoModel.RIT_VEHICLE_YEAR;
-                infoModel.RIT_VEHICLE_YEAR = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            NSString *year = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            if (![NSString tdd_isEmpty:year]) {
+                TDD_ArtiGlobalModel.sharedArtiGlobalModel.carYear = year;
+                infoModel.RIT_VEHICLE_YEAR = year;
             }else {
                 infoModel.RIT_VEHICLE_YEAR = TDD_ArtiGlobalModel.sharedArtiGlobalModel.carYear?:@"";
             }
         }
         
         if (vctDtcInfo[i].eType == 4) {
-            infoModel.RIT_VIN = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
-            if (![NSString tdd_isEmpty:infoModel.RIT_VIN]) {
-                TDD_ArtiGlobalModel.sharedArtiGlobalModel.CarVIN = infoModel.RIT_VIN;
+            NSString *vin = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            
+            if (![NSString tdd_isEmpty:vin]) {
+                TDD_ArtiGlobalModel.sharedArtiGlobalModel.CarVIN = vin;
+                infoModel.RIT_VIN = vin;
+            }else {
+                infoModel.RIT_VIN = TDD_ArtiGlobalModel.sharedArtiGlobalModel.CarVIN?:@"";
             }
         }
         
         if (vctDtcInfo[i].eType == 5) {
-            infoModel.RIT_SYSTEM_NAME = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue];
+            infoModel.RIT_SYSTEM_NAME = [TDD_CTools CStrToNSString:vctDtcInfo[i].strValue]?:@"";
         }
     }
     

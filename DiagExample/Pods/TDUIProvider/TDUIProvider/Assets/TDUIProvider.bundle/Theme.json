@@ -22,7 +22,8 @@
         "confirmBtnBackgroundColor" : "#F22222",
         "confirmBtnDisableBackgroundColor" : "",
         "confirmBtnDisableTextColor" : "",
-        "textFieldPlaceholder": "#999999"
+        "textFieldPlaceholder": "#999999",
+        "cardBackground": "#F8F8F8"
     },
     
     "alert" : {

@@ -18,15 +18,14 @@
 @property (nonatomic, strong) UIButton *stateBtn;
 @property (nonatomic, strong) YYLabel * descLab;
 @property (nonatomic, strong) UIView * lineView;
-@property (nonatomic, strong) UIImageView *lockBGImageView;
-@property (nonatomic, strong) UIImageView *lockImageView;
-@property (nonatomic, strong) UIView * lockBGView;
 
 @property (nonatomic, strong) CAGradientLayer * gl;
 @property (nonatomic, strong) NSMutableArray<UIButton *> * btnArray;
 @property (nonatomic, strong) NSMutableArray<UIView *> * btnLinesArray;
 @property (nonatomic, assign) CGFloat scale;
 @property (nonatomic, assign) CGFloat itemWidth;
+@property (nonatomic, assign) CGFloat leftSpace;
+@property (nonatomic, assign) CGFloat topSpace;
 @end
 
 @implementation TDD_ArtiTroubleCellView
@@ -54,6 +53,8 @@
 {
     CGFloat leftSpace = (IS_IPad ? 16 : 10) * _scale;
     CGFloat topSpace = (IS_IPad ? 16 : 10) * _scale;
+    _leftSpace = leftSpace;
+    _topSpace = topSpace;
     CGFloat centerSpace = (IS_IPad ? 74 : 66) * _scale;
     CGFloat codeFont = IS_IPad ? 18 : 15;
     CGFloat descFont = IS_IPad ? 14 : 13;
@@ -142,25 +143,6 @@
     self.lineView = lineView;
     
     [self updateBtnsLayoutWithShowTrouble: NO];
-    //软件过期（carpal这里不需要）
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
-        _lockBGImageView = [[UIImageView alloc] initWithImage:kImageNamed(@"diag_trouble_lock_bg")];
-        _lockBGImageView.userInteractionEnabled = YES;
-        [self.view addSubview:_lockBGImageView];
-        
-        _lockImageView = [[UIImageView alloc] initWithImage:kImageNamed(@"diag_trouble_btn_lock")];
-        [self.view addSubview:_lockImageView];
-        
-        _lockBGView = [UIView new];
-        _lockBGView.backgroundColor = UIColor.clearColor;
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lockClick)];
-        [_lockBGView addGestureRecognizer:tap];
-        [self.view addSubview:_lockBGView];
-        [_lockBGView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self.view);
-        }];
-    }
-
     
     [view mas_makeConstraints:^(MASConstraintMaker *make) {
         make.edges.equalTo(self);
@@ -169,7 +151,7 @@
     [codeLab mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(view).offset(leftSpace);
         make.top.equalTo(view).offset(topSpace);
-        make.width.lessThanOrEqualTo(view).multipliedBy(0.4);
+        make.width.equalTo(view).multipliedBy(0.5);
     }];
     
     [stateLab mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -196,20 +178,6 @@
         make.bottom.equalTo(view).offset(- (IS_IPad ? 56 : 40) * _scale);
     }];
     
-    //软件过期
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
-        [_lockBGImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.bottom.equalTo(self.view);
-            make.height.mas_equalTo(75 * _scale);
-        }];
-        
-        [_lockImageView mas_makeConstraints:^(MASConstraintMaker *make) {
-            make.centerX.equalTo(self.lockBGImageView);
-            make.size.mas_equalTo(CGSizeMake(22 * _scale, 22 * _scale));
-            make.bottom.equalTo(self.lockBGImageView).offset((IS_IPad ? -16 : -10) * _scale);
-        }];
-    }
-    
     [self mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.equalTo(view.mas_bottom).offset(topSpace).priorityHigh();
     }];
@@ -217,6 +185,7 @@
 
 - (void)updateBtnsLayoutWithShowTrouble: (BOOL)isShowTrouble
 {
+    BOOL isLock = [TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries];
     [self.btnArray enumerateObjectsUsingBlock:^(UIButton * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         [obj removeFromSuperview];
     }];
@@ -239,16 +208,31 @@
             NSString * disableImgName = [NSString stringWithFormat:@"trouble_button_select_%d", index];
             if (([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany || [TDD_DiagnosisManage sharedManage].functionConfigMask & 1) && (i == count-1)) {
                 [btn setImage:[UIImage tdd_imageDiagAIIcon] forState:UIControlStateNormal];
-                [btn setImage:[UIImage tdd_imageDiagAIIcon] forState:UIControlStateDisabled];
+                [btn setImage:isLock ? [UIImage tdd_imageDiagAIIcon] : [UIImage tdd_imageDiagAIDisableIcon] forState:UIControlStateDisabled];
             }else {
                 [btn setImage:kImageNamed(normalImgName) forState:UIControlStateNormal];
-                [btn setImage:kImageNamed(disableImgName) forState:UIControlStateDisabled];
+                [btn setImage:isLock ? kImageNamed(normalImgName) :kImageNamed(disableImgName) forState:UIControlStateDisabled];
             }
-
             btn;
         });
+        
         [self.view addSubview:button];
         [self.btnArray addObject:button];
+        if (isLock) {
+            if (i > 0) {
+                //软件过期
+                UIImageView *lockIcon = [[UIImageView alloc] initWithImage:kImageNamed(@"diag_trouble_btn_lock")];
+                lockIcon.tag = 300 + i;
+                lockIcon.userInteractionEnabled = false;
+                [button addSubview:lockIcon];
+                CGFloat lockSize = (IS_IPad ? 24 : 18) * _scale;
+                [lockIcon mas_makeConstraints:^(MASConstraintMaker *make) {
+                    make.top.equalTo(button.mas_top).offset((IS_IPad ? 6 : 2) * _scale);
+                    make.left.equalTo(button.mas_centerX);
+                    make.size.mas_equalTo(CGSizeMake(lockSize, lockSize));
+                }];
+            }
+        }
         CGFloat topSpace = (IS_IPad ? 16 : 12) * _scale;
         if (i < count - 1) {
             UIView *lineView = [[UIView alloc] init];
@@ -290,15 +274,6 @@
         lastButton = button;
     }
 
-    if (_lockBGImageView && _lockBGImageView.superview) {
-        [self.view bringSubviewToFront:_lockBGImageView];
-    }
-    if (_lockImageView && _lockImageView.superview) {
-        [self.view bringSubviewToFront:_lockImageView];
-    }
-    if (_lockBGView && _lockBGView.superview) {
-        [self.view bringSubviewToFront:_lockBGView];
-    }
 }
 
 - (void)showStateView {
@@ -330,6 +305,20 @@
 
 }
 
+- (void)setPopupItemModel:(TDD_ArtiPopupItemModel *)popupItemModel {
+    TDD_ArtiTroubleItemModel *itemModel = [TDD_ArtiTroubleItemModel new];
+    itemModel.strTroubleCode = popupItemModel.code;
+    
+    itemModel.strTroubleDesc = popupItemModel.content;
+    itemModel.strTranslatedTroubleDesc = popupItemModel.strTranslatedContent;
+    itemModel.isStrTroubleDescTranslated = popupItemModel.isStrContentTranslated;
+    
+    itemModel.strTroubleStatus = popupItemModel.status;
+    itemModel.strTranslatedTroubleStatus = popupItemModel.strTranslatedStatus;
+    itemModel.isStrTroubleStatusTranslated = popupItemModel.isStrStatusTranslated;
+    self.itemModel = itemModel;
+}
+
 - (void)setItemModel:(TDD_ArtiTroubleItemModel *)itemModel
 {
     
@@ -338,11 +327,8 @@
     self.codeLab.text = [NSString tdd_isEmpty:itemModel.strTroubleCode]?@" ":itemModel.strTroubleCode;
     
     NSString *descStr = @"";
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
-        descStr = @"******";
-    }else {
-        descStr = self.isShowTranslated ?itemModel.strTranslatedTroubleDesc :itemModel.strTroubleDesc;
-    }
+    descStr = self.isShowTranslated ?itemModel.strTranslatedTroubleDesc :itemModel.strTroubleDesc;
+
     NSMutableAttributedString *attStr = [NSMutableAttributedString mutableAttributedStringWithLTRString:descStr];
     CGFloat descFont = IS_IPad ? 14 : 13;
     [attStr setYy_font:[[UIFont systemFontOfSize:descFont] tdd_adaptHD]];
@@ -356,64 +342,72 @@
         
         self.stateLab.hidden = YES;
         self.stateBtn.hidden = NO;
-        
+        [self.codeLab mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.width.equalTo(self.view).multipliedBy(0.8);
+
+        }];
+
     }else {
         self.stateLab.hidden = NO;
+        self.stateBtn.hidden = YES;
         if (self.isShowTranslated) {
             self.stateLab.attributedText = [TDD_DiagnosisManage getDtcNodeStatusDescription:itemModel.uStatus statusStr:itemModel.strTranslatedTroubleStatus fromTrouble:YES];
         }else {
             self.stateLab.attributedText = [TDD_DiagnosisManage getDtcNodeStatusDescription:itemModel.uStatus statusStr:itemModel.strTroubleStatus fromTrouble:YES];
         }
+        [self.codeLab mas_updateConstraints:^(MASConstraintMaker *make) {
+            make.width.equalTo(self.view).multipliedBy(0.5);
+        }];
     }
 
     
     if (itemModel.isShowMore) {
         self.descLab.numberOfLines = 0;
-//        self.descLab.truncationToken = nil;
-        
-//        [self.descLab layoutIfNeeded];
-//        NSString *content = @"";
-//        if (self.isShowTranslated) {
-//            content = itemModel.strTranslatedTroubleDesc;
-//        }else {
-//            content = itemModel.strTroubleDesc;
-//        }
-//        float height = [NSString tdd_getHeightWithText:content width:IphoneWidth - 50 * _scale fontSize:self.descLab.font];
-//
-//        [self.descLab mas_updateConstraints:^(MASConstraintMaker *make) {
-//            make.height.mas_equalTo(ceil(height));
-//        }];
+
     }else {
         self.descLab.numberOfLines = 2;
 
-//        [self.descLab mas_updateConstraints:^(MASConstraintMaker *make) {
-//            make.height.mas_equalTo(46);
-//        }];
     }
     
     [self updateBtnsLayoutWithShowTrouble:_itemModel.isShowMILStatus];
     
-    UIButton * helpButton = [self viewWithTag:202];
-    
-    helpButton.enabled = _itemModel.isShowHelpButton;
-    
-    UIButton * FreezeStatusButton = [self viewWithTag:203];
-    
-    FreezeStatusButton.enabled = itemModel.isShowFreezeStatus;
-    
-    UIButton * FaultCodeButton = [self viewWithTag:204];
-    FaultCodeButton.enabled = NO;
+    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
+        UIButton * helpButton = [self viewWithTag:202];
+        UIButton * FreezeStatusButton = [self viewWithTag:203];
+        UIButton * FaultCodeButton = [self viewWithTag:204];
+        helpButton.enabled = FreezeStatusButton.enabled = FaultCodeButton.enabled = true;
+        
+    }else if (self.popupItemModel){
+        UIButton * helpButton = [self viewWithTag:202];
+        UIButton * FreezeStatusButton = [self viewWithTag:203];
+        UIButton * FaultCodeButton = [self viewWithTag:204];
+        helpButton.enabled = FreezeStatusButton.enabled = FaultCodeButton.enabled = false;
+
+    }else {
+        UIButton * helpButton = [self viewWithTag:202];
+        
+        helpButton.enabled = _itemModel.isShowHelpButton;
+        
+        UIButton * FreezeStatusButton = [self viewWithTag:203];
+        
+        FreezeStatusButton.enabled = itemModel.isShowFreezeStatus;
+        
+        UIButton * FaultCodeButton = [self viewWithTag:204];
+        FaultCodeButton.enabled = NO;
 
 
-    //支持专业版本故障码
-    if ([TDD_DiagnosisManage sharedManage].carModel.supportProfessionalTrouble) {
-        FaultCodeButton.enabled = YES;
+        //支持专业版本故障码
+        if ([TDD_DiagnosisManage sharedManage].carModel.supportProfessionalTrouble) {
+            FaultCodeButton.enabled = YES;
 
+        }
+        //德国定制全放开
+        if ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany || [TDD_DiagnosisManage sharedManage].functionConfigMask & 1) {
+            FaultCodeButton.enabled = YES;
+        }
     }
-    //德国定制全放开
-    if ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany || [TDD_DiagnosisManage sharedManage].functionConfigMask & 1) {
-        FaultCodeButton.enabled = YES;
-    }
+    
+
 
 }
 
@@ -425,16 +419,16 @@
 
 - (void)buttonClick:(UIButton *)button
 {
+
+    long tag = button.tag - 200;
+    
     //软件过期前往购买
-    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries]) {
+    if ([TDD_DiagnosisTools isLimitedTrialFuction] && ![TDD_DiagnosisTools softWareIsCarPalSeries] && tag > 1) {
         if ([self.delegate respondsToSelector:@selector(ArtiTroubleCellLockClick:)]) {
             [self.delegate ArtiTroubleCellLockClick:self];
             return;
         }
     }
-
-    
-    long tag = button.tag - 200;
     
     if (tag == 2) {
         //帮助

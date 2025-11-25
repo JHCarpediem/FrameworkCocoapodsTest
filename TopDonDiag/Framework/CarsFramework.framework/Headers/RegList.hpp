@@ -373,6 +373,30 @@ public:
     static void SetButtonText(std::function<void(uint32_t, uint8_t, const std::string&)> fnSetButtonText);
 
     /*
+     *   注册CArtiList的成员函数GetUpdateItems的回调函数
+     *
+     *   std::vector<uint16_t> GetUpdateItems(uint32_t id);
+     *
+     *   id, 对象编号，是哪一个对象调用的成员方法
+     *   其他参数见ArtiList.h的说明
+     *
+     *   GetUpdateItems 其它参数和返回值说明见 ArtiList.h
+     */
+    static void GetUpdateItems(std::function<std::vector<uint16_t>(uint32_t)> fnGetUpdateItems);
+
+    /*
+     *   注册CArtiList的成员函数GetItemIsUpdate的回调函数
+     *
+     *   bool GetItemIsUpdate(uint32_t id, uint16_t uIndex);
+     *
+     *   id, 对象编号，是哪一个对象调用的成员方法
+     *   其他参数见ArtiList.h的说明
+     *
+     *   GetItemIsUpdate 其它参数和返回值说明见 ArtiList.h
+     */
+    static void GetItemIsUpdate(std::function<bool(uint32_t, uint16_t)> fnGetItemIsUpdate);
+    
+    /*
      *   注册CArtiList的成员函数GetSelectedRow的回调函数
      *
      *   uint16_t GetSelectedRow(uint32_t id);

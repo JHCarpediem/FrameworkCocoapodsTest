@@ -249,7 +249,7 @@ extension BinaryFloatingPoint {
 
 extension BinaryInteger {
     /// 平板水平方向缩放比
-    public var hdHorizontalScale: Self { self * Self(UI.HD.horizontalScale) }
+    public var hdHorizontalScale: Self { Self(Double(self) * UI.HD.horizontalScale) }
     /// 平板竖直方向缩放比
-    public var hdVerticalScale: Self { self * Self(UI.HD.verticalScale) }
+    public var hdVerticalScale: Self { Self(Double(self) * UI.HD.verticalScale) }
 }

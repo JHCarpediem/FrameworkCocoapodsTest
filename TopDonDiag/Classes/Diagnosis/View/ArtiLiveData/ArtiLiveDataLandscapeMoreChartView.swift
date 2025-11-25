@@ -69,7 +69,7 @@ final class LandscapeLiveDataItemView: UIView {
         cubeView.backgroundColor = cubeColor
         let name = itemName
         
-        let leftMargin: CGFloat = TDD_DiagBridge.isIPhoneX() ? 3.0 : 10.0
+        let leftMargin: CGFloat = DiagBridge.iPhoneX ? 3.0 : 10.0
         
         let textMaxWidth: CGFloat = 170
         let yyLabelHeight = name.calculateYYLabelHeight(font: .systemFont(ofSize: 11, weight: .medium) , width: textMaxWidth, numberOfLines: 2)
@@ -107,7 +107,7 @@ final class LandscapeLiveDataItemView: UIView {
             let confirmAction = LMSAlertAction.init(title: TDDLocalized.app_confirm, titleColor: UIColor.tdd_colorDiagTheme()) { action in
                 
             }
-            //LMSAlertController.showAlert(nil, message: self.itemName, actions: [confirmAction])
+            LMSAlertController.showAlert(nil, message: self.itemName, actions: [confirmAction])
         }
         
         let seeMore = YYLabel()
@@ -145,7 +145,7 @@ final class LandscapeLiveDataItemView: UIView {
     
     private func setupConstraints() {
         
-        let leftMargin: CGFloat = TDD_DiagBridge.isIPhoneX() ? 3.0 : 10.0
+        let leftMargin: CGFloat = DiagBridge.iPhoneX ? 3.0 : 10.0
         
         cubeView.snp.makeConstraints { make in
             make.left.equalTo(leftMargin)
@@ -251,12 +251,21 @@ public class ArtiLiveDataLandscapeMoreChartView: TDD_ArtiContentBaseView {
     private let maxCount: Int = 4
     private lazy var kSafeBottomHeightValue: CGFloat = { TDD_DiagBridge.kSafeBottomHeightValue() }()
     
-    private let tableViewWidth: CGFloat = 244.0
-    private lazy var tableViewHeight: CGFloat = (UIScreen.main.bounds.width - navigationHeight - composeBottomHeight - kSafeBottomHeightValue  - lineHeight)
+    /// 非刘海屏 202.5 刘海屏 244.0
+    private lazy var tableViewWidth: CGFloat = { DiagBridge.liveLandscapeLeftCombineWidth }()
+    
+    private lazy var makeSureOriginScreenWidth: CGFloat = {
+        let bounds = UIScreen.main.bounds
+        let width = bounds.width
+        let height = bounds.height
+        return min(width, height)
+    }()
+    
+    private lazy var tableViewHeight: CGFloat = (makeSureOriginScreenWidth - navigationHeight - composeBottomHeight - kSafeBottomHeightValue  - lineHeight)
     
     private let space: CGFloat = 10.0 // 图标和 tableVeiw 中间间距
     
-    private lazy var rowHeight: CGFloat = { (UIScreen.main.bounds.width - navigationHeight - composeBottomHeight - kSafeBottomHeightValue - lineHeight) / CGFloat(maxCount) }()
+    private lazy var rowHeight: CGFloat = { (makeSureOriginScreenWidth - navigationHeight - composeBottomHeight - kSafeBottomHeightValue - lineHeight) / CGFloat(maxCount) }()
     
     // MARK: - UI Components
     
@@ -298,8 +307,7 @@ public class ArtiLiveDataLandscapeMoreChartView: TDD_ArtiContentBaseView {
         label.textAlignment = .right
         label.textColor = UIColor.tdd_liveDataLegend() // #999999
         label.font = UIFont.systemFont(ofSize: 10.0)
-        // TODO: xinwen 国际化
-        label.text = "支持X轴Y轴的手势缩放"
+        label.text = TDDLocalized.support_xy_scaling
         return label
     }()
     

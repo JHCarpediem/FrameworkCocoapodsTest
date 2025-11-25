@@ -127,7 +127,7 @@
 - (UIImageView *)arrowImageView {
     if (!_arrowImageView) {
         _arrowImageView = [[UIImageView alloc] init];
-        _arrowImageView.image = [kImageNamed(@"icon_diag_arrow") tdd_imageByTintColor:[UIColor tdd_colorWithHex:0x1b212a]];
+        _arrowImageView.image = [UIImage tdd_imageDiagGuildAIArrow];
     }
     return _arrowImageView;
 }

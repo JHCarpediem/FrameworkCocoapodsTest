@@ -108,6 +108,9 @@ protocol LogFileUploadable {
     var lfuPhoneSystemLanguageName: String {get set}
 
     var lfuAppInfo: String {get set}
+    
+    /// 按时间从自然顺序递增；比如 第 1 条是 11:30:20 秒，第 2 条是 11:30:22秒
+    var carPaths: [String] {get set}
 }
 
 typealias LogRecordDBable = LogRecordable & TableCodable & DBModelProtocol & DBModelValidable
@@ -222,6 +225,8 @@ final class NewAppLogRecordDBModel: LogRecordDBable, LogFileUploadable {
     var lfuPhoneSystemLanguageName: String = ""
     
     var lfuAppInfo: String = ""
+    
+    var carPaths: [String] = []
     
     // MARK: - Validable
     
@@ -606,6 +611,8 @@ final class AppLogRecordDBModel: LogRecordDBable, LogFileUploadable {
     
     var lfuAppInfo: String = ""
     
+    var carPaths: [String] = []
+    
     // MARK: - Validable
     
     var _insertSQLAppVersion: String  = ""
@@ -879,6 +886,34 @@ final class EnterDiagLogRecordDBModel: LogRecordDBable, LogFileUploadable {
     //var appLogRecord: AppLogRecordDBModel?
     var newAppLogRecord: NewAppLogRecordDBModel?
     
+    /// 存储车型路径，最多保存50条
+    var carModelPaths: String = ""
+    
+    /// 添加车型路径，最多保留最新的50条
+    func addCarModelPathWithTime(_ path: String, millSeconds timestamp: TimeInterval) {
+        if path.isEmpty { return }
+        
+        let timePath = "\(Int64(timestamp)):\(path)"
+        var paths = carPaths
+        paths.append(timePath)
+        
+        // 如果超过50条，只保留最新的50条
+        if paths.count > 50 {
+            paths = Array(paths.suffix(50))
+        }
+        
+        carModelPaths = paths.joined(separator: ",")
+    }
+    
+    var carPaths: [String] {
+        set {
+            
+        }
+        get {
+            carModelPaths.isEmpty ? [] : carModelPaths.components(separatedBy: ",")
+        }
+    }
+    
     // MARK: - LogFileUploadable
     
     var lfuSn: String = ""
@@ -934,6 +969,7 @@ final class EnterDiagLogRecordDBModel: LogRecordDBable, LogFileUploadable {
     var lfuPhoneSystemLanguageName: String = ""
     
     var lfuAppInfo: String = ""
+    
     
     // MARK: - Ex
     var isAutoVin: Bool {
@@ -1018,6 +1054,8 @@ final class EnterDiagLogRecordDBModel: LogRecordDBable, LogFileUploadable {
         case status
         
         case uploadType = "upload_type"
+        
+        case carModelPaths = "car_model_paths"
         
         case lfuSn
         

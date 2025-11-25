@@ -30,7 +30,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
     _scale = IS_IPad ? HD_Height : H_Height;
-    self.view.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleUpleftToLowright withFrame:self.view.bounds.size];
+    self.view.backgroundColor = [UIColor tdd_background];
     
     self.titleStr = TDDLocalized.select_vehicle;
     self.naviView.naviType = kNaviTypeWhite;
@@ -176,6 +176,12 @@
     
     cellView.itemModel = itemModel;
     
+#if DEBUG
+    if ([carModel.strVehicle isEqualToString:@"DEMO"]) {
+        cell.accessibilityIdentifier = @"DEMO";
+    }
+#endif
+    
     return cell;
 }
 
@@ -230,7 +236,12 @@
         }else {
             [TDD_ArtiGlobalModel sharedArtiGlobalModel].softCode = [NSString stringWithFormat:@"AD200_CarSW_%@_iOS",carModel.strVehicle];
         }
-
+#ifdef DEBUG
+    BOOL setSoftExpire =  [[NSUserDefaults standardUserDefaults] boolForKey:@"kAllSoftExpire"];
+    if (setSoftExpire) {
+        [TDD_ArtiGlobalModel sharedArtiGlobalModel].softIsExpire = YES;
+    }
+#endif
         [TDD_DiagnosisManage enterDiagViewControllerWithCarModel:self.carModel entryType:self.diagEntryType menuMask:DMM_ALL_SYSTEM_SUPPORT delegate:self.delegate];
     }];
     

@@ -13,6 +13,8 @@ import TDBasis
     
     @objc public var clickTap:Block.VoidBlock?
     
+    @objc public var clickEnable:Bool = true
+    
     @objc public override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -47,12 +49,19 @@ import TDBasis
         
     }
     
+    @objc public func setTitle(content: String? = nil) {
+        
+        tipsLabel.text = content
+        
+    }
+    
     
     lazy var bgView : UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.tdd_colorDiagTheme()
         view.alpha = 0.1
         view.td.addTap { [weak self] tap in guard let self = self else{ return }
+            if !clickEnable {return}
             self.clickTap?()
         }
         return view

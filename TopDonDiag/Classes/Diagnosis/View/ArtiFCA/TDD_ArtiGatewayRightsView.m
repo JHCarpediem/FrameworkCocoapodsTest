@@ -8,12 +8,14 @@
 #import "TDD_ArtiGatewayRightsView.h"
 #import "TDD_ArtiGlobalModel.h"
 #import "TDD_LoadingView.h"
+static NSString *demoDefaultSN = @"1104*******001";
 @import TDUIProvider;
 @interface TDD_ArtiGatewayRightsView()
 @property (nonatomic, strong)UIScrollView *scrollView;
 @property (nonatomic, strong)UIView *topBGView;
 @property (nonatomic, strong)TDD_CustomLabel *snLabel;
 @property (nonatomic, strong)TDD_CustomLabel *snExpireLabel;
+@property (nonatomic, strong)UIView *snExpireBottomLineView;
 @property (nonatomic, strong)UIButton *expireRefreshButton;
 @property (nonatomic, strong)UIButton *renewButton;
 @property (nonatomic, strong)TDD_LoadingView *expireLoadingView;
@@ -29,6 +31,7 @@
 @property (nonatomic, strong)UIView *buyBGView;
 @property (nonatomic, strong)TDD_CustomLabel *buyLabel;
 @property (nonatomic, strong)TDD_CustomLabel *noteContentLabel;
+@property (nonatomic, strong)UIView *bottomBGView;
 @property (nonatomic, assign)CGFloat fontSize;
 @property (nonatomic, assign)CGFloat preFontSize;
 @property (nonatomic, assign)CGFloat scale;
@@ -49,7 +52,7 @@
 - (void)viewDidAppear {
     if (_buyBGView) {
         //德国定制隐藏购买入口
-        _buyBGView.hidden = ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany  || [TDD_DiagnosisTools softWareIsTopVCIPro]);
+        _buyBGView.hidden = ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany  || [TDD_DiagnosisTools softWareIsTopVCIPro] || (_fcaModel && [TDD_DiagnosisTools isAutoAuthNa] == 1 && (_fcaModel.uType == SST_FUNC_FCA_AUTH ||  _fcaModel.uType == SST_FUNC_NISSAN_AUTH )));
         [_buyBGView mas_updateConstraints:^(MASConstraintMaker *make) {
             make.height.mas_equalTo(_buyBGView.hidden ? 0 : (IS_IPad ? 112 : 84));
         }];
@@ -200,10 +203,8 @@
     
     [self createTopView];
     
-    if ([TDD_DiagnosisTools isAutoAuthNa] < 1) {
-        [self createMidView];
-    }
-
+    [self createMidView];
+    
     [self createBottomView];
   
 }
@@ -242,9 +243,14 @@
     [topBGView addSubview:self.renewButton];
     [topBGView addSubview:self.expireRefreshButton];
     
-    UIView *snSpaceView = [UIView new];
-    snSpaceView.backgroundColor = [UIColor tdd_liveDataSetBackground];
-    [topBGView addSubview:snSpaceView];
+    _snExpireBottomLineView = [UIView new];
+    if (IS_IPad) {
+        _snExpireBottomLineView.backgroundColor = [UIColor tdd_line];
+    }else {
+        _snExpireBottomLineView.backgroundColor = [UIColor tdd_liveDataSetBackground];
+    }
+    
+    [topBGView addSubview:_snExpireBottomLineView];
     
     [topSpaceView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.left.equalTo(self.scrollView);
@@ -255,65 +261,118 @@
     [topBGView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(topSpaceView.mas_bottom);
         make.width.mas_equalTo(IphoneWidth);
+        make.left.equalTo(self.scrollView);
     }];
     
     [snPreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(topBGView).offset(20 * _scale + _textTopSpaceMoreHeight);
         make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(topBGView).offset(-20 * _scale - _textLeftMoreSpace);
+        if (IS_IPad) {
+            make.right.equalTo(expirePreLabel.mas_left).offset(-24 * _scale);
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+        }else {
+            make.right.lessThanOrEqualTo(topBGView).offset(-20 * _scale - _textLeftMoreSpace);
+        }
+        
     }];
     
     [self.snLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
         make.top.equalTo(snPreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
-        make.right.lessThanOrEqualTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.right.equalTo(expirePreLabel.mas_left).offset(-24 * _scale);
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+        }else {
+            make.right.lessThanOrEqualTo(topBGView).offset(-20 * _scale - _textLeftMoreSpace);
+        }
     }];
     
     [snMidLineView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.equalTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
-        make.top.equalTo(self.snLabel.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
+        make.left.equalTo(self.snLabel);
+        make.top.equalTo(self.snLabel.mas_bottom).offset(16 * _scale + _textTopSpaceMoreHeight);
         make.height.mas_equalTo(1);
+        if (IS_IPad) {
+            make.right.equalTo(expirePreLabel.mas_left).offset(-24 * _scale);
+        }else {
+            make.right.equalTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [expirePreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(snMidLineView.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.top.equalTo(snPreLabel.mas_top);
+            make.left.equalTo(snMidLineView.mas_right).offset(24 * _scale);
+            make.right.equalTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }else {
+            make.top.equalTo(snMidLineView.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [self.snExpireLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(expirePreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.left.equalTo(expirePreLabel);
+            make.right.equalTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }else {
+            make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
     }];
     
     [self.expireLoadingView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(expirePreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.size.mas_equalTo(IS_IPad ? CGSizeMake(40 * _scale, 40 * _scale) : CGSizeMake(20 * _scale, 20 * _scale));
+        if (IS_IPad) {
+            make.top.equalTo(expirePreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(expirePreLabel);
+            make.size.mas_equalTo(IS_IPad ? CGSizeMake(40 * _scale, 40 * _scale) : CGSizeMake(20 * _scale, 20 * _scale));
+        }else {
+            make.top.equalTo(expirePreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(topBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.size.mas_equalTo(IS_IPad ? CGSizeMake(40 * _scale, 40 * _scale) : CGSizeMake(20 * _scale, 20 * _scale));
+        }
+
     }];
     
     [self.renewButton mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.size.mas_equalTo(CGSizeMake((IS_IPad ? 140 * _scale : 100 * _scale), (IS_IPad ? 38 * _scale : 28 * _scale)));
-        make.top.equalTo(expirePreLabel.mas_bottom).offset(IS_IPad ? 7 * _scale : 3.5 * _scale);
-        make.right.equalTo(topBGView.mas_right).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.size.mas_equalTo(CGSizeMake((IS_IPad ? 140 * _scale : 100 * _scale), (IS_IPad ? 38 * _scale : 28 * _scale)));
+            make.top.equalTo(expirePreLabel.mas_bottom).offset(IS_IPad ? 7 * _scale : 3.5 * _scale);
+            make.left.equalTo(self.snExpireLabel.mas_right).offset(46 * _scale);
+        }else {
+            make.size.mas_equalTo(CGSizeMake((IS_IPad ? 140 * _scale : 100 * _scale), (IS_IPad ? 38 * _scale : 28 * _scale)));
+            make.top.equalTo(expirePreLabel.mas_bottom).offset(IS_IPad ? 7 * _scale : 3.5 * _scale);
+            make.right.equalTo(topBGView.mas_right).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [self.expireRefreshButton mas_makeConstraints:^(MASConstraintMaker *make) {
         make.size.mas_equalTo(CGSizeMake(IS_IPad ? 33 * _scale : 22 * _scale, IS_IPad ? 24 * _scale : 16 * _scale));
         make.left.equalTo(self.snExpireLabel.mas_right).offset(IS_IPad ? 12 * _scale : 6 * _scale);
         make.centerY.equalTo(self.snExpireLabel);
-    }];
-    
-    [snSpaceView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.scrollView);
-        make.width.mas_equalTo(IphoneWidth);
-        make.top.equalTo(self.snExpireLabel.mas_bottom).offset(IS_IPad ? 25 * _scale : 15 * _scale);
-        make.height.mas_equalTo(_topSpaceViewHeight);
-        make.bottom.equalTo(topBGView.mas_bottom);
 
     }];
+    
+    [_snExpireBottomLineView mas_makeConstraints:^(MASConstraintMaker *make) {
+        if (IS_IPad) {
+            make.left.equalTo(expirePreLabel);
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+            make.height.mas_equalTo(1);
+            make.centerY.equalTo(snMidLineView);
+            make.bottom.equalTo(topBGView.mas_bottom);
+        }else {
+            make.top.equalTo(self.snExpireLabel.mas_bottom).offset(IS_IPad ? 25 * _scale : 15 * _scale);
+            make.left.equalTo(self.scrollView);
+            make.width.mas_equalTo(IphoneWidth);
+            make.height.mas_equalTo(_topSpaceViewHeight);
+            make.bottom.equalTo(topBGView.mas_bottom);
+        }
+
+    }];
+
 }
 
 - (void)createMidView {
@@ -326,7 +385,6 @@
     TDD_CustomLabel *accountPreLabel = [[TDD_CustomLabel alloc] init];
     accountPreLabel.textColor = [UIColor tdd_color666666];
     accountPreLabel.font = [[UIFont systemFontOfSize:_preFontSize weight:UIFontWeightRegular] tdd_adaptHD];
-    accountPreLabel.font = [[UIFont systemFontOfSize:14 weight:UIFontWeightRegular] tdd_adaptHD];
     accountPreLabel.text = TDDLocalized.fca_current_account_number;
     [accountBGView addSubview:accountPreLabel];
     [accountBGView addSubview:self.accountLabel];
@@ -348,7 +406,12 @@
     [accountBGView addSubview:self.expireLabel];
     
     UIView *midSpaceView = [UIView new];
-    midSpaceView.backgroundColor = [UIColor tdd_liveDataSetBackground];
+    if (IS_IPad) {
+        midSpaceView.backgroundColor = [UIColor tdd_line];
+    }else {
+        midSpaceView.backgroundColor = [UIColor tdd_liveDataSetBackground];
+    }
+
     [accountBGView addSubview:midSpaceView];
     
     [accountBGView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -359,61 +422,120 @@
     [accountPreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(accountBGView).offset(20 * _scale + _textTopSpaceMoreHeight);
         make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.right.equalTo(countPreLabel.mas_left).offset(-24 * _scale);
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+        }else {
+            make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+        
     }];
     
     [self.accountLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
         make.top.equalTo(accountPreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
-        make.right.lessThanOrEqualTo(self.changeAccountBtn.mas_left).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+
+        }else {
+            make.right.lessThanOrEqualTo(self.changeAccountBtn.mas_left).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [self.changeAccountBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         make.size.mas_equalTo(CGSizeMake(IS_IPad ? 36 * _scale : 22 * _scale, IS_IPad ? 25 * _scale : 16 * _scale));
         make.centerY.equalTo(self.accountLabel);
-        make.right.equalTo(accountBGView.mas_right).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.left.equalTo(self.accountLabel.mas_right).offset(12 * _scale);
+            make.right.equalTo(countPreLabel.mas_left).offset(-24 * _scale);
+        }else {
+            make.right.equalTo(accountBGView.mas_right).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [topBGMidLineView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.centerX.equalTo(accountBGView);
         make.top.equalTo(self.accountLabel.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
         make.height.mas_equalTo(1);
+        if (IS_IPad) {
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+            make.bottom.equalTo(accountBGView.mas_bottom);
+        }else {
+            make.centerX.equalTo(accountBGView);
+        }
+        
+
     }];
     
     [countPreLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(topBGMidLineView.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.top.equalTo(accountPreLabel);
+            make.left.equalTo(topBGMidLineView.mas_right).offset(24 * _scale);
+            make.right.equalTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }else {
+            make.top.equalTo(topBGMidLineView.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [self.countLabel mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(countPreLabel.mas_bottom).offset(6 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.left.equalTo(countPreLabel);
+
+        }else {
+            make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
         
     }];
     
     [self.expireLabel mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.countLabel.mas_bottom).offset(6 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        if (IS_IPad) {
+            make.top.equalTo(self.countLabel);
+            make.left.lessThanOrEqualTo(self.countLabel.mas_right).offset(40 * _scale);
+            make.right.equalTo(topBGMidLineView);
+        }else {
+            make.top.equalTo(self.countLabel.mas_bottom).offset(6 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }
+
     }];
     
     [self.loadingView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.top.equalTo(countPreLabel.mas_bottom).offset(8 * _scale + _textTopSpaceMoreHeight);
-        //make.bottom.equalTo(topBGView.mas_bottom).offset(-(20 * _scale + textTopSpaceMoreHeight));
-        make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
         make.size.mas_equalTo(IS_IPad ? CGSizeMake(40 * _scale, 40 * _scale) : CGSizeMake(20 * _scale, 20 * _scale));
+        if (IS_IPad) {
+            make.left.equalTo(countPreLabel);
+        }else {
+            make.left.equalTo(accountBGView).offset(20 * _scale + _textLeftMoreSpace);
+        }
+
     }];
     
     ///分割
     [midSpaceView mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.left.equalTo(self.scrollView);
-        make.width.mas_equalTo(IphoneWidth);
-        make.top.equalTo(self.expireLabel.mas_bottom).offset((16 * _scale + _textTopSpaceMoreHeight));
-        make.height.mas_equalTo(_topSpaceViewHeight);
+
         make.bottom.equalTo(accountBGView.mas_bottom);
+//        make.top.equalTo(countPreLabel.mas_bottom).offset((IS_IPad ? 60 : 45) * _scale);
+
+        if (IS_IPad) {
+            make.left.equalTo(countPreLabel);
+            make.width.mas_equalTo(IphoneWidth / 2  - 40 * _scale - 24 * _scale);
+            make.height.mas_equalTo(1);
+            make.top.equalTo(self.accountLabel.mas_bottom).offset(20 * _scale + _textTopSpaceMoreHeight);
+        }else {
+            make.left.equalTo(self.scrollView);
+            make.width.mas_equalTo(IphoneWidth);
+            make.height.mas_equalTo(_topSpaceViewHeight);
+            make.top.equalTo(self.expireLabel.mas_bottom).offset((16 * _scale + _textTopSpaceMoreHeight));
+        }
+
+        
     }];
 }
 
@@ -422,6 +544,7 @@
     //底部
     UIView *bottomBGView = [UIView new];
     bottomBGView.backgroundColor = [UIColor tdd_liveDataCellBackground];
+    self.bottomBGView = bottomBGView;
     [self.scrollView addSubview:bottomBGView];
     
     UIView *buyBGView = [UIView new];
@@ -437,7 +560,7 @@
     UIButton *buyBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [buyBtn addTarget:self action:@selector(buyAction) forControlEvents:UIControlEventTouchUpInside];
     
-    [buyBtn setBackgroundImage:IS_IPad ? kImageNamed(@"diag_gateway_purchase_bg_hd") : [UIImage tdd_imageDiageGateWayToBuyImage] forState:UIControlStateNormal];
+    [buyBtn setBackgroundImage:[UIImage tdd_imageDiageGateWayToBuyImage] forState:UIControlStateNormal];
     [buyBGView addSubview:buyBtn];
     
     TDD_CustomLabel *buyLabel = [TDD_CustomLabel new];
@@ -454,7 +577,7 @@
     [buyBGView addSubview:arrowImageView];
     
     //德国定制隐藏购买入口
-    _buyBGView.hidden = ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany  || [TDD_DiagnosisTools softWareIsTopVCIPro]);
+    _buyBGView.hidden = ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany  || [TDD_DiagnosisTools softWareIsTopVCIPro] || (_fcaModel && [TDD_DiagnosisTools isAutoAuthNa] == 1 && (_fcaModel.uType == SST_FUNC_FCA_AUTH ||  _fcaModel.uType == SST_FUNC_NISSAN_AUTH )));
     [_buyBGView mas_updateConstraints:^(MASConstraintMaker *make) {
         make.height.mas_equalTo(_buyBGView.hidden ? 0  : (IS_IPad ? 112 : 84) * _scale);
     }];
@@ -483,7 +606,7 @@
     ///底部
     [bottomBGView mas_makeConstraints:^(MASConstraintMaker *make) {
         make.bottom.equalTo(self.scrollView);
-        if ([TDD_DiagnosisTools isAutoAuthNa] == 1) {
+        if ([TDD_DiagnosisTools isAutoAuthNa] == 1 && (_fcaModel.uType == SST_FUNC_NISSAN_AUTH || _fcaModel.uType == SST_FUNC_FCA_AUTH)) {
             make.top.equalTo(self.topBGView.mas_bottom);
         }else {
             make.top.equalTo(self.accountBGView.mas_bottom);
@@ -613,12 +736,8 @@
         
     }
     
-    [_expireLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
-        make.top.equalTo(self.countLabel.hidden ? self.countPreLabel.mas_bottom : self.countLabel.mas_bottom).offset(6 * _scale + _textTopSpaceMoreHeight);
-        make.left.equalTo(self.topBGView).offset(20 * _scale + _textLeftMoreSpace);
-        make.right.lessThanOrEqualTo(self.topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
-//        make.bottom.equalTo(self.topBGView.mas_bottom).offset(-(16 * _scale + _textTopSpaceMoreHeight));
-    }];
+    [self updateExpireLabelLayout];
+    
     _expireLabel.hidden = NO;
 
 }
@@ -628,9 +747,9 @@
     NSString *str = [NSString stringWithFormat:@"%@%@",preStr,valueStr];
     NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:str];
     NSRange hlRange = NSMakeRange(preStr.length, str.length - preStr.length);
-    [attStr setYy_font:kSystemFont(14)];
+    [attStr setYy_font:kSystemFont(IS_IPad ? 18 : 14)];
     [attStr setYy_color:[UIColor tdd_subTitle]];
-    [attStr yy_setFont:[UIFont systemFontOfSize:16 weight:UIFontWeightMedium] range:hlRange];
+    [attStr yy_setFont:[UIFont systemFontOfSize:IS_IPad ? 20 : 16 weight:UIFontWeightMedium] range:hlRange];
     [attStr yy_setColor:[UIColor tdd_title] range:hlRange];
     
     return attStr;
@@ -638,8 +757,8 @@
 
 - (NSMutableAttributedString *)unRightAttStr {
     NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:TDDLocalized.unlock_rights_zero];
-    [attStr setYy_color:[TDD_DiagnosisTools softWareIsCarPalSeries] ? [UIColor tdd_title] : [UIColor td_error]];
-    [attStr setYy_font:[UIFont systemFontOfSize:16 weight:UIFontWeightMedium]];
+    [attStr setYy_color:[UIColor tdd_title]];
+    [attStr setYy_font:[UIFont systemFontOfSize:IS_IPad ? 20 : 16 weight:UIFontWeightMedium]];
     return attStr;
     
 }
@@ -657,10 +776,14 @@
 - (void)vciStatusDidChange {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([TDD_EADSessionController sharedController].VciStatus) {
-            self.snLabel.text = [TDD_EADSessionController sharedController].SN?:@"--";
+            
             if (self.fcaModel.uType == SST_FUNC_DEMO_AUTH){
+                NSString *snStr = [NSString tdd_isEmpty:[TDD_EADSessionController sharedController].SN] ? [TDD_DiagnosisTools selectedVCISerialNum] : [TDD_EADSessionController sharedController].SN;
+                snStr = [NSString tdd_isEmpty:snStr] ? demoDefaultSN  : snStr;
+                self.snLabel.text = snStr;
                 [self requestData];
             }else {
+                self.snLabel.text = [NSString tdd_isEmpty:[TDD_EADSessionController sharedController].SN] ? @"--" : [TDD_EADSessionController sharedController].SN;
                 [self requestSNInfo];
             }
 
@@ -714,14 +837,22 @@
                 break;
             case 3:
                 {
-                    self.snExpireLabel.text = expireStr;
                     self.snExpireLabel.textColor = [UIColor tdd_title];
                     self.snExpireLabel.hidden = false;
                     self.expireRefreshButton.hidden = YES;
                     self.renewButton.hidden = YES;
-                    self.snLabel.text = @"--";
+                    if (self.fcaModel.uType == SST_FUNC_DEMO_AUTH) {
+                        NSString *snStr =  [TDD_DiagnosisTools selectedVCISerialNum];
+                        snStr = [NSString tdd_isEmpty:snStr] ? demoDefaultSN  : snStr;
+                        self.snLabel.text = snStr;
+                    }else {
+                        self.snLabel.text = @"--";
+                        self.snExpireLabel.text = expireStr;
+                        [self.fcaModel setNextBtnEnable:false];
+                    }
+
                     self.expireLoadingView.hidden = YES;
-                    [self.fcaModel setNextBtnEnable:false];
+                    
                 }
                 break;
             case 4:
@@ -772,6 +903,7 @@
             //切换账号成功缓存账号
             [TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount = account?:@"";
             [view removeFromSuperview];
+            [self updateExpireLabelLayout];
             return;
         }
         [self requestRightsCount:account needSuccess:YES complete:^(BOOL success, NSString *errCode, NSString *errMsg) {
@@ -820,9 +952,20 @@
         _expireLabel.text = TDDLocalized.unlimited;
         _countLabel.hidden = YES;
         _loadingView.hidden = YES;
+        [self updateExpireLabelLayout];
     }else {
-        if ([TDD_DiagnosisTools isAutoAuthNa] < 1) {
-            [self requestRightsCount:nil needSuccess:NO complete:nil];
+        if (([TDD_DiagnosisTools isAutoAuthNa] < 1 || (_fcaModel.uType != SST_FUNC_NISSAN_AUTH && _fcaModel.uType != SST_FUNC_FCA_AUTH)) && (![NSString tdd_isEmpty:[TDD_DiagnosisTools userAccount]] || ![NSString tdd_isEmpty:[TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount])) {
+            if (![NSString tdd_isEmpty:[TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount]) {
+                [self requestRightsCount:[TDD_ArtiGlobalModel sharedArtiGlobalModel].authChangeAccount needSuccess:NO complete:nil];
+            }else {
+                [self requestRightsCount:nil needSuccess:NO complete:nil];
+            }
+            
+        }else {
+            _expireLabel.textColor = [UIColor tdd_title];
+            _expireLabel.text = @"--";
+            _countLabel.hidden = YES;
+            _loadingView.hidden = YES;
         }
         
         [self requestSNInfo];
@@ -831,8 +974,34 @@
 
 - (void)setFcaModel:(TDD_FCAAuthModel *)fcaModel {
     _fcaModel = fcaModel;
+    if (self.fcaModel.uType == SST_FUNC_DEMO_AUTH) {
+        NSString *snStr = [NSString tdd_isEmpty:[TDD_EADSessionController sharedController].SN] ? [TDD_DiagnosisTools selectedVCISerialNum] : [TDD_EADSessionController sharedController].SN;
+        snStr = [NSString tdd_isEmpty:snStr] ? demoDefaultSN  : snStr;
+        self.snLabel.text = snStr;
+    }
     [self requestData];
-
+    if ([TDD_DiagnosisTools isAutoAuthNa] < 1 || (_fcaModel.uType != SST_FUNC_NISSAN_AUTH && _fcaModel.uType != SST_FUNC_FCA_AUTH)) {
+        self.accountBGView.hidden = false;
+    }else {
+        self.accountBGView.hidden = true;
+    }
+    [_bottomBGView mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.bottom.equalTo(self.scrollView);
+        if (self.accountBGView.hidden) {
+            make.top.equalTo(self.topBGView.mas_bottom);
+            
+        }else {
+            make.top.equalTo(self.accountBGView.mas_bottom);
+        }
+        
+        make.width.mas_equalTo(IphoneWidth);
+    }];
+    
+    //隐藏购买入口
+    _buyBGView.hidden = ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany  || [TDD_DiagnosisTools softWareIsTopVCIPro] || (_fcaModel && [TDD_DiagnosisTools isAutoAuthNa] == 1 && (_fcaModel.uType == SST_FUNC_FCA_AUTH ||  _fcaModel.uType == SST_FUNC_NISSAN_AUTH )));
+    [_buyBGView mas_updateConstraints:^(MASConstraintMaker *make) {
+        make.height.mas_equalTo(_buyBGView.hidden ? 0  : (IS_IPad ? 112 : 84) * _scale);
+    }];
     self.accountLabel.text = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount];
     NSString *buyTips = _fcaModel.uType == SST_FUNC_NISSAN_AUTH ? TDDLocalized.gateway_purchase_nissan :TDDLocalized.unlock_rights_to_buy;
     [_buyLabel setText:buyTips];
@@ -840,7 +1009,7 @@
     NSString *normalNoteStr = @"";
     switch (_fcaModel.uType) {
         case SST_FUNC_FCA_AUTH:
-            normalNoteStr = isDeepScan ? TDDLocalized.fca_gateway_hint_deepscan : ([TDD_DiagnosisTools isAutoAuthNa] == 1) ? TDDLocalized.fca_north_america_gateway_hint : TDDLocalized.fca_other_gateway_hint;
+            normalNoteStr = isDeepScan ? TDDLocalized.fca_gateway_hint_deepscan : TDDLocalized.fca_north_america_gateway_hint;
             break;
         case SST_FUNC_RENAULT_AUTH:
             normalNoteStr = isDeepScan ? TDDLocalized.gateway_buy_tips_neutral_deepscan : TDDLocalized.gateway_buy_tips_neutral;
@@ -863,6 +1032,24 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(vciStatusDidChange) name:KTDDNotificationVciStatusDidChange object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewDidAppear) name:KTDDNotificationArtiViewDidAppear object:nil];
 }
+
+- (void)updateExpireLabelLayout {
+    if (IS_IPad) {
+        [self.expireLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.countPreLabel.mas_bottom).offset(12 * _scale);
+            make.left.equalTo(self.countLabel.hidden ? self.countPreLabel :self.countLabel.mas_right).offset(self.countLabel.hidden ? 0 : (20 * _scale + _textLeftMoreSpace));
+            make.right.lessThanOrEqualTo(self.accountBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }];
+    }else {
+        [_expireLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
+            make.top.equalTo(self.countLabel.hidden ? self.countPreLabel.mas_bottom : self.countLabel.mas_bottom).offset(6 * _scale + _textTopSpaceMoreHeight);
+            make.left.equalTo(self.topBGView).offset(20 * _scale + _textLeftMoreSpace);
+            make.right.lessThanOrEqualTo(self.topBGView).offset(-(20 * _scale + _textLeftMoreSpace));
+        }];
+    }
+    
+}
+
 
 #pragma mark lazy
 - (UIScrollView *)scrollView {
@@ -964,7 +1151,7 @@
 - (UIButton *)changeAccountBtn {
     if (!_changeAccountBtn) {
         _changeAccountBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-        [_changeAccountBtn setImage:IS_IPad ? kImageNamed(@"diag_change_account_hd") : [UIImage tdd_imageDiageGateWayChangeAccount] forState:UIControlStateNormal];
+        [_changeAccountBtn setImage:[UIImage tdd_imageDiageGateWayChangeAccount] forState:UIControlStateNormal];
         [_changeAccountBtn addTarget:self action:@selector(changeAccountAction) forControlEvents:UIControlEventTouchUpInside];
     }
     return _changeAccountBtn;

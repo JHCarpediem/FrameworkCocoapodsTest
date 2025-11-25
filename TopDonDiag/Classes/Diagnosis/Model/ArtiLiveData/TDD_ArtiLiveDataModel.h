@@ -8,6 +8,7 @@
 #import "TDD_ArtiModelBase.h"
 #import "TDD_ArtiLiveDataRecordeModel.h"
 #import "TDD_UnitConversion.h"
+#import "TDD_ArtiLiveDataRecordeChangeModel.h"
 @class TDD_HChartModel;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -28,6 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) int UIType; //0、文本 1、折线图 2、饼状图
 @property (nonatomic, strong) NSString * setStrMin; //用户设置的数据流最小参考值  - 在下
 @property (nonatomic, strong) NSString * setStrMax; //用户设置的数据流最大参考值 - 在下
+@property (nonatomic, assign) double minProgress;//用户设置的数据流最小参考值的比例
+@property (nonatomic, assign) double maxProgress;//用户设置的数据流最大参考值的比例
 @property (nonatomic, strong) NSMutableArray<TDD_HChartModel *> * valueArr; //图表数据数组
 @property (nonatomic, strong) NSMutableArray<NSString *> * valueStrArr; //非数字数据，使用数组存储
 @property (nonatomic, assign) NSTimeInterval startTime; // 开始日期
@@ -134,9 +137,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// 页面展示的items 如果是在搜索页面 使用searchItems 如果不在搜索页面 展示selectItems
 @property (nonatomic, strong, readonly) NSMutableArray<TDD_ArtiLiveDataItemModel *> * showItems;
 
-// 搜索后更新数据流显示数据，底部按钮显示
-- (void)updateLiveDataModel;
-
 /// TopVCI
 /// 部件测试类型
 @property (nonatomic, assign) uint32_t uType;
@@ -147,8 +147,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSMutableDictionary *recordChangeDict;
 /// record 过程中修改过的 model  的 itemModel 数据
 @property (nonatomic, strong) NSMutableDictionary *recordChangeItemDict;
+/// record 过程中修改过的 model  的 itemModel 数据
+@property (nonatomic, strong) NSMutableArray *recordChangeModelArr;
+@property (nonatomic, assign) NSTimeInterval chartTime; // 图表时间
 //非阻塞
 
+// 搜索后更新数据流显示数据，底部按钮显示
+- (void)updateLiveDataModel;
 #pragma mark 设置部件测试类型
 /*******************************************************************
 *    功  能：设置部件测试类型，此接口只针对小车探（国内版TOPVCI）

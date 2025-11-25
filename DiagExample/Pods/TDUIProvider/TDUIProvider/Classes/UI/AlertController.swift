@@ -26,15 +26,17 @@ extension LMSAlertController {
         inView: UIView? = nil,
         shouldNoMoreAlert: Bool = false,
         btnArrangeType: LMSAlertButtonArrangeStyle = .horizontal,
-        priority: AlertPriority = .greatestFiniteMagnitude,
+        priority: AlertPriority = .required,
         untriggerBehavoir: TDPopupViewUntriggeredBehavior = .await,
         switchBehavoir: TDPopupViewSwitchBehavior = .latent,
+        canRegisterFirstPopupViewResponder: Bool = true,
         actions: [LMSAlertAction]
     ) -> Self {
         showAlert(
             title,
             message: message,
             image: image,
+            inView: inView,
             shouldNoMoreAlert: shouldNoMoreAlert,
             alertButtonArrangeStyle: btnArrangeType,
             priority: priority,
@@ -43,10 +45,59 @@ extension LMSAlertController {
             actions: actions
         )
     }
+    
+    
+    /// 显示自定义的 AlertController
+    /// - Parameters:
+    ///   - customView: 自定义的视图
+    ///   - btnArrangeType: 按钮排列方式
+    ///   - priority: 优先级
+    ///   - untriggeredBehavior: 未触发行为
+    ///   - switchBehavior: 开关行为
+    ///   - actions: 按钮数组
+    /// - Returns: 返回一个 AlertController 实例
+    @discardableResult
+    public static func show(
+        customView: UIView,
+        btnArrangeType: LMSAlertButtonArrangeStyle = .horizontal,
+        priority: AlertPriority = .required,
+        untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await,
+        switchBehavior: TDPopupViewSwitchBehavior = .latent,
+        canRegisterFirstPopupViewResponder: Bool = true,
+        actions: [LMSAlertAction]
+    ) -> Self {
+        showAlert(customView: customView,
+                  alertButtonArrangeStyle: btnArrangeType,
+                  priority: priority,
+                  untriggeredBehavior: untriggeredBehavior,
+                  switchBehavior: switchBehavior,
+                  actions: actions)
+    }
+    
+    
+    @objc
+    public convenience init(customView: UIView,
+                            priority: Float = 1000,
+                            untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await,
+                            switchBehavior: TDPopupViewSwitchBehavior = .latent,
+                            canRegisterFirstPopupViewResponder: Bool = true,
+                            actions: [LMSAlertAction]) {
+        self.init()
+        self.customView = customView
+        self.priority = .init(priority)
+        self._untriggerBehavior = untriggeredBehavior
+        self._switchBehavior = switchBehavior
+        self.actions = actions
+    }
 }
 
-// MARK: - update Attribute message 
+// MARK: - update Attribute message
 extension  LMSAlertController {
+    
+    /// 更新富文本消息
+    /// - Parameters:
+    ///   - attributeMsg: NSAttributedString 消息内容
+    ///   - tapHandle: 点击消息回调
     @objc public func setAttributeMessage(_ attributeMsg: NSAttributedString?, tapHandle: Block.VoidBlock? = nil) {
         guard let attributeMsg = attributeMsg else { return }
         messageLabel.text = nil
@@ -59,14 +110,49 @@ extension  LMSAlertController {
         }
     }
     
+    
+    /// 更新富文本消息
+    /// - Parameter msg: NSAttributedString 消息内容
     @objc public func updateAttributeMessage(_ msg: NSAttributedString) {
         _updateAttributeMsg(msg)
     }
 }
 
+extension LMSAlertController {
+    func updateRepetitionTriger() {
+        let elements = TDPopupScheduler.shared.elementList
+        for element in elements {
+            guard let alert = element.data as? LMSAlertController else {
+                continue
+            }
+            let alertTitle = alert.titleLabel.text ?? ""
+            let alertMessage = alert.messageLabel.text ?? ""
+            let title = titleLabel.text ?? ""
+            let message = messageLabel.text ?? ""
+            
+            if title == alertTitle && message == alertMessage {
+                TDLogDebug("当前调度列表中已存在相同弹框 - \"\(title)\" - \"\(message)\" 不再重复添加")
+                self._untriggerBehavior = .discard
+                return
+            }
+        }
+    }
+}
+
+//MARK: - LMSAlertController
 @objc
 @objcMembers
 open class LMSAlertController: UIView {
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        addNotification()
+    }
+    
+    required public init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
     
     static public var alertStack: [LMSAlertController] = []
     
@@ -101,12 +187,14 @@ open class LMSAlertController: UIView {
     public var titleFont: UIFont? {
         didSet {
             self.titleLabel.font = titleFont
+            _setupConstains()
         }
     }
     /// message 字体
     public var messageFont: UIFont? {
         didSet {
             self.messageLabel.font = messageFont
+            _setupConstains()
         }
     }
     
@@ -140,6 +228,7 @@ open class LMSAlertController: UIView {
     
     var _untriggerBehavior: TDPopupViewUntriggeredBehavior = .await
     var _switchBehavior: TDPopupViewSwitchBehavior = .latent
+    public var _canRegisterFirstPopupViewResponder: Bool = true
     private var btnHeight: CGFloat {
         
         let hdBtnHeight: CGFloat = 70.hdVerticalScale
@@ -161,7 +250,7 @@ open class LMSAlertController: UIView {
         return btnHeight + noMoreHeight
     }
     
-    private var customView: UIView? {
+    public var customView: UIView? {
         didSet {
             updateCustomView()
         }
@@ -169,6 +258,60 @@ open class LMSAlertController: UIView {
     var showInView: UIView?
     private var buttonStyle: LMSAlertButtonStyle { AlertProvider.buttonStyle }
     private var noMoreHeight: CGFloat { isShowNomoreAlert ? 40 : 0 }
+    
+    /// 点击了 action 按钮
+    @objc final func onBtnsClick(_ sender: UIButton){
+        let index = sender.tag
+        self.actions.forEach { (action) in
+            action.isNomoreAlert = isShowNomoreAlert ? nomoreAlertBtn.isSelected : false
+        }
+        if index > actions.count {
+            return
+        }
+        let action = self.actions[index]
+        if action.isTapHideAlert {
+            hide {
+                action.action?(action)
+            }
+        } else {
+            action.action?(action)
+        }
+       
+    }
+    
+    /// 显示Alert, 通过 init 方法创建的 Alert 可以通过这个方法 显示视图
+    public final func showAlert() {
+        let elements = TDPopupScheduler.shared.elementList
+        for element in elements {
+            guard let alert = element.data as? LMSAlertController else {
+                continue
+            }
+            let alertTitle = alert.titleLabel.text ?? ""
+            let alertMessage = alert.messageLabel.text ?? ""
+            let title = titleLabel.text ?? ""
+            let message = messageLabel.text ?? ""
+            
+            if title == alertTitle && message == alertMessage {
+                TDLogDebug("当前调度列表中已存在相同弹框 - \"\(title)\" - \"\(message)\" 不再重复添加")
+                return
+            }
+        }
+        
+        TDPopupScheduler.shared.add(self, priority: priority)
+    }
+    
+    /// 隐藏 Alert, 通过 hide 方法隐藏 Alert
+    public final func hide(_ complete: (()->Void)? = nil){
+        self.dismissWithAnimation(complete)
+    }
+    
+    @objc func onNoMoreClick(_ sender: UIButton){
+        sender.isSelected.toggle()
+    }
+}
+
+//MARK: - 显示 AlertController 内部方法
+extension LMSAlertController {
     /// 显示alertView 使用方法类似UIAlertController
     ///
     /// - Parameters:
@@ -176,7 +319,7 @@ open class LMSAlertController: UIView {
     ///   - message: 说明
     ///   - actions: actions [LMSAlertAction]
     @discardableResult
-    internal static func showAlert(
+    public static func showAlert(
         _ title: String?,
         message: String?,
         image: UIImage? = nil,
@@ -186,44 +329,81 @@ open class LMSAlertController: UIView {
         priority: AlertPriority = .required,
         untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await,
         switchBehavior: TDPopupViewSwitchBehavior = .latent,
+        canRegisterFirstPopupViewResponder: Bool = true,
         actions: [LMSAlertAction]
     ) -> Self {
-        UIApplication.shared.keyWindow?.endEditing(true)
         let alert = Self.init()
-        alert.alertTitle = title
-        alert.actions = actions
-        alert.message = message
-        alert.image = image
-        alert.priority = priority
-        alert.isShowNomoreAlert = shouldNoMoreAlert
-        alert.btnArrangeStyle = actions.count > 2 ? .vertical : alertButtonArrangeStyle
-        alert._switchBehavior = switchBehavior
-        alert._untriggerBehavior = untriggeredBehavior
-        alert._init()
-        
-        alert.showAlert()
-        
+        DispatchQueue.syncInMain {
+            UIApplication.shared.keyWindow?.endEditing(true)
+            alert.alertTitle = title
+            alert.actions = actions
+            alert.message = message
+            alert.image = image
+            alert.priority = priority
+            alert.showInView = inView
+            alert.isShowNomoreAlert = shouldNoMoreAlert
+            alert.btnArrangeStyle = actions.count > 2 ? .vertical : alertButtonArrangeStyle
+            alert._switchBehavior = switchBehavior
+            alert._untriggerBehavior = untriggeredBehavior
+            alert._canRegisterFirstPopupViewResponder = canRegisterFirstPopupViewResponder
+            alert._init()
+            
+            alert.showAlert()
+        }
         return alert
     }
     
+    
+    /// 显示自定义 AlertController
+    /// - Parameters:
+    ///   - customView: 自定义视图
+    ///   - inView: 显示的父视图, 默认为 keyWindow
+    ///   - alertButtonArrangeStyle: 按钮排列方式
+    ///   - priority: 优先级
+    ///   - untriggeredBehavior: 未触发行为
+    ///   - switchBehavior: 开关行为
+    ///   - actions: 按钮数组
+    /// - Returns: 返回一个 AlertController 实例
     @discardableResult
-    internal static func showAlert(customView: UIView, alertButtonArrangeStyle: LMSAlertButtonArrangeStyle = .horizontal, priority: AlertPriority = .required, untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await, switchBehavior: TDPopupViewSwitchBehavior = .latent, actions: [LMSAlertAction]) -> Self {
-        UIApplication.shared.keyWindow?.endEditing(true)
+    public static func showAlert(
+        customView: UIView,
+        inView: UIView? = nil,
+        alertButtonArrangeStyle: LMSAlertButtonArrangeStyle = .horizontal,
+        priority: AlertPriority = .required,
+        untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await,
+        switchBehavior: TDPopupViewSwitchBehavior = .latent,
+        canRegisterFirstPopupViewResponder: Bool = true,
+        actions: [LMSAlertAction]
+    ) -> Self {
         let alert = Self.init()
-        alert.actions = actions
-        alert.priority = priority
-        alert._switchBehavior = switchBehavior
-        alert._untriggerBehavior = untriggeredBehavior
-        alert.customView = customView
-        
-        alert.showAlert()
+        DispatchQueue.syncInMain {
+            UIApplication.shared.keyWindow?.endEditing(true)
+            alert.showInView = inView
+            alert.actions = actions
+            alert.priority = priority
+            alert._switchBehavior = switchBehavior
+            alert._untriggerBehavior = untriggeredBehavior
+            alert.customView = customView
+            alert._canRegisterFirstPopupViewResponder = canRegisterFirstPopupViewResponder
+            
+            alert.showAlert()
+        }
         
         return alert
     }
+}
 
+//MARK: - layout 布局
+extension LMSAlertController {
+    
+    public func refreshUI() {
+        let topVc = UI.topViewController
+        self.frame = topVc?.view.bounds ?? UI.SCREEN_BOUNDS
+        _setupConstains()
+    }
+    
     /// 初始化UI
     open func _init(){
-        self.frame = UI.SCREEN_BOUNDS
         self.backgroundColor = UIColor.black.withAlphaComponent(0.7)
         
         contentView = UIView()
@@ -240,7 +420,7 @@ open class LMSAlertController: UIView {
         titleLabel.font = config.titleFont
         titleLabel.theme.textColor = AlertProvider.titleTextColor
         titleLabel.textAlignment = .center
-        titleLabel.numberOfLines = 0
+        titleLabel.numberOfLines = 5
         titleLabel.text = alertTitle
         
         messageLabel.isUserInteractionEnabled = true
@@ -275,9 +455,11 @@ open class LMSAlertController: UIView {
         }
         contentView.addSubview(closeBtn)
         closeBtn.isHidden = true
-        _setupConstains()
+        
+        refreshUI()
     }
     
+    // 设置约束
     open func _setupConstains() {
         titleLabel.isHidden = !hasTitle
         messageLabel.isHidden = !hasMessage
@@ -286,8 +468,8 @@ open class LMSAlertController: UIView {
         let maxScrollHeight: CGFloat = 350
         
         let contentWidth: CGFloat = Const.contentWidth
-        let messageMaxWidth = (message ?? "").td.size(font: config.messageFont, maxSize: CGSize(width: .greatestFiniteMagnitude, height: 100.0)).width
-        let messageWidth = min(Const.contentWidth, messageMaxWidth)
+        let messageMaxWidth = (message ?? "").td.size(font: config.messageFont, maxSize: CGSize(width: CGFloat.greatestFiniteMagnitude, height: .greatestFiniteMagnitude)).width
+        let messageWidth =  min(Const.contentWidth, messageMaxWidth)
         
         // 标题布局
         titleLabel.td.width = contentWidth
@@ -343,9 +525,12 @@ open class LMSAlertController: UIView {
                                        height: messageHeight)
         
         // 调整容器视图总高度
-        contentView.frame = CGRect(center: CGPoint(x: UI.SCREEN_WIDTH / 2, y: UI.SCREEN_HEIGHT / 2),
-                                 size: CGSize(width: UI.SCREEN_WIDTH - Const.contentInset * 2,
-                                             height: scrollView.frame.maxY + Const.edgeInsets.bottom + btnViewHeight))
+        let topVc = UI.topViewController
+        let cWidth = (topVc?.view.bounds.width ?? UI.SCREEN_WIDTH) / 2
+        let cHeight = (topVc?.view.bounds.height ?? UI.SCREEN_HEIGHT) / 2
+        contentView.frame = CGRect(center: CGPoint(x: cWidth, y: cHeight),
+                                   size: CGSize(width: UI.SCREEN_WIDTH - Const.contentInset * 2,
+                                                height: scrollView.frame.maxY + Const.edgeInsets.bottom + btnViewHeight))
         
         // 视图层级调整
         contentView.addSubview(titleLabel)    // 标题添加到内容视图
@@ -357,11 +542,13 @@ open class LMSAlertController: UIView {
         self.layoutIfNeeded()
     }
     
+    // 更新自定义视图
     private func updateCustomView() {
         guard let customView else {
             return
         }
-        self.frame = UI.SCREEN_BOUNDS
+        let topVc = UI.topViewController
+        self.frame = topVc?.view.bounds ?? UI.SCREEN_BOUNDS
         
         contentView = UIView()
         contentView.td.cornerRadius = AlertProvider.contentCornerRadius
@@ -376,6 +563,7 @@ open class LMSAlertController: UIView {
         }
     }
 
+    // 更新富文本内容约束
     private func _updateAttributeMsg(_ attribute: NSAttributedString) {
         // 修改部分保持与上述逻辑一致，主要调整高度计算
         let maxScrollHeight: CGFloat = 350
@@ -411,8 +599,11 @@ open class LMSAlertController: UIView {
         
         self.setNeedsLayout()
         self.layoutIfNeeded()
+        
+        updateRepetitionTriger()
     }
     
+    // 设置按钮的布局
     open func _setupBtnsConstatins(){
         btnView.subviews.forEach {
             $0.removeFromSuperview()
@@ -473,6 +664,22 @@ open class LMSAlertController: UIView {
             }
             btnView.addSubview(btn)
             actionBtns.append(btn)
+            
+            if index > 0 {
+                if case .confirm = action.style {
+                    btn.accessibilityIdentifier = "alertConfirm"
+                }
+                
+                if case .custom = action.style {
+                    btn.accessibilityIdentifier = "alertConfirm"
+                }
+            } else {
+                if case .confirm = action.style {
+                    btn.accessibilityIdentifier = "alertSingleConfirm"
+                } else {
+                    btn.accessibilityIdentifier = "alertCancel"
+                }
+            }
         }
         
         lineView.isHidden = buttonStyle == .custom
@@ -566,42 +773,11 @@ open class LMSAlertController: UIView {
             }
         }
     }
-    
-    /// 点击了 action 按钮
-    @objc final func onBtnsClick(_ sender: UIButton){
-        let index = sender.tag
-        self.actions.forEach { (action) in
-            action.isNomoreAlert = isShowNomoreAlert ? nomoreAlertBtn.isSelected : false
-        }
-        if index > actions.count {
-            return
-        }
-        let action = self.actions[index]
-        if action.isTapHideAlert {
-            hide {
-                action.action?(action)
-            }
-        } else {
-            action.action?(action)
-        }
-       
-    }
-    
-    public func showAlert() {
-        TDPopupScheduler.shared.add(self, priority: priority)
-    }
-    
-    /// 隐藏Alert
-    public func hide(_ complete: (()->Void)? = nil){
-        self.dismissWithAnimation(complete)
-    }
-    
-    @objc func onNoMoreClick(_ sender: UIButton){
-        sender.isSelected.toggle()
-    }
 }
 
+// MARK: - TDPopupView 代理
 extension LMSAlertController: TDPopupView {
+    /// 显示 AlertController 内部方法, 外界不要调用
     public func showWithAnimation(_ animation: Block.VoidBlock?) {
         let showInView = self.showInView ?? UI.keyWindow
         showInView?.addSubview(self)
@@ -613,6 +789,7 @@ extension LMSAlertController: TDPopupView {
         }
     }
     
+    /// 隐藏 AlertController 内部方法, 外界不要调用
     public func dismissWithAnimation(_ animation: Block.VoidBlock?) {
         UIView.animate(withDuration: 0.25) {
             self.alpha = 0
@@ -622,15 +799,18 @@ extension LMSAlertController: TDPopupView {
         }
     }
     
-    public var untriggerBehavior: TDPopupViewUntriggeredBehavior {
-        _untriggerBehavior
-    }
+    /// 当前弹框的触发显示行为 详细作用请参考 `TDPopupViewUntriggeredBehavior`
+    public var untriggerBehavior: TDPopupViewUntriggeredBehavior { _untriggerBehavior }
     
-    public var switchBehavior: TDPopupViewSwitchBehavior {
-        _switchBehavior
+    /// 当前弹框已显示，后续触发其他弹框，当前弹框的显示行为. 详细作用请参考 `TDPopupViewSwitchBehavior`
+    public var switchBehavior: TDPopupViewSwitchBehavior { _switchBehavior }
+    
+    public var canRegisterFirstPopupViewResponder: Bool {
+        return _canRegisterFirstPopupViewResponder
     }
 }
 
+//MARK: - Const
 extension LMSAlertController {
     struct Const {
         static let edgeInsets = UIEdgeInsets(top: 24, left: 20, bottom: 24, right: 20)
@@ -641,171 +821,35 @@ extension LMSAlertController {
     }
 }
 
-@objc public enum LMSAlertButtonArrangeStyle: Int {
-    case vertical
-    case horizontal
-}
+// MARK: - Rotation
 
-public enum LMSAlertActionStyle {
-    /// 确认按钮
-    case confirm
-    /// 取消按钮
-    case cancel
-    /// 我知道了  按钮
-    case iknow
+extension LMSAlertController {
     
-    case custom(title: String, color: UIColor?, backgroundColor: UIColor?)
+    func addNotification() {
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOrientationChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
     
-    
-    var textColor : UIColor? {
-        switch self {
-        case .confirm, .iknow:
-            if AlertProvider.buttonStyle == .custom {
-                return UIColor.td.confirmBtnText
-            }
-            return UIColor.td.theme
-        case .cancel:
-            if AlertProvider.buttonStyle == .custom {
-                return UIColor.td.title
-            }
-            return UIColor.td.subTitle
-        case .custom(_, let color, _):
-            return color
+    @objc private func handleOrientationChange() {
+        let orientation = UIDevice.current.orientation
+        switch orientation {
+        case .portrait:
+            print("竖屏")
+        case .landscapeLeft, .landscapeRight:
+            print("横屏")
+        default:
+            break
         }
-    }
-    
-    var backgroundColor: UIColor? {
-        let config = LMSAlertConfig.global
-        switch self {
-        case .confirm, .iknow:
-            if AlertProvider.buttonStyle == .custom {
-                return UIColor.td.theme
-            }
-            return nil
-        case .cancel:
-            if AlertProvider.buttonStyle == .custom {
-                return AlertProvider.cancelBtnBackgroundColor?.color
-            }
-            return nil
-        case .custom(_, _, let backgroundColor):
-            return backgroundColor
-        }
-    }
-    
-    var title: String {
-        let config = LMSAlertConfig.global
-        switch self {
-        case .confirm:
-            return config.confirmTitle()
-        case .cancel:
-            return config.cancelTitle()
-        case .iknow:
-            return config.iknowTitle()
-        case .custom(let title, _, _):
-            return title
-        }
-    }
-}
-
-
-@objc
-@objcMembers
-open class LMSAlertAction: NSObject {
-    public var titleColor: UIColor?
-    /// 标题
-    public var title: String!
-    /// 图片
-    public var image: UIImage?
-    /// 点击回调
-    public var action: ((_ action: LMSAlertAction) -> Void)?
-    /// 按钮的样式
-    public var style: LMSAlertActionStyle = .confirm
-    
-    public var backgroundColor: UIColor?
-    
-    public var isTapHideAlert: Bool = true
-    
-    public var btnStyle: LMSAlertButtonStyle = .default
-    
-    // 是否不再提示
-    public var isNomoreAlert: Bool = false
-    
-    /// 快速构建AlertAction  alert 的按钮
-    ///
-    /// - Parameters:
-    ///   - title: 按钮的标题
-    ///   - style: LMSAlertActionStyle 支持default 和 cancel 两种样式
-    ///   - image: 按钮的图片
-    ///   - action: 点击按钮的回调
-    public convenience init(
-        style: LMSAlertActionStyle,
-        title: String? = nil,
-        image: UIImage? = nil,
-        _ action: ((_ action: LMSAlertAction) -> Void)?
-    ) {
-        self.init()
-        self.title = title
-        self.image = image
-        self.action = action
-        self.style = style
-    }
-    
-    @objc public convenience init(
-        title: String,
-        titleColor: UIColor,
-        backgroundColor: UIColor? = nil,
-        image: UIImage? = nil,
-        _ action: ((_ action: LMSAlertAction) -> Void)?
-    ) {
-        self.init()
         
-        self.title = title
-        self.image = image
-        self.action = action
-        self.backgroundColor = backgroundColor
-        self.titleColor = titleColor
+        refreshAfterRotation()
     }
     
-    @objc public convenience init(
-        title: String,
-        titleColor: UIColor,
-        image: UIImage? = nil,
-        backgroundColor: UIColor? = nil,
-        btnStyle: LMSAlertButtonStyle,
-        _ action: ((_ action: LMSAlertAction) -> Void)?
-    ) {
-        self.init()
-        self.title = title
-        self.image = image
-        self.action = action
-        self.backgroundColor = backgroundColor
-        self.titleColor = titleColor
-        self.btnStyle = btnStyle
+    func refreshAfterRotation() {
+        self.refreshUI()
     }
-    
-    @objc public convenience init(
-        title: String,
-        titleColor: ThemeColorPicker? = nil,
-        backgroundColor: ThemeColorPicker? = nil,
-        _ action: ((_ action: LMSAlertAction) -> Void)?
-    ) {
-        self.init()
-        self.title = title
-        self.titleColor = titleColor?.color
-        self.action = action
-        self.backgroundColor = backgroundColor?.color
-    }
-    
-}
-
-@objc extension LMSAlertAction {
-    
-    
-    @objc public static var confirmAction: LMSAlertAction { LMSAlertAction(style: .confirm, nil) }
-    
-    @objc public static var cancelAction: LMSAlertAction { LMSAlertAction(style: .cancel, nil) }
-    
-    @objc public static var iknowAction: LMSAlertAction { LMSAlertAction(style: .iknow, nil) }
-    
     
 }

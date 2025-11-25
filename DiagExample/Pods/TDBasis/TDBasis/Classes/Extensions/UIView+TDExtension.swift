@@ -666,3 +666,22 @@ extension UIRectCorner {
         return cornersMask
     }
 }
+
+public extension UIView {
+    /// 获取当前视图所在的控制器
+    @objc var topViewController: UIViewController? {
+        var responder: UIResponder? = self
+        while let currentResponder = responder {
+            if let viewContoller = currentResponder as? UIViewController {
+                return viewContoller
+            }
+            responder = currentResponder.next
+        }
+        return nil
+    }
+}
+
+public extension TDBasisWrap where Base: UIView {
+    /// 获取当前视图所在的控制器
+    var topViewController:  UIViewController? { base.topViewController }
+}

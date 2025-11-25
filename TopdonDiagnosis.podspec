@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'TopdonDiagnosis'
-  s.version          = '2.09.066'
+  s.version          = '2.09.119'
   s.summary          = 'Automotive diagnosis and Bluetooth module'
   s.swift_versions = ['4.2', '5.0', '5.1', '5.2']
 

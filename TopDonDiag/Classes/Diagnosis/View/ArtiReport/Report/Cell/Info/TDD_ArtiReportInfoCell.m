@@ -19,6 +19,8 @@
 /// 左右边距
 @property (nonatomic, assign) CGFloat labelMargin;
 
+/// 是否历史诊断
+@property (nonatomic, assign) CGFloat isHistoryDiag;
 
 @end
 
@@ -39,14 +41,15 @@
               reuseIdentifier:(NSString *)reuseIdentifier
                   labelMargin:(CGFloat)labelMargin
                   lineSpacing:(CGFloat)lineSpacing
-             interItemSpacing:(CGFloat)interItemSpacing {
+             interItemSpacing:(CGFloat)interItemSpacing
+                isHistoryDiag:(BOOL)isHistoryDiag {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
         self.labelMargin = labelMargin;
         self.lineSpacing = lineSpacing;
         self.interItemSpacing = interItemSpacing;
-        
+        self.isHistoryDiag = isHistoryDiag;
         [self setupUI];
     }
     return self;
@@ -128,7 +131,7 @@
     if (IS_IPad) {
         
     }
-    NSArray *titleArray = @[
+    NSMutableArray *titleArray = @[
         TDDLocalized.report_license_plate,
         TDDLocalized.report_brand_of_vehicle,
         TDDLocalized.report_model,
@@ -142,14 +145,16 @@
         TDDLocalized.report_vin_code,
         TDDLocalized.report_diagnosis_path,
         [NSString tdd_reportTitleUser],
-        [NSString tdd_reportTitleUserPhone],
-//        TDDLocalized.maintenance_bill_number
-    ];
+        [NSString tdd_reportTitleUserPhone]
+    ].mutableCopy;
+    if (!self.isHistoryDiag) {
+        [titleArray addObject:TDDLocalized.maintenance_bill_number];
+    }
     return titleArray;
 }
 
 - (NSArray *)valueArrayWithModel:(TDD_ArtiReportCellModel *)model {
-    NSArray *valueArray = @[
+    NSMutableArray *valueArray = @[
 //        [TDD_ArtiReportInfoCell getFlatStringWith:model.describe_title],
         [TDD_ArtiReportInfoCell getFlatStringWith: model.describe_license_plate_number],
         [TDD_ArtiReportInfoCell getFlatStringWith: model.describe_brand],
@@ -165,8 +170,10 @@
         [TDD_ArtiReportInfoCell getFlatStringWith: model.describe_diagnosis_path],
         [TDD_ArtiReportInfoCell getFlatStringWith: model.describe_customer_name],
         [TDD_ArtiReportInfoCell getFlatStringWith: model.describe_customer_call],
-//        [TDD_ArtiReportInfoCell getFlatStringWith: model.repairOrderNum],
-    ];
+    ].mutableCopy;
+    if (!self.isHistoryDiag) {
+        [valueArray addObject:[TDD_ArtiReportInfoCell getFlatStringWith: model.repairOrderNum]];
+    }
     return valueArray;
 }
 

@@ -13,7 +13,6 @@
 
 @property (nonatomic, strong) TDD_ButtonCollectionView *collectionView;
 @property (nonatomic, strong) NSArray<TDD_ArtiButtonModel *> *buttonArr;
-@property (nonatomic, strong) NSMutableArray *cellArr;
 @property (nonatomic, assign) CGFloat btnWidth;
 @property (nonatomic, assign) CGFloat btnHeight;
 @property (nonatomic, assign) CGFloat spaceWidth;
@@ -35,7 +34,7 @@
         
         _btnWidth = (IS_IPad ? 160 : 100) * scale;
         _btnHeight = (IS_IPad ? 50: 35) * scale;
-        _spaceWidth = (IS_IPad ? 20 : 10) * scale;
+        _spaceWidth = (IS_IPad ? 20 : 12) * scale;
         _noReuseCount = 10;
     }
     
@@ -77,6 +76,9 @@
 }
 
 - (void)createCollectionView {
+    if (self.collectionView && self.collectionView.superview) {
+        [self.collectionView removeFromSuperview];
+    }
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     layout.minimumInteritemSpacing = _spaceWidth;
@@ -92,9 +94,8 @@
     collectionView.bounces = NO;
     collectionView.delaysContentTouches = NO;
     
-    int section = 0;
     for (int row = 0; row < _noReuseCount; row++) {
-        NSString *identify = [NSString stringWithFormat:@"Cell%d%d", (int)section, (int)row];//以indexPath来唯一确定
+        NSString *identify = [NSString stringWithFormat:@"Cell%d", (int)row];
         [collectionView registerClass:[TDD_ArtiButtonCollectionCellView class] forCellWithReuseIdentifier:identify];
     }
     
@@ -114,7 +115,6 @@
     
     // 强制刷新布局，确保 inset 在屏幕旋转时能正确更新
     [self.collectionView.collectionViewLayout invalidateLayout];
-    [self.collectionView reloadData];
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -125,18 +125,9 @@
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
 
-    NSString *identify = [NSString stringWithFormat:@"Cell%d%d", (int)[indexPath section], (int)[indexPath row]];//以indexPath来唯一确定
-    TDD_ArtiButtonCollectionCellView *cell = nil;
-    if ([indexPath row] < _noReuseCount) {
-        cell = [collectionView dequeueReusableCellWithReuseIdentifier:identify forIndexPath:indexPath];
-    } else {
-        cell = self.cellArr[indexPath.row % _noReuseCount];
-    }
-    
-    if (!cell) {
-        cell = [[TDD_ArtiButtonCollectionCellView alloc] initWithFrame:CGRectZero];
-        HLog(@"不应该来到这里 TDD_ArtiButtonCollectionCellView alloc");
-    }
+    // 固定 10 个复用标识，控制最多创建 10 个 cell
+    NSString *identify = [NSString stringWithFormat:@"Cell%d", (int)(indexPath.item % _noReuseCount)];
+    TDD_ArtiButtonCollectionCellView *cell = [collectionView dequeueReusableCellWithReuseIdentifier:identify forIndexPath:indexPath];
     
     if (indexPath.item >= self.buttonArr.count) {
         return cell;
@@ -151,6 +142,10 @@
     if ([TDD_DiagnosisTools isDebug]) {
         if (![NSString tdd_isEmpty:model.uiTextIdentify]) {
             cell.btn.accessibilityIdentifier = model.uiTextIdentify;
+        }
+        // 用于页面触发返回后，再次出现msgbox确认时
+        if ([model.strButtonText isEqualToString:@"是"]) {
+            cell.btn.accessibilityIdentifier = @"diagQuitBtn";
         }
     }
     
@@ -170,7 +165,7 @@
         return CGSizeZero;
     }
     
-    return CGSizeMake(_btnWidth, _btnHeight);
+    return CGSizeMake(_btnWidth, _btnHeight + _spaceWidth);
 }
 
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section {
@@ -221,9 +216,11 @@
 - (void)ArtiButtonCollectionCellButtonClick:(UIButton *)Button cell:(TDD_ArtiButtonCollectionCellView *)cell {
     TDD_ArtiButtonModel *model = cell.model;
     
-    CGPoint cellCenter = cell.center;
-    // 将 cell 的中心点转换到 window 坐标系
-    CGPoint cellCenterInWindow = [cell convertPoint:cellCenter toView:FLT_APP_WINDOW];
+    // cell 自己坐标系里的中心点
+    CGPoint cellLocalCenter = CGPointMake(CGRectGetMidX(cell.bounds), CGRectGetMidY(cell.bounds));
+
+    // 转换到 window 坐标系
+    CGPoint cellCenterInWindow = [cell convertPoint:cellLocalCenter toView:FLT_APP_WINDOW];
     model.clickPoint = cellCenterInWindow;
     
     // 过期加锁软件不适用报告置灰逻辑

@@ -331,6 +331,7 @@ NSString *divideByTwo(NSString *decimalString, int *remainder) {
 }
 
 //将二进制字符串数组[@"0",@"1"]转换成十进制字符串
+//限制 64 位
 + (NSString *)tdd_converBinaryArrToDecimal:(NSArray *)binaryArr {
     //倒序
     binaryArr = [[binaryArr reverseObjectEnumerator] allObjects];
@@ -345,6 +346,92 @@ NSString *divideByTwo(NSString *decimalString, int *remainder) {
     NSString *decimalString = [NSString stringWithFormat:@"%lu", (unsigned long)decimalValue];
     
     return decimalString;
+}
+
+// 将二进制字符串（比如 79 个 @"1" 拼成的 @"111...111"）转换为十进制字符串
+// 无限制
++ (NSString *)tdd_decimalStringFromBinaryString:(NSArray *)binaryArr {
+    //倒序
+    binaryArr = [[binaryArr reverseObjectEnumerator] allObjects];
+    NSString *binaryStr = [binaryArr componentsJoinedByString:@""];
+    // 可选：校验输入只含 0 和 1
+    NSCharacterSet *invalidChars = [[NSCharacterSet characterSetWithCharactersInString:@"01"] invertedSet];
+    if ([binaryStr rangeOfCharacterFromSet:invalidChars].location != NSNotFound) {
+        return @"0"; // 或者抛出错误
+    }
+    
+    NSUInteger len = binaryStr.length;
+    if (len == 0) return @"0";
+    
+    NSString *decimal = @"0";
+    
+    for (NSUInteger i = 0; i < len; i++) {
+        unichar c = [binaryStr characterAtIndex:i];
+        if (c == '0') {
+            // 相当于 decimal = decimal * 2
+            decimal = [self multiplyDecimalString:decimal by:2];
+        } else if (c == '1') {
+            // 相当于 decimal = decimal * 2 + 1
+            decimal = [self multiplyDecimalString:decimal by:2];
+            decimal = [self addDecimalString:decimal and:@"1"];
+        }
+    }
+    
+    return decimal;
+}
+
+// 十进制字符串 × 整数，返回新的十进制字符串
++ (NSString *)multiplyDecimalString:(NSString *)decimalStr by:(NSInteger)multiplier {
+    if ([decimalStr isEqualToString:@"0"] || multiplier == 0) {
+        return @"0";
+    }
+    if (multiplier == 1) {
+        return decimalStr;
+    }
+
+    NSMutableString *result = [NSMutableString string];
+    NSInteger carry = 0;
+
+    for (NSInteger i = (NSInteger)decimalStr.length - 1; i >= 0; i--) {
+        unichar c = [decimalStr characterAtIndex:i];
+        NSInteger digit = c - '0';
+        NSInteger product = digit * multiplier + carry;
+        carry = product / 10;
+        [result insertString:@(product % 10).stringValue atIndex:0];
+    }
+
+    if (carry > 0) {
+        [result insertString:@(carry).stringValue atIndex:0];
+    }
+
+    return [self removeLeadingZeros:result];
+}
+
++ (NSString *)removeLeadingZeros:(NSMutableString *)str {
+    while (str.length > 1 && [str characterAtIndex:0] == '0') {
+        [str deleteCharactersInRange:NSMakeRange(0, 1)];
+    }
+    return [str isEqualToString:@""] ? @"0" : str;
+}
+
+// 十进制字符串 + 十进制字符串，返回十进制字符串
++ (NSString *)addDecimalString:(NSString *)a and:(NSString *)b {
+    NSMutableString *result = [NSMutableString string];
+    NSInteger i = (NSInteger)a.length - 1;
+    NSInteger j = (NSInteger)b.length - 1;
+    NSInteger carry = 0;
+
+    while (i >= 0 || j >= 0 || carry > 0) {
+        NSInteger digitA = (i >= 0) ? [a characterAtIndex:i] - '0' : 0;
+        NSInteger digitB = (j >= 0) ? [b characterAtIndex:j] - '0' : 0;
+        NSInteger sum = digitA + digitB + carry;
+        carry = sum / 10;
+        [result insertString:@(sum % 10).stringValue atIndex:0];
+        i--;
+        j--;
+    }
+
+    return [self removeLeadingZeros:result];
 }
 
 + (NSString *)tdd_removeWhiteSpaceFromPreOrSuff:(NSString *)originalStr {

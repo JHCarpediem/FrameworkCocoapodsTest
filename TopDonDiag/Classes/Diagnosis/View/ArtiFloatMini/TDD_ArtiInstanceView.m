@@ -20,10 +20,13 @@
 - (void)checkShowInstanceView:(TDD_ArtiFloatMiniModel *)model {
     CGFloat leftSpace = IS_IPad ? 72 : 24;
     CGFloat bottomSpace = IS_IPad ? 42 : 32;
-    UIView *subview = [self viewWithTag:model.ID];
-    if (subview) {
+    TDD_ArtiInstanceTipView *subview = [self viewWithTag:model.ID];
+    if (subview && [subview isKindOfClass:[TDD_ArtiInstanceTipView class]]) {
         if (model.hidden) {
             [subview removeFromSuperview];
+        } else {
+            [subview setHidden:NO];
+            [subview refreshContentWith:model];
         }
     } else {
         // 最多三个 tip，超过三个替换掉第一个，否则新增一个，位置在上一个 tip 至上

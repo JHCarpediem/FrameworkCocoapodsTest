@@ -240,7 +240,7 @@ import UIKit
         case .sl:
             return "SL" // 斯洛文尼亚语
         case .sv:
-            return "SE" // 瑞典语
+            return "SV" // 瑞典语
         case .tr:
             return "TR" // 土耳其语
         case .ar:

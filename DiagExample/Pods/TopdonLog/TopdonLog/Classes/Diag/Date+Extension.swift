@@ -17,6 +17,10 @@ extension Date {
         return Self.current().timeIntervalSince1970 * 1000.0
     }
     
+    var millSecondsInteger: Int64 {
+        Int64(self.timeIntervalSince1970 * 1000.0)
+    }
+    
     /// 默认是 zipName 时间格式-yyyyMMddHHmmss
     func string(withFormat format: String = TopdonDateFormat.kZipName,
                 local: Locale = Locale(identifier: "en_US_POSIX"),

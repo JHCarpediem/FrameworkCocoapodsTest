@@ -206,7 +206,7 @@ final public class LogColletionManager {
     }
     
     /// 不建议使用
-    public func update(topDir: String, diagDir: String) -> Self {
+    func update(topDir: String, diagDir: String) -> Self {
         
         diagCarLogDir = getDiagCarLogDir(topDir: topDir, diagDir: diagDir)
         uploadTempDir = getUploadTempDir(topDir: topDir, diagDir: diagDir)
@@ -417,6 +417,19 @@ final public class LogColletionManager {
             
             var uploadModel = zipModel.convertToUploadModel(uploadInterface.lfuLogUploadType, feedBackZipPath: feedBackZipPath)
             uploadModel.update(from: uploadInterface) // 更新外部传值
+            
+            /// 当前诊断内反馈，查询最新一条当前 车 匹配 pathArr
+            if inDiag {
+                // 使用串行队列确保数据库操作的顺序性，避免死锁
+                TopdonLog.globalQueue.async {
+                    if let record = EnterDiagLogRecordDBModel.queryLastRecord(by: car) {
+                        uploadModel.carPaths = record.carPaths
+                    }
+                    // 在数据库操作完成后回调
+                    completion(uploadModel)
+                }
+                return // 提前返回，避免重复回调
+            }
             
             completion(uploadModel)
         }

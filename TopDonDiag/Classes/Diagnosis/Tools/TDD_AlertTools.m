@@ -64,7 +64,7 @@
 + (void)showSoftExpiredToBuyAlert:(nullable void (^)(void))completionHandler {
     dispatch_async(dispatch_get_main_queue(), ^{
         if ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany) {
-            [LMSAlertController showWithTitle:TDDLocalized.software_expired content:TDDLocalized.software_is_out_of_date_custom image:nil priority:1002 actions:@[[LMSAlertAction confirmAction]]];
+            [LMSAlertController showWithTitle:TDDLocalized.expiration_tips content:TDDLocalized.software_is_out_of_date_custom image:nil priority:1002 actions:@[[LMSAlertAction confirmAction]]];
             
         }else if ([TDD_DiagnosisTools isDEMO]){
             LMSAlertAction *action = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.app_confirm titleColor:[LMSAlertAction confirmAction].titleColor backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull ac) {
@@ -73,6 +73,8 @@
                 }
             }] ;
             [LMSAlertController showWithTitle:TDDLocalized.buy_tips content:TDDLocalized.demo_buy_tips image:nil priority:1002 actions:@[action]];
+        }else if ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany) {
+            [LMSAlertController showWithTitle:TDDLocalized.software_expired content:TDDLocalized.software_is_out_of_date_custom image:nil priority:1002 actions:@[[LMSAlertAction confirmAction]]];
         }
         else {
             LMSAlertAction *action = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.go_to_renewal titleColor:[LMSAlertAction confirmAction].titleColor backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull ac) {
@@ -80,12 +82,44 @@
                     [[TDD_ArtiGlobalModel sharedArtiGlobalModel].delegate ArtiGlobalEvent:TDD_DiagOtherEventType_GotoShop param:@{@"mallType":@(30)}];
                 }
             }] ;
-            [LMSAlertController showWithTitle:TDDLocalized.software_expired content:TDDLocalized.software_fuction_expire_tip image:nil priority:1002 actions:@[[LMSAlertAction cancelAction],action]];
+            [LMSAlertController showWithTitle:TDDLocalized.expiration_tips content:TDDLocalized.software_fuction_expire_tip_detail image:nil priority:1002 actions:@[[LMSAlertAction cancelAction],action]];
         }
         
     });
     
 }
+
++ (void)showUnScanSoftExpiredAlert:(nullable void (^)(void))completionHandler {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany) {
+            [LMSAlertController showWithTitle:TDDLocalized.expiration_tips content:TDDLocalized.software_is_out_of_date_custom_new image:nil priority:1002 actions:@[[LMSAlertAction confirmAction]]];
+            
+        }else if ([TDD_DiagnosisTools isDEMO]){
+            LMSAlertAction *action = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.app_confirm titleColor:[LMSAlertAction confirmAction].titleColor backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull ac) {
+                if (completionHandler) {
+                    completionHandler();
+                }
+            }] ;
+            [LMSAlertController showWithTitle:TDDLocalized.expiration_tips content:TDDLocalized.demo_buy_tips image:nil priority:1002 actions:@[action]];
+        }
+        else {
+            LMSAlertAction *action = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.go_to_renewal titleColor:[UIColor tdd_subTitle] backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull ac) {
+                if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel].delegate respondsToSelector:@selector(ArtiGlobalEvent:param:)]) {
+                    [[TDD_ArtiGlobalModel sharedArtiGlobalModel].delegate ArtiGlobalEvent:TDD_DiagOtherEventType_GotoShop param:@{@"mallType":@(30)}];
+                }
+            }] ;
+            LMSAlertAction *confirmAction = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.app_confirm titleColor:[LMSAlertAction confirmAction].titleColor backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull ac) {
+                if (completionHandler) {
+                    completionHandler();
+                }
+            }] ;
+            [LMSAlertController showWithTitle:TDDLocalized.expiration_tips content:TDDLocalized.software_fuction_expire_tip_un_scan image:nil priority:1002 actions:@[action,confirmAction]];
+        }
+        
+    });
+    
+}
+
 
 + (void)openTwoFaAlert:(NSDictionary *)param {
     LMSAlertAction *action = [[LMSAlertAction alloc] initWithTitle:TDDLocalized.user_immediate_open titleColor:[LMSAlertAction confirmAction].titleColor backgroundColor:nil image:nil :^(LMSAlertAction * _Nonnull action) {
@@ -98,7 +132,7 @@
 }
 
 + (void)openTwoFaChangeAccountAlert:(NSString *)account {
-    NSString *contentStr = [NSString stringWithFormat:TDDLocalized.tips_authentication_account_error,account];
+    NSString *contentStr = [NSString stringWithFormat:TDDLocalized.tips_authentication_account_error_new,account];
     LMSAlertController *alert = [LMSAlertController showWithTitle:TDDLocalized.explanation content:contentStr image:nil shouldNoMoreAlert:NO priorityValue:1003 actions:@[LMSAlertAction.confirmAction]];
     NSMutableAttributedString *attStr = [[NSMutableAttributedString alloc] initWithString:contentStr];
     [attStr yy_setColor:[UIColor tdd_colorDiagTheme] range:[contentStr rangeOfString:account]];
@@ -120,8 +154,9 @@
     NSString *accountStr = [[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthAccount];
     NSString *str = [NSString stringWithFormat:TDDLocalized.unlock_rights_need_buy,accountStr,carName];
     NSMutableAttributedString *attributedString = [NSMutableAttributedString mutableAttributedStringWithLTRString:str];
-    [attributedString addAttributes:@{ NSForegroundColorAttributeName: [UIColor tdd_colorDiagTheme], NSFontAttributeName: [[UIFont systemFontOfSize:14 weight:UIFontWeightRegular] tdd_adaptHD] } range:[str rangeOfString:accountStr]];
-    [attributedString addAttributes:@{ NSForegroundColorAttributeName: [UIColor tdd_colorDiagTheme], NSFontAttributeName: [[UIFont systemFontOfSize:14 weight:UIFontWeightRegular] tdd_adaptHD] } range:[str rangeOfString:carName]];
+    [attributedString setYy_font:[UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightRegular]];
+    [attributedString addAttributes:@{ NSForegroundColorAttributeName: [UIColor tdd_colorDiagTheme], NSFontAttributeName: [UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightRegular] } range:[str rangeOfString:accountStr]];
+    [attributedString addAttributes:@{ NSForegroundColorAttributeName: [UIColor tdd_colorDiagTheme], NSFontAttributeName: [UIFont systemFontOfSize:IS_IPad ? 20 : 14 weight:UIFontWeightRegular] } range:[str rangeOfString:carName]];
     [alertController setAttributeMessage:attributedString];
     
 }

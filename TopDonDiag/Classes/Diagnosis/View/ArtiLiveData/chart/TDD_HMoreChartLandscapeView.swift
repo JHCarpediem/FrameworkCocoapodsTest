@@ -365,6 +365,17 @@ extension TDD_HMoreChartLandscapeView: UIGestureRecognizerDelegate {
                 let incrementalScale = Double(gesture.scale)
                 accumulatedScaleX *= incrementalScale
                 
+                let p1 = gesture.location(ofTouch: 0, in: self)
+                let p2 = gesture.location(ofTouch: 1, in: self)
+                
+                let dx = abs(p1.x - p2.x)
+                print("⚪️【ChatView】 dx = \(dx), accumulatedScaleX = \(accumulatedScaleX)")
+                
+                if (dx <= 80.0 && accumulatedScaleX <= 0.4) {
+                    accumulatedScaleX = showDataChartView1.kMinScaleX
+                }
+                
+                
                 // 应用累积的X轴缩放到所有图表
                 let location = gesture.location(in: self)
                 let masterPoint = self.convert(location, to: showDataChartView1)

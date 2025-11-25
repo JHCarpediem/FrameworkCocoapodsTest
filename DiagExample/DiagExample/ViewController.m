@@ -24,7 +24,7 @@
     [self initDiagnosis];
     [TDD_DiagnosisManage enterLocalChooseCarViewController:DET_ALLFUN delegate:self];
     [TDD_DiagnosisManage sharedManage].currentSoftware = TDDSoftwareTopScan;
-    self.view.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleUpleftToLowright withFrame:self.view.bounds.size];
+//    self.view.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleUpleftToLowright withFrame:self.view.bounds.size];
 
 }
 

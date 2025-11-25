@@ -13,10 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 #define TDFileHashDefaultChunkSizeForReadingData 1024*8
 
 @interface TDHAESEncryption : NSObject
-
+/// 传给服务器的加密
 + (NSString *)td_AES128ParmEncryptWithContent:(NSString *)content;
+/// 服务器数据解密
 + (NSString *)td_AES128ParmDecryptWithContent:(NSString *)content;
+/// 本地存储加密
 + (NSString *)td_AESLocalEncryptionWithContent:(NSString *)content;
+/// 本地存储解密
++ (NSString *)td_AESLocalDecryptionWithContent:(NSString *)content;
 + (NSString *)td_hmacSHA256WithContent:(NSString *)content;
 + (NSString *)td_getmd5Str:(NSString *)str;
 + (NSString *)td_getBigFileMD5:(NSString *)path;

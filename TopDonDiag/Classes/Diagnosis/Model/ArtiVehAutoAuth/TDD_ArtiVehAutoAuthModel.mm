@@ -499,7 +499,9 @@ uint32_t ArtiAutoAuthModelSendRecv(uint32_t id, uint32_t Type, uint32_t TimeOutM
     
     HLog(@"ArtiVehAutoAuthSendRecv: ID-%d  type-%d timsOutMs-%u",ID,type,timeOutMs);
     [TDD_ArtiVehAutoAuthModel clearResponseData:ID];
-    if (type == SRT_RENAULT_DIAG_REQ || type == SRT_NISSAN_DIAG_REQ) {
+    //JH:此处安卓只判断了SRT_VW_SFD_REPORT，其余全走renaultDiagRequest
+    //每次有新网关功能的时候注意一下此处
+    if (type == SRT_RENAULT_DIAG_REQ || type == SRT_NISSAN_DIAG_REQ || type == SRT_VW_DIAG_REQ) {
         return [TDD_ArtiVehAutoAuthModel renaultDiagRequest:ID type:type timeOutMs:timeOutMs];
     }else if (type == SRT_VW_SFD_REPORT) {
         return [TDD_ArtiVehAutoAuthModel uploadSFDReport:ID type:type timeOutMs:timeOutMs];
@@ -526,7 +528,10 @@ uint32_t ArtiAutoAuthModelSendRecv(uint32_t id, uint32_t Type, uint32_t TimeOutM
         return -9;
     }
     NSMutableDictionary *param = @{}.mutableCopy;
-    [param setValue:@(model.brandType) forKey:@"brand"];
+    NSInteger brand = model.brandType;
+    brand = (long)[[TDD_ArtiGlobalModel sharedArtiGlobalModel] getAuthBrand];
+    
+    [param setValue:@(brand) forKey:@"brand"];
     [param setValue:model.vin?:@"" forKey:@"vin"];
     [param setValue:model.strType?:@"" forKey:@"ecuUnlockType"];
     [param setValue:model.strData?:@"" forKey:@"ecuPublicServiceData"];
@@ -534,7 +539,17 @@ uint32_t ArtiAutoAuthModelSendRecv(uint32_t id, uint32_t Type, uint32_t TimeOutM
     [param setValue:model.strCanID?:@"" forKey:@"ecuCANID"];
     [param setValue:model.strPolicy?:@"" forKey:@"routingPolicy"];
     [param setValue:[TDD_ArtiGlobalModel sharedArtiGlobalModel].authToken forKey:@"token"];
-    [param setValue:@(2) forKey:@"source"];
+    if (brand == 4) {
+        //大众 SFD source 统一用 0
+        [param setValue:@(0) forKey:@"source"];
+    }else {
+        if ([[TDD_ArtiGlobalModel sharedArtiGlobalModel] authUnlockType] == 0) {
+
+            [param setValue:@(1) forKey:@"source"];
+        }else {
+            [param setValue:@(2) forKey:@"source"];
+        }
+    }
     [param setValue:@(timeOutMs) forKey:@"timeOut"];
     [param setValue:[TDD_DiagnosisTools topdonID]?:@"" forKey:@"toolUserId"];
     NSString *snStr = [TDD_EADSessionController sharedController].SN;

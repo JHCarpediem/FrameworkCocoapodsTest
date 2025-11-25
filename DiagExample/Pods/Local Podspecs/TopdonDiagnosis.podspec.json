@@ -1,6 +1,6 @@
 {
   "name": "TopdonDiagnosis",
-  "version": "2.09.066",
+  "version": "2.09.119",
   "summary": "Automotive diagnosis and Bluetooth module",
   "swift_versions": [
     "4.2",
@@ -19,7 +19,7 @@
   },
   "source": {
     "git": "http://172.16.50.23:8081/topdon-app/ios/topdondiagnosis.git",
-    "tag": "2.09.066"
+    "tag": "2.09.119"
   },
   "resources": "TopDonDiag/Classes/TopdonDiagnosis.bundle",
   "prefix_header_file": "TopDonDiag/Classes/PrefixHeader.pch",

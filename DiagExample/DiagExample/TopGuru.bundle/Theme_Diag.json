@@ -1,0 +1,165 @@
+{
+    "TopdonDiagnosis" : {
+        "General": {
+            "line": "#EEEEEE",
+            "viewBorder": "#CCCCCC",
+            "cardBackground": "#F5F5F5",
+            "buttonBackground": "#FFFFFF",
+            "dashLine": "#C9E0EF",
+            "shadowBackground": "#FFFFFF",
+            "webLinkText": "#3A82E9",
+            "cellHeadBackground": "#EEEEEE",
+            "cellBackground": "#F5F5F5",
+            "textFieldBackground": "#F5F5F5",
+            "textFieldClearButtonTint": "#AAAAAA",
+            "titleLock": "#C4C4C4",
+            "placeholderText": "#999999",
+            "diagBlue": "#215CB0",
+            "collectionViewBackground": "#F5F5F5"
+        },
+        
+        "MsgProgress": {
+            "titleText": "#FFFFFF",
+            "trackTint": "",
+            "progressTint": {
+                "color": "",
+                "gradientStyle": "leftToRight",
+                "gradientColors": "#FFD100,#F22222"
+            }
+        },
+        
+        "TopView": {
+            "tipsBackground": "#E5F0FF",
+            "tipsText": "#215CB0"
+        },
+        
+        "BottomView": {
+            "background": "#FFFFFF",
+            "tipsBackground": "#FFECD6",
+            "tipsText": "#666666",
+            "buttonNormalBackground": "#FFFFFF",
+            "buttonDisableBackground": "#FFFFFF",
+            "buttonHighlightBackground": "#E4E4E4",
+            "buttonNormalText": "#F22222",
+            "buttonDisableText": "#E9E9E9"
+        },
+        
+        "Report": {
+            "inputNormalCellBackground": "#FFFFFF",
+            "codeSectionText": "#666666",
+            "codeSectionBackground": "#F5F5F5",
+            "codeTitleText": "#215CB0",
+            "infoValueText": "#666666",
+            "repairHeaderText": "#FFFFFF",
+            "repairSectionPDFLine": "#EEEEEE",
+            "summaryBackground": "#F8F8F8",
+            "summaryPDFBackground": "#F8F8F8",
+            "summaryBottomLine": "#FFFFFF33",
+            "summaryTipsText": "#999999",
+            "mileSelectBackground": "#F5F5F5",
+            "mileNormalBackground": "#FFFFFF",
+            "headCellBackground": "#FFFFFF",
+            "disclaimText": "#333333",
+            "background": "#FFFFFF",
+            "PDFBackground": "#FFFFFF"
+        },
+        
+        "SystemScan": {
+            "viewBackground": "#EEEEEE",
+            "cellBackground": "#FFFFFF",
+            "line": "#EBEBEB",
+            "cellHighlightBackground": {
+                "color": "",
+                "gradientStyle": "leftToRight",
+                "gradientColors": "#FDECEC,#FFFFFF"
+            }
+        },
+        
+        "List": {
+            "background": "#DDDDDD",
+            "cellSelectBackground": {
+                "color": "",
+                "gradientStyle": "topToBottom",
+                "gradientColors": "#FFE2E2,#FFD2D2"
+            },
+            "cellHighlightBackground": {
+                "color": "",
+                "gradientStyle": "topToBottom",
+                "gradientColors": "#FFE074,#FFBF1A"
+            }
+        },
+        
+        "LiveData": {
+            "cellBackground": "#FFFFFF",
+            "sepLine": "#FBFBFB",
+            "valueNormalText": "#2B79D8",
+            "unitNormalText": "#666666",
+            "segmentBackground": "#F5F5F5",
+            "recordBackground": "#00000099",
+            "scoreText": "#666666",
+            "setBackground": "#F8F8F8",
+            "setRangeText": "#215CB0",
+            "setRangeBackground": "#EEEEEE",
+            "legendText": "#999999"
+        },
+        
+        "DTC": {
+            "fault": "#F5222D",
+            "noFault": "#2B79D8",
+            "statusNormal": "#2B79D8",
+            "pdfStatsuNormal": "#2B79D8",
+            "pdfNormal": "#333333"
+        },
+        
+        "Keyboard": {
+            "background": "#F3F3F3",
+            "itemDisableBackground": "#E4E4E4",
+            "itemNormalBackground": "#FCFCFE",
+            "itemHighlightBackground": "#FFFFFF",
+            "itemNormalText": "#F22222",
+            "itemHighlightBorder": "#F22222",
+            "itemDisableText": "#999999",
+            "enterBackground": "#F22222",
+            "deleteBackground": "#FFFFFF"
+        },
+        
+        "Menu": {
+            "cellBackground": "#FFFFFF",
+            "cellBackgroundGradientStyle": "",
+            "cellBackgroundGradientColors": "",
+            "cellHighlightBackground": "#F8F0EF",
+            "textDisable": "#BBBBBB"
+        },
+        
+        "Popup": {
+            "background": "#F5F5F5"
+        },
+        
+        "Input": {
+            "historyCellBackground": "#FFFFFF",
+            "textViewBackground": "#FFFFFF"
+        },
+        
+        "Trouble": {
+            "showStateBackground": "#FFFFFF",
+            "background": "#F5F5F5"
+        },
+        
+        "FCA": {
+            "areaBackground": "#FCF7F7"
+        },
+        
+        "Alert": {
+            "background": "#FFFFFF",
+            "confirmBackground": "#FFFFFF",
+            "confirmText": "#F22222",
+            "cancelBackground": "#FFFFFF"
+        },
+        
+        "Loading": {
+            "background": "#FFFFFF",
+            "topBallBackground": "#FF8100",
+            "bottomBallBackground": "#F22222"
+        }
+    }
+}

@@ -135,8 +135,7 @@
         _reportModel.cellModels = tempArray;
     }
     
-    UInt32 createTime = reportModel.reportCreateTime != 0 ? (UInt32)reportModel.reportCreateTime : (UInt32)[NSDate tdd_getTimestampSince1970];
-    
+    UInt32 createTime = reportModel.reportCreateTime;
     @kWeakObj(self)
     self.reportModel.generatorTapBlock = ^{
         @kStrongObj(self)
@@ -149,9 +148,12 @@
                 [self saveHistory:createTime];
                 
                 // 保存成功后显示为分享按钮
-                if (self.reportModel.buttonArr.count > 0) {
+                if (self.reportModel.buttonArr.count > 1) {
                     TDD_ArtiButtonModel *model = self.reportModel.buttonArr[0];
-                    model.strButtonText = TDDLocalized.battery_share;
+                    model.strButtonText = TDDLocalized.mine_device_connect_done;
+                    
+                    TDD_ArtiButtonModel *model1 = self.reportModel.buttonArr[1];
+                    model1.strButtonText = TDDLocalized.battery_share;
                     self.reportModel.isReloadButton = YES;
                     [self.reportModel reloadView];
                 }
@@ -474,8 +476,8 @@
                 TDD_ArtiReportCellModel *imgsRow = [[TDD_ArtiReportCellModel alloc] init];
                 imgsRow.identifier = [TDD_ArtiADASReportImagesPreviewCell reuseIdentifier];
                 imgsRow.adasImages = reportModel.adasImageDatas;
-                imgsRow.cellHeight  = TDD_ArtiADASReportImagesPreviewCell.cellHeight;
-                imgsRow.cellA4Height = TDD_ArtiADASReportImagesPreviewCell.a4CellHeight;
+                imgsRow.cellHeight  = [TDD_ArtiADASReportImagesPreviewCell cellHeightWithImageCount:reportModel.adasImageDatas.count lineCount:4 isA4:NO];
+                imgsRow.cellA4Height = [TDD_ArtiADASReportImagesPreviewCell cellHeightWithImageCount:reportModel.adasImageDatas.count lineCount:4 isA4:YES];
                 
                 [tempArray addObject:imgsRow];
                 
@@ -522,8 +524,8 @@
                 TDD_ArtiReportCellModel *imgsRow = [[TDD_ArtiReportCellModel alloc] init];
                 imgsRow.identifier = [TDD_ArtiADASReportImagesPreviewCell reuseIdentifier];
                 imgsRow.adasImages = reportModel.adasImageDatas;
-                imgsRow.cellHeight  = TDD_ArtiADASReportImagesPreviewCell.cellHeight;
-                imgsRow.cellA4Height = TDD_ArtiADASReportImagesPreviewCell.a4CellHeight;
+                imgsRow.cellHeight  = [TDD_ArtiADASReportImagesPreviewCell cellHeightWithImageCount:reportModel.adasImageDatas.count lineCount:4 isA4:NO];
+                imgsRow.cellA4Height = [TDD_ArtiADASReportImagesPreviewCell cellHeightWithImageCount:reportModel.adasImageDatas.count lineCount:4 isA4:YES];
                 
                 [tempArray addObject:imgsRow];
                 
@@ -1058,49 +1060,50 @@
     return self.items.count;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportCodeTitleTableViewCell reuseIdentifier]]) {
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.items.count <= indexPath.row) {
+        return 0.01;
+    }
+    TDD_ArtiReportCellModel *model = self.items[indexPath.row];
+    if ([model.identifier isEqualToString: [TDD_ArtiReportCodeTitleTableViewCell reuseIdentifier]]) {
         
         BOOL isLower = [self.items[indexPath.row-1].identifier isEqualToString: [TDD_ArtiReportHeaderTableViewCell reuseIdentifier]];
         if (isLower) {
-            self.items[indexPath.row].cellHeight = IS_IPad ? 80 : 30;
+            model.cellHeight = IS_IPad ? 80 : 30;
         }
     }
     if (tableView == self.tableView) {
-        return self.items[indexPath.row].cellHeight;
+        return model.cellHeight;
     } else {
-        return self.items[indexPath.row].cellA4Height;
+        return model.cellA4Height;
     }
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-     if ([self.items[indexPath.row].identifier isEqualToString: [_infoCellClass reuseIdentifier]]) {
-        TDD_ArtiReportCellModel *model = self.items[indexPath.row];
-         if (self.tableView == tableView) {
-             if (isKindOfTopVCI){
-                 TDD_ArtiReportInfoTopVCITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportInfoTopVCITableViewCell reuseIdentifier] forIndexPath:indexPath];
-                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                 [cell updateWith:model];
-                 return cell;
-             }else {
-                 TDD_ArtiReportInfoCell *cell = [[TDD_ArtiReportInfoCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[TDD_ArtiReportInfoCell reuseIdentifier] labelMargin:IS_IPad ? 40 : 15 lineSpacing:IS_IPad ? 30 : 15 interItemSpacing:IS_IPad ? 40 : 20];
-                 cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                 [cell updateUIWithModel:model];
-                 return cell;
-             }
-         } else {
-             TDD_ArtiReportInfosA4Cell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportInfosA4Cell reuseIdentifier] forIndexPath:indexPath];
-             
-             [cell updateWithInfos:model.infos];
-             
-             return cell;
-         }
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    if (self.items.count <= indexPath.row) {
+        return [UITableViewCell new];
     }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportSummaryTableViewCell reuseIdentifier]]) {
+    TDD_ArtiReportCellModel *model = self.items[indexPath.row];
+    if ([model.identifier isEqualToString: [_infoCellClass reuseIdentifier]]) {
+        if (self.tableView == tableView) {
+            if (isKindOfTopVCI){
+                TDD_ArtiReportInfoTopVCITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportInfoTopVCITableViewCell reuseIdentifier] forIndexPath:indexPath];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                [cell updateWith:model];
+                return cell;
+            } else {
+                TDD_ArtiReportInfoCell *cell = [[TDD_ArtiReportInfoCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[TDD_ArtiReportInfoCell reuseIdentifier] labelMargin:IS_IPad ? 40 : 15 lineSpacing:IS_IPad ? 30 : 15 interItemSpacing:IS_IPad ? 40 : 20 isHistoryDiag:NO];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                [cell updateUIWithModel:model];
+                return cell;
+            }
+        } else {
+            TDD_ArtiReportInfosA4Cell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportInfosA4Cell reuseIdentifier] forIndexPath:indexPath];
+            [cell updateWithInfos:model.infos];
+            return cell;
+        }
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportSummaryTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportSummaryTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportSummaryTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        TDD_ArtiReportCellModel *model = self.items[indexPath.row];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if (tableView == self.tableView) {
             [cell updateWith:model];
@@ -1108,10 +1111,9 @@
             [cell updateA4With:model];
         }
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportHeaderTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportHeaderTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportHeaderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportHeaderTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        cell.nameLabel.text = self.items[indexPath.row].headerTitle;
+        cell.nameLabel.text = model.headerTitle;
         if (tableView == self.tableView) {
             [cell updateLayout];
         } else {
@@ -1119,10 +1121,9 @@
         }
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportTextTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportTextTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportTextTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportTextTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        cell.valueLabel.text = self.items[indexPath.row].subTitle;
+        cell.valueLabel.text = model.subTitle;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if (tableView == self.tableView) {
             [cell updateLayout];
@@ -1130,16 +1131,14 @@
             [cell updateA4Layout];
         }
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportRepairHeaderTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportRepairHeaderTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportRepairHeaderTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportRepairHeaderTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if (tableView == self.tableView) {
-            [cell updateHistoryLabelPercent:self.items[indexPath.row].leftWidth withCurrentLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateHistoryLabelPercent:model.leftWidth withCurrentLabelPercent:model.rightWidth];
         } else {
-            [cell updateA4HistoryLabelPercent:self.items[indexPath.row].leftWidth withCurrentLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4HistoryLabelPercent:model.leftWidth withCurrentLabelPercent:model.rightWidth];
         }
-        TDD_ArtiReportCellModel *model = self.items[indexPath.row];
         if (model.repairIndex == 1) {
             cell.currentLabel.text = TDDLocalized.report_system_type_before;
             cell.historyLabel.text = @"";
@@ -1160,15 +1159,14 @@
     }
     
     // ADAS repair head
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportRepairHeaderCell reuseIdentifier]]) {
+    else if ([model.identifier isEqualToString: [TDD_ArtiADASReportRepairHeaderCell reuseIdentifier]]) {
         TDD_ArtiADASReportRepairHeaderCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportRepairHeaderCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         if (tableView == self.tableView) {
-            [cell updateWithHistoryPercent:self.items[indexPath.row].leftWidth currentPercent:self.items[indexPath.row].rightWidth];
+            [cell updateWithHistoryPercent:model.leftWidth currentPercent:model.rightWidth];
         } else {
-            [cell updateA4WithHistoryPercent:self.items[indexPath.row].leftWidth currentPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4WithHistoryPercent:model.leftWidth currentPercent:model.rightWidth];
         }
-        TDD_ArtiReportCellModel *model = self.items[indexPath.row];
         if (model.repairIndex == 1) {
             [cell updateTextWithHistory:@"" historyTime:@"" current:TDDLocalized.report_system_type_before currentTime: model.adasPostScanTime];
         } else if (model.repairIndex == 2 && model.hasRepairHistory == YES) {
@@ -1181,35 +1179,31 @@
             [cell updateTextWithHistory:@"" historyTime:@"" current:TDDLocalized.report_system_type_ing currentTime:model.adasPostScanTime];
         }
         return cell;
-    }
-    
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportRepairSectionTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportRepairSectionTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportRepairSectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportRepairSectionTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         if (tableView == self.tableView) {
-            [cell updateLeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateLeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
         } else {
-            [cell updateA4LeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4LeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
         }
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportRepairRowTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportRepairRowTableViewCell reuseIdentifier]]) {
         // 维修前后
         TDD_ArtiReportRepairRowTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportRepairRowTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         if (tableView == self.tableView) {
-            [cell updateLeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateLeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
         } else {
-            [cell updateA4LeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4LeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
         }
-        [cell updateWith:self.items[indexPath.row]];
+        [cell updateWith:model];
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportCodeTitleTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportCodeTitleTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportCodeTitleTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportCodeTitleTableViewCell reuseIdentifier] forIndexPath:indexPath];
-        cell.nameLabel.text = self.items[indexPath.row].cell_header_title;
+        cell.nameLabel.text = model.cell_header_title;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         BOOL isLower = [self.items[indexPath.row-1].identifier isEqualToString: [TDD_ArtiReportHeaderTableViewCell reuseIdentifier]];
@@ -1222,37 +1216,35 @@
         }
         
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportCodeSectionTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportCodeSectionTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportCodeSectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportCodeSectionTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         if (tableView == self.tableView) {
-            [cell updateLeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateLeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
             if (!IS_IPad) {
                 cell.nameLabel.textAlignment = NSTextAlignmentCenter;
             } else {
                 cell.nameLabel.textAlignment = NSTextAlignmentLeft;
             }
         } else {
-            [cell updateA4LeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4LeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
             cell.nameLabel.textAlignment = NSTextAlignmentCenter;
         }
         cell.nameLabel.text = TDDLocalized.report_fault_code;
         cell.leftLabel.text = TDDLocalized.trouble_desc;
         cell.rightLabel.text = TDDLocalized.vci_status;
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportCodeRowTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportCodeRowTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportCodeRowTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportCodeRowTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        cell.leftLabel.text = self.items[indexPath.row].leftTitle;
-        cell.nameLabel.text = self.items[indexPath.row].headerTitle;
-        NSAttributedString *pdfAttri = [self getDtcNodeStatusDescription:self.items[indexPath.row].dtcNodeStatus statusStr:self.items[indexPath.row].dtcNodeStatusStr isPDF:YES];
-        NSAttributedString *normalAttri = [self getDtcNodeStatusDescription:self.items[indexPath.row].dtcNodeStatus statusStr:self.items[indexPath.row].dtcNodeStatusStr isPDF:NO];
+        cell.leftLabel.text = model.leftTitle;
+        cell.nameLabel.text = model.headerTitle;
+        NSAttributedString *pdfAttri = [self getDtcNodeStatusDescription:model.dtcNodeStatus statusStr:model.dtcNodeStatusStr isPDF:YES];
+        NSAttributedString *normalAttri = [self getDtcNodeStatusDescription:model.dtcNodeStatus statusStr:model.dtcNodeStatusStr isPDF:NO];
         if (tableView == self.tableView) {
             [cell updateRightLabelWithAttributedString:normalAttri isA4:NO];
-            [cell updateLeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateLeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
             if (!IS_IPad) {
                 cell.nameLabel.textAlignment = NSTextAlignmentCenter;
             } else {
@@ -1260,12 +1252,11 @@
             }
         } else {
             [cell updateRightLabelWithAttributedString:pdfAttri isA4:YES];
-            [cell updateA4LeftLabelPercent:self.items[indexPath.row].leftWidth withRightLabelPercent:self.items[indexPath.row].rightWidth];
+            [cell updateA4LeftLabelPercent:model.leftWidth withRightLabelPercent:model.rightWidth];
             cell.nameLabel.textAlignment = NSTextAlignmentCenter;
         }
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportFlowSectionTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportFlowSectionTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportFlowSectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportFlowSectionTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         NSArray *defaultTitles = @[TDDLocalized.diagnosis_name, TDDLocalized.report_data_stream_number, TDDLocalized.diagnosis_unit, TDDLocalized.report_data_stream_reference];
@@ -1276,48 +1267,41 @@
             [cell updateA4With:defaultTitles];
         }
         return cell;
-    }
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiReportFlowRowTableViewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiReportFlowRowTableViewCell reuseIdentifier]]) {
         TDD_ArtiReportFlowRowTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiReportFlowRowTableViewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         if (tableView == self.tableView) {
-            [cell updateWith: self.items[indexPath.row].liveDatas];
+            [cell updateWith: model.liveDatas];
         } else {
-            [cell updateA4With:self.items[indexPath.row].liveDatas];
+            [cell updateA4With:model.liveDatas];
         }
         return cell;
     }
     
     // ADAS
-    
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportMessagePreviewCell reuseIdentifier]]) {
+    else if ([model.identifier isEqualToString: [TDD_ArtiADASReportMessagePreviewCell reuseIdentifier]]) {
         TDD_ArtiADASReportMessagePreviewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportMessagePreviewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        TDD_ArtiReportCellModel *cellModel = self.items[indexPath.row];
         if (tableView == self.tableView) {
-            [cell update: cellModel.adasMessage];
+            [cell update: model.adasMessage];
         } else {
-            [cell updateA4: cellModel.adasMessage];
+            [cell updateA4: model.adasMessage];
         }
         return cell;
     }
     
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportImagesPreviewCell reuseIdentifier]]) {
+    else if ([model.identifier isEqualToString: [TDD_ArtiADASReportImagesPreviewCell reuseIdentifier]]) {
         TDD_ArtiADASReportImagesPreviewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportImagesPreviewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        TDD_ArtiReportCellModel *cellModel = self.items[indexPath.row];
         if (tableView == self.tableView) {
-            [cell update: cellModel.adasImages];
+            [cell update: model.adasImages];
         } else {
-            [cell updateA4: cellModel.adasImages];
+            [cell updateA4: model.adasImages];
         }
         return cell;
     }
-    
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportExecuteNoneCell reuseIdentifier]]) {
+    else if ([model.identifier isEqualToString: [TDD_ArtiADASReportExecuteNoneCell reuseIdentifier]]) {
         TDD_ArtiADASReportExecuteNoneCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportExecuteNoneCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
@@ -1327,60 +1311,44 @@
             [cell updateA4];
         }
         return cell;
-    }
-    
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportExecuteCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiADASReportExecuteCell reuseIdentifier]]) {
         TDD_ArtiADASReportExecuteCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportExecuteCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         
         if (tableView == self.tableView) {
-            [cell updateWith: self.items[indexPath.row].adasResult];
+            [cell updateWith: model.adasResult];
         } else {
-            [cell updateA4With:self.items[indexPath.row].adasResult];
+            [cell updateA4With:model.adasResult];
         }
         return cell;
-    }
-   
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportTirePreviewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiADASReportTirePreviewCell reuseIdentifier]]) {
         if (tableView == self.tableView) {
             TDD_ArtiADASReportTirePreviewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportTirePreviewCell reuseIdentifier] forIndexPath:indexPath];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            TDD_ArtiReportCellModel *cellModel = self.items[indexPath.row];
-            
-            [cell update: cellModel.adasTireData];
+            [cell update: model.adasTireData];
             return cell;
         } else {
             TDD_ArtiADASReportTirePDFCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportTirePDFCell reuseIdentifier] forIndexPath:indexPath];
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
-            
-            TDD_ArtiReportCellModel *cellModel = self.items[indexPath.row];
-            
-            [cell update: cellModel.adasTireData.asPDFPageRowDatas];
+            [cell update: model.adasTireData.asPDFPageRowDatas];
             return cell;
         }
-    }
-
-    if ([self.items[indexPath.row].identifier isEqualToString: [TDD_ArtiADASReportFuelPreviewCell reuseIdentifier]]) {
+    } else if ([model.identifier isEqualToString: [TDD_ArtiADASReportFuelPreviewCell reuseIdentifier]]) {
         TDD_ArtiADASReportFuelPreviewCell *cell = [tableView dequeueReusableCellWithIdentifier:[TDD_ArtiADASReportFuelPreviewCell reuseIdentifier] forIndexPath:indexPath];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        
-        TDD_ArtiReportCellModel *cellModel = self.items[indexPath.row];
-        
         if (tableView == self.tableView) {
-            [cell update: cellModel.adasFuel];
+            [cell update: model.adasFuel];
         } else {
-            [cell updateA4: cellModel.adasFuel];
+            [cell updateA4: model.adasFuel];
         }
         if (_reportModel.fuelImage) {
             [cell updateImage: _reportModel.fuelImage];
         } else {
-            [cell setupImageWithPath: cellModel.adasFuel.imagePath];
+            [cell setupImageWithPath: model.adasFuel.imagePath];
         }
         return cell;
     }
 
-    
     return [UITableViewCell new];
 }
 

@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) TDD_ArtiReportModel *reportModel;
 
 @property (nonatomic, weak) __nullable id<TDD_ArtiReportGeneratorModelDelegata> delegate;
+
 @end
 
 NS_ASSUME_NONNULL_END

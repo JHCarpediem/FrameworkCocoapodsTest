@@ -1,0 +1,104 @@
+
+{
+    "global" : {
+        "appTitle" : "TopGuru",
+        "isHD" : 0,
+        "thirdLoginType" : "0b1010",
+        "isThirdLoginNotMustBindEmailOrPhone": 1,
+        "statusBarStyle" : 0,
+        "isLogoutPopToRoot": 1,
+        "isLoginPageBackgroudImageShow": 1,
+        "isGoogleAuthSupport": 0,
+        "titleColor" : "#333333",
+        "subTitleColor" : "#999999",
+        "assitTitleColor": "#666666",
+        "mainBackgroundColor" : "#FFFFFF",
+        "tableViewBackgroundColor" : "#F8F8F8",
+        "lineColor" : "#EEEEEE",
+        "themeColor" : "#F22222",
+        "disableBackgroundColor" : "#F2222266",
+        "disableTextColor" : "#CCCCCC",
+        "errorColor" : "#F22222",
+        "cellBackgroundColor" : "#FFFFFF",
+        "cellSelectBackgroundColor" : "#1C2C3C",
+        "actionChoosePhotoBackgoundColor" : "#FFFFFF",
+        "privacyColor" : "#F22222",
+        "tipBackColor" : "#FAF7F2",
+        "otherMobileLoginBackColor" : "#DDDDDD",
+        "confirmBtnTextColor" : "#FFFFFF",
+        "confirmBtnBackgroundColor" : "#F22222",
+        "confirmBtnDisableBackgroundColor" : "",
+        "confirmBtnDisableTextColor" : "",
+        "passwordErrorBackgroundColor" : "#FFFFFF",
+        "selectAccountCardBackground": "#F4F4F4",
+        "textFieldPlaceholder": "#999999"
+    },
+    
+    "alert" : {
+        "buttonStyle" : 0,
+        "conterntCornerRadius" : 5,
+        "backgroundColor" : "#FFFFFF",
+        "titleTextColor" : "#333333",
+        "messageTextColor" : "#333333",
+        "cancelBtnTextColor" : "#FFFFFF",
+        "cancelBtnBackgroundColor" : "#FFFFFF33",
+        "linkTextColor" : "#F22222",
+        "lineHidden" : 0,
+    },
+    
+    "gradient" : {
+        "mainBackgroundGradientStyle" : "",
+        "mainBackgroundGradient" : "",
+        "confirmBtnGradientStyle" : "",
+        "confirmBtnGradientColors" : "",
+        "alertBackgroundGradientStyle" : "",
+        "alertBackgroundGradient" : "",
+        "pickerViewRowSelectGradientStyle" : "leftToRight",
+        "pickerViewRowSelectGradient" : "",
+        "feedbackBackgroundGradientStyle" : "topToBottom",
+        "feedbackBackgroundGradient" : ""
+    },
+    
+    "navigationBar" : {
+        "backgroundColor" : "",
+        "rightItemTextColor" : "#F22222",
+        "userCenterBackgroundColor" : "#FFFFFF",
+        "userCenterRightItemTextColor" : "#F22222"
+    },
+    
+    "feedback" : {
+        "hiddenLogChooseBtn" : 0,
+        "hiddenNavRightBtn": 1,
+        "pickerViewRowSelectColor" : "#FDE8E8",
+        "pickerViewTitleColor": "#333333",
+        "feedbackBackgroundColor" : "#F8F8F9",
+        "textViewBackColor" : "#F4F5F4",
+        "feedbackCellBackcolor": "#FFFFFF",
+        "pickerViewBackColor" : "#FFFFFF",
+        "logSelectIndicatorColor" : "#1093FF",
+        "solvedLabelBackground" : "#0000004D"
+    },
+    
+    "FirmwareColor" : {
+        "lightStyle": "light",
+        "main": "#F22222",
+        "title": "#333333",
+        "subTitle": "#999999",
+        "viewControllerBackground": "#F8F8F8",
+        "navgationBarBackground": "",
+        "cardBackground": "#FFFFFF",
+        "progressTint" : "#F22222",
+        "progressTrack": "#DAE0E9",
+        "errorTips": "#F22222",
+        "upgradeAlertBackground": "#FFFFFF"
+    },
+    
+    "FirmwareGradient" : {
+        "viewControllerBackgroundGradientStyle": "topLeftToBottomRight",
+        "viewControllerBackgroundGradient": "",
+        "confirmBtnGradientStyle": "leftToRight",
+        "confirmBtnGradientColors": "",
+        "upgradeProgressGradientStyle": "leftToRight",
+        "upgradeProgressGradient": "#F26D22,#F22222"
+    }
+}

@@ -330,8 +330,8 @@ extension TDD_AlertController {
         messageLabel.attributedText = NSAttributedString(string: message ?? "", attributes: attributes)
         
         nomoreAlertBtn.setTitle(TDDLocalized.dialog_vci_vol_tips, for: .normal)
-        nomoreAlertBtn.setImage(UIImage.tdd_imageAlertCheckboxNormal(), for: .normal)
-        nomoreAlertBtn.setImage(UIImage.tdd_imageAlertCheckboxSelect(), for: .selected)
+        nomoreAlertBtn.setImage(UIImage.tdd_imageCheckboxRoundNormal(), for: .normal)
+        nomoreAlertBtn.setImage(UIImage.tdd_imageCheckboxRoundSelect(), for: .selected)
         nomoreAlertBtn.contentHorizontalAlignment = .left
         nomoreAlertBtn.setTitleColor(UIColor.tdd_title(), for: .normal)
         nomoreAlertBtn.titleLabel?.font = UIFont.systemFont(ofSize: 12)

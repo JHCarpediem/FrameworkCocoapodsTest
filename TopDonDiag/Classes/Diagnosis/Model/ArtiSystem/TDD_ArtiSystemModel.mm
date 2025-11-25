@@ -53,6 +53,7 @@ const uint32_t DF_ID_SYS_H_ALL = 2;
     CRegSystem::InitTitle(ArtiSystemInitTitle);
     CRegSystem::InitTitleWithType(ArtiSystemInitTitleWithType);
     CRegSystem::AddItem(ArtiSystemAddItem);
+    //CRegSystem::AddItemEx(ArtiSystemAddItemEx);
     CRegSystem::AddItemWithType(ArtiSystemAddItemWithType);
     CRegSystem::GetScanOrder(ArtiGetScanOrder);
     CRegSystem::GetItem(ArtiSystemGetItem);
@@ -62,6 +63,7 @@ const uint32_t DF_ID_SYS_H_ALL = 2;
     CRegSystem::SetItemStatus(ArtiSystemSetItemStatus);
     CRegSystem::SetItemResult(ArtiSystemSetItemResult);
     CRegSystem::SetItemAdas(ArtiSystemSetItemAdas);
+    //CRegSystem::SetItemLockStatus(ArtiSystemSetItemLockStatus);
     CRegSystem::SetButtonAreaHidden(ArtiSystemSetButtonAreaHidden);
     CRegSystem::SetScanStatus(ArtiSystemSetScanStatus);
     CRegSystem::SetClearStatus(ArtiSystemSetClearStatus);
@@ -92,6 +94,11 @@ bool ArtiSystemInitTitleWithType(uint32_t id, const std::string& strTitle, uint3
 void ArtiSystemAddItem(uint32_t id, const std::string& strItem)
 {
     [TDD_ArtiSystemModel AddItemWithId:id strItem:[TDD_CTools CStrToNSString:strItem]];
+}
+
+uint32_t ArtiSystemAddItemEx(uint32_t id, const std::string& strItem, uint32_t uStatus)
+{
+    return [TDD_ArtiSystemModel AddItemExWithId:id strItem:[TDD_CTools CStrToNSString:strItem] uStatus:uStatus];
 }
 
 void ArtiSystemAddItemWithType(uint32_t id, const std::string& strItem, uint32_t etype)
@@ -144,6 +151,11 @@ void ArtiSystemSetItemResult(uint32_t id, uint16_t uIndex, uint32_t uResult)
 void ArtiSystemSetItemAdas(uint32_t id, uint16_t uIndex, uint32_t uResult)
 {
     [TDD_ArtiSystemModel SetItemAdasWithId:id uIndex:uIndex uAdasResult:uResult];
+}
+
+uint32_t ArtiSystemSetItemLockStatus(uint32_t id, uint16_t uIndex, uint32_t uStatus)
+{
+    return [TDD_ArtiSystemModel SetItemLockStatusWithId:id uIndex:uIndex uStatus:uStatus];
 }
 
 void ArtiSystemSetButtonAreaHidden(uint32_t id, bool bIsVisible)
@@ -345,6 +357,43 @@ uint32_t ArtiSystemShow(uint32_t id)
     
     [model.itemArr addObject:itemModel];
 }
+
+/******************************************************************************
+*    功  能：添加系统项
+*
+*    参  数：strItem   系统项名称
+*            bStatus   系统项的状态
+*
+*            DF_ST_SYS_NORMAL       正常状态
+*            DF_ST_SYS_EXPIR        软件过期
+*            DF_ST_SYS_DISABLE      失能状态，不可用状态
+*
+*    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+*            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+*
+*            DF_APP_CURRENT_NOT_SUPPORT_FUNCTION, 当前App有此接口，但未实现对应功能
+*
+*            其它返回值，暂无意义
+******************************************************************************/
++ (uint32_t)AddItemExWithId:(uint32_t)ID strItem:(NSString *)strItem uStatus:(uint32_t)bStatus
+{
+    HLog(@"%@ - 添加系统项 - ID:%d - strItem:%@ - uStatus:%d", [self class], ID, strItem,bStatus);
+    
+    TDD_ArtiSystemModel * model = (TDD_ArtiSystemModel *)[self getModelWithID:ID];
+    
+    ArtiSystemItemModel * itemModel = [[ArtiSystemItemModel alloc] init];
+    
+    itemModel.uIndex = (uint32_t)model.itemArr.count;
+    
+    itemModel.strItem = strItem;
+    
+    itemModel.bStatus = bStatus;
+    
+    [model.itemArr addObject:itemModel];
+    
+    return 1;
+}
+
 
 /**********************************************************
 *    功  能：添加系统项
@@ -625,6 +674,52 @@ uint32_t ArtiSystemShow(uint32_t id)
     }
   
 }
+
+/**************************************************************************************
+*    功  能：设置系统项的软件锁状态
+*
+*    参  数：uIndex    指定的系统项
+*            bStatus   系统项的状态
+*
+*            DF_ST_SYS_NORMAL       正常状态
+*            DF_ST_SYS_EXPIR        软件过期
+*            DF_ST_SYS_DISABLE      失能状态，不可用状态
+*
+*    返回值：DF_FUNCTION_APP_CURRENT_NOT_SUPPORT，当前APP版本还没有此接口
+*            DF_FUNCTION_APP_CURRENT_NOT_SUPPORT值由SO返回
+*
+*            DF_APP_CURRENT_NOT_SUPPORT_FUNCTION, 当前App有此接口，但未实现对应功能
+*
+*            其它值，暂无意义
+*
+*    说  明：
+*            如果没有调用此接口，默认的系统项状态为AddItem/AddItemEx中指定的初始状态
+****************************************************************************************/
++ (uint32_t)SetItemLockStatusWithId:(uint32_t)ID uIndex:(uint32_t)uIndex uStatus:(uint32_t)uStatus
+{
+    HLog(@"%@ - 设置系统项的软件锁状态 - ID:%d - uIndex:%d - uStatus:%d", [self class], ID, uIndex, uStatus);
+    
+    TDD_ArtiSystemModel * model = (TDD_ArtiSystemModel *)[self getModelWithID:ID];
+    
+    if (uIndex >= model.itemArr.count) {
+        HLog(@"uRowIndex 过界");
+        return DF_FUNCTION_APP_CURRENT_NOT_SUPPORT;
+    }
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"uIndex == %u", uIndex];
+    
+    NSArray *filterArray = [model.itemArr filteredArrayUsingPredicate:predicate];
+    
+    ArtiSystemItemModel * itemModel;
+    
+    if (filterArray.count) {
+        itemModel = filterArray.firstObject;
+        itemModel.bStatus = uStatus;
+    }
+    
+    return 1;
+}
+
 
 /**********************************************************
 *    功  能：设置扫描按键是否隐藏，控件默认显示

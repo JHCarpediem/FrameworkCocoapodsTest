@@ -19,13 +19,15 @@ typedef enum
 @property (nonatomic, strong) NSString * strTips;//提示文本
 @property (nonatomic, strong) NSString * strMask;//输入掩码
 @property (nonatomic, strong) NSString * strDefault;//默认值
+@property (nonatomic, strong) NSString * strInnerTips;//请输入提示文本
 @property (nonatomic, strong) NSString * strText;//输入值
 @property (nonatomic, strong) NSArray<NSString *> * vctValue;//选择值
 @property (nonatomic, assign) BOOL isDropDownBox; //是否是下拉框
 
 @property (nonatomic, strong) NSString * strTranslatedTips;//提示文本 - 翻译后的数据 - 未翻译前与原数据一致
 @property (nonatomic, assign) BOOL isStrTipsTranslated; //提示文本是否已翻译
-
+@property (nonatomic, strong) NSString * strTranslatedInnerTips;//请输入提示文本 - 翻译后的数据 - 未翻译前与原数据一致
+@property (nonatomic, assign) BOOL isStrTipsInnerTranslated; //请输入提示文本是否已翻译
 /// 校验字符
 - (NSString *)filterTextMatch:(NSString *)text;
 - (BOOL)shouldTurnToUppercase;

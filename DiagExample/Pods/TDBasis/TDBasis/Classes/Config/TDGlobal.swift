@@ -10,7 +10,7 @@ import UIKit
 @objc(TDBasisInfo)
 public class BasisInfo: NSObject {
     /// 获取 basis 版本号
-    @objc public static var currentVersion: String { "5.00.022" }
+    @objc public static var currentVersion: String { "5.00.054" }
     
     /// V4.40 新增接口 初始化需要传入 App 软件编码 用于登录隔离
     @objc public static var softCode: String = ""
@@ -243,65 +243,55 @@ public struct Sandbox {
 }
 
 //MARK: - APP info
-public struct AppInfo {
+@objc
+public class AppInfo: NSObject {
     
     /// 获取App的版本号
-    public static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
+    public static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     
     /// 获取App的build 版本号
-    public static let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as! String
+    @objc public static let buildVersion = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? ""
 
     /// app名称
-    public static let name = Bundle.main.infoDictionary?["CFBundleDisplayName"] as! String
+    @objc public static let name = Bundle.main.infoDictionary?["CFBundleDisplayName"] as? String ?? ""
     
-    public static let bundleName = Bundle.main.infoDictionary?["CFBundleName"] as! String
+    @objc public static let bundleName = Bundle.main.infoDictionary?["CFBundleName"] as? String ?? ""
+    
+    // 公共资源路径 （之前是 TD/(AppInfo.bundleName)）现固定 TD/AD200
+    @objc public static var docPathName: String { docFirstName + "/" + docLastName }
+    
+    @objc public static let docFirstName = "TD"
+    
+    @objc public static let docLastName = "AD200"
     
     /// 当前regionCode
-    public static let regionCode = Locale.current.regionCode ?? "cn"
+    @objc public static let regionCode = Locale.current.regionCode ?? "cn"
     
     /// 当前设备的设备名
-    public static let deviceName = UIDevice.deviceMode
+    @objc public static let deviceName = UIDevice.deviceMode
     
     /// 当前设备的语言
-    public static let languageCode = Locale.current.languageCode ?? "zh"
+    @objc public static let languageCode = Locale.current.languageCode ?? "zh"
     
-    public static let bundleId = Bundle.main.bundleIdentifier ?? ""
+    @objc public static let bundleId = Bundle.main.bundleIdentifier ?? ""
     
     public static var serviceDelta: TimeInterval?
     
-    public static var serviceTimestamp: TimeInterval {
-        var reslut = Date().timeIntervalSince1970
+    @objc public static var serviceTimestamp: TimeInterval {
+        var result = Date().timeIntervalSince1970
         if let serviceDelta = serviceDelta {
-            let cpuDate = Date(timeIntervalSince1970: systemUpTime)
-            let realCurDate = cpuDate.addingTimeInterval(-serviceDelta)
-            let realCurTime = realCurDate.timeIntervalSince1970
-            reslut = realCurTime
+            result = systemUpTime - serviceDelta
         }
-        return reslut
+        return result
     }
     
     /// 获取一个本地时间与本机重启时间的差值
-    static var systemUpTime: TimeInterval {
-        var bootTime = timeval()
-        var mib = [CTL_KERN, KERN_BOOTTIME]
-        var size: Int = MemoryLayout<timeval>.size
-        let result = sysctl(&mib, 2, &bootTime, &size, nil, 0)
-        
-        var now = timeval()
-        var tz = timezone()
-        
-        gettimeofday(&now, &tz)
-        
-        var uptime = -1
-        if result != -1 , bootTime.tv_sec != 0 {
-            uptime = now.tv_sec - bootTime.tv_sec
-        }
-        
-        return TimeInterval(uptime)
+    @objc public static var systemUpTime: TimeInterval {
+        ProcessInfo.processInfo.systemUptime
     }
     
     /// 服务器时间 格式化之后的 string `yyyy-MM-dd HH:mm:ss`
-    public static var serviceTime: String {
+    @objc public static var serviceTime: String {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone.init(abbreviation: "GMT")
@@ -389,7 +379,7 @@ public enum iPhoneModel : String {
     
          unrecognized       = "?unrecognized?"
     
-    var value: CGFloat {
+    public var value: CGFloat {
 
             switch self {
             case .simulator:
@@ -499,7 +489,7 @@ public extension UIDevice {
     }
     
     /// 手机型号
-    var type: iPhoneModel {
+    public var type: iPhoneModel {
         var systemInfo = utsname()
         uname(&systemInfo)
         let modelCode = withUnsafePointer(to: &systemInfo.machine) {

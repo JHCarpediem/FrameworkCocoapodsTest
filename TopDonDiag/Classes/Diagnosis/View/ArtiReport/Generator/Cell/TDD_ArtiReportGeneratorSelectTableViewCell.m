@@ -55,7 +55,7 @@
     }];
     
     self.arrow = [[UIImageView alloc] init];
-    self.arrow.image = kImageNamed(@"down_arrow");
+    self.arrow.image = kImageNamed(@"input_down_arrow");
     [bg addSubview:self.arrow];
     [self.arrow mas_makeConstraints:^(MASConstraintMaker *make) {
         make.right.equalTo(@-15);

@@ -85,6 +85,20 @@ public class TDUserModel: TDDBModel {
     
     @objc dynamic public var pointCardBalance: Int = 0
     
+    /// 是否已开启二次验证
+    @objc dynamic public var twoFactorStatus: Bool = false
+    
+    /// 我的身份
+    @objc dynamic public var userIdentity: Int = 0
+    
+    @nonobjc
+    public var identity: TDUserIdentityType {
+        .init(rawValue: userIdentity) ?? .confidentiality
+    }
+    
+    /// nastf账号
+    @objc dynamic public var vspId: String = ""
+    
     @objc dynamic public var pointCardBalanceDisplay: String {
         pointCardBalance.decimalFormatString
     }
@@ -311,4 +325,18 @@ extension UserDefaults {
             UserDefaults.topdon.synchronize()
         }
     }
+}
+
+public enum TDUserIdentityType: Int {
+    /// 未知
+    case `unknown` = 0
+    /// 车主 `DIYer`
+    case owner = 1
+    /// 技师
+    case technician = 2
+    /// 发烧友 `carGuy`
+    case enthusiast = 3
+    /// 保密
+    case confidentiality = 4
+    
 }

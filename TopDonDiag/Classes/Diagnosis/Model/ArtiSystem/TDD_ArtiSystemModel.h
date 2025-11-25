@@ -25,6 +25,7 @@ typedef enum
 @property (nonatomic, strong) NSString * strTranslatedStatus;//状态 - 翻译后的数据 - 未翻译前与原数据一致
 @property (nonatomic, assign) BOOL isStrItemTranslated; //系统项名称是否已翻译
 @property (nonatomic, assign) BOOL isStrStatusTranslated; //状态是否已翻译
+@property (nonatomic, assign) uint32_t bStatus; //系统项的状态
 @end
 
 @protocol TDD_ArtiSystemModelDelegata <NSObject>

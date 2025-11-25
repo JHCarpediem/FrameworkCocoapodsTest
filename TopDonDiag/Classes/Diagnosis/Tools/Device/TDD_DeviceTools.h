@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// 获取项目版本号
 + (NSString *)getVersion;
 
++ (NSString *)docPathName;
+
 @end
 
 NS_ASSUME_NONNULL_END

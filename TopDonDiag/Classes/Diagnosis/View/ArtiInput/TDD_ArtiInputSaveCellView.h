@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) TDD_ArtiInputSaveModel *saveModel;
 @property (nonatomic, strong) TDD_CustomLabel *titleLab;
 @property (nonatomic, assign) NSInteger index;
+@property (nonatomic, assign) BOOL isLast;
+@property (nonatomic, assign) BOOL isDropDownBox; //是否是下拉框
 @end
 
 NS_ASSUME_NONNULL_END

@@ -33,9 +33,9 @@
     
     [self.backBtn mas_makeConstraints:^(MASConstraintMaker *make) {
         self.backBtnCenterYConstraints = make.centerY.equalTo(self).offset(StatusBarHeight / 2);
-        make.left.equalTo(self).offset(15 * _scale);
-        make.width.mas_equalTo(30 * _scale);
-        make.height.mas_equalTo(30 * _scale);
+        make.left.equalTo(self).offset(12 * _scale);
+        make.width.mas_equalTo(38 * _scale);
+        make.height.mas_equalTo(38 * _scale);
     }];
     
     [self.titleLabel mas_makeConstraints:^(MASConstraintMaker *make) {

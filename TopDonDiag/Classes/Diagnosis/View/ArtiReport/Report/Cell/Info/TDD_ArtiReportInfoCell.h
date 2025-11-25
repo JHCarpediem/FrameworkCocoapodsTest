@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
               reuseIdentifier:(NSString *)reuseIdentifier
                   labelMargin:(CGFloat)labelMargin
                   lineSpacing:(CGFloat)lineSpacing
-             interItemSpacing:(CGFloat)interItemSpacing;
+             interItemSpacing:(CGFloat)interItemSpacing
+                isHistoryDiag:(BOOL)isHistoryDiag;
 
 - (void)updateUIWithModel:(TDD_ArtiReportCellModel *)model;
 

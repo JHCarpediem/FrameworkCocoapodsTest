@@ -38,5 +38,31 @@ public:
      */
     static void IsSupported(std::function<bool(const std::string&, const std::string&, uint32_t)> fnIsSupported);
 
+    /*
+     *   获取当前app应用的产品名称
+     *
+     *   static const std::string CurVehSoftCode(uint32_t uVehType);
+     *
+     *   CurVehSoftCode 函数说明见 IotRequest.h
+     */
+    static void CurVehSoftCode(std::function<std::string(uint32_t)> fnCurVehSoftCode);
+
+    /*
+     *   获取当前用户的偏好设置
+     *
+     *   static const uint32_t GetUserPreference(eAppUserPref ePreferenceType);
+     *
+     *   GetUserPreference 函数说明见 IotRequest.h
+     */
+    static void GetUserPreference(std::function<uint32_t(uint32_t)> fnGetUserPreference);
+
+    /*
+     *   获取当前进车的软件编码
+     *
+     *   static const std::string HwProductModel(uint32_t uType);
+     *
+     *   HwProductModel 函数说明见 IotRequest.h
+     */
+    static void HwProductModel(std::function<std::string(uint32_t)> fnHwProductModel);
 };
 #endif

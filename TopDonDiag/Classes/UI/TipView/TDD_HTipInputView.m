@@ -245,9 +245,11 @@
 - (void)btnClick:(UIButton *)button
 {
     int i = (int)[self.btnArr indexOfObject:button];
-    
+    [button setEnabled:false];
     if (self.completeBlock) {
         self.completeBlock(self.inputTextField.text, i);
+    }else {
+        [self removeFromSuperview];
     }
     
     if (!_delayDismiss) {

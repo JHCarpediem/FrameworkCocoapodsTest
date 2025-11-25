@@ -138,6 +138,8 @@ public class TDPopupViewPlaceHolder: NSObject, TDPopupView {
 @objc(TDPopupScheduler)
 @objcMembers
 public class TDPopupScheduler: NSObject {
+    public var elementList: [PopupElement] { self.list.list }
+    
     public static let shared: TDPopupScheduler = .init()
     
     /// 返回当前调度器是否拥有已经显示的弹窗, 如果canRegisterFirstPopupViewResponder为true，registerFirstPopupViewResponder将执行无效
@@ -234,7 +236,7 @@ public class TDPopupScheduler: NSObject {
     
     // MARK: - Static Properties & Methods
     
-    private static var schedulers = NSHashTable<TDPopupScheduler>.weakObjects()
+    static var schedulers = NSHashTable<TDPopupScheduler>.weakObjects()
     
     static func initializeRunLoopObserver() {
         DispatchQueue.once(token: "com.td.TDPopupScheduler") {
@@ -296,18 +298,18 @@ private func runLoopObserverCallback(observer: CFRunLoopObserver?, activity: CFR
 }
 
 class TDPopupQueue: NSObject {
-    private var list: [PopupElement] = []
+    public private(set) var list: [PopupElement] = []
     private(set) var firstFirstResponderElement: PopupElement?
     
     func canRegisterFirstFirstPopupViewResponder() -> Bool {
         return firstFirstResponderElement == nil
     }
     
-    func addPopupView(_ view: TDPopupView, priority: TDPopupPriority) {
+    func addPopupView(_ view: TDPopupView, priority: TDPopupPriority, isLatent: Bool = false) {
+        // 监控移除事件
         monitorRemoveEvent(with: view)
         
         var index = 0
-        // Create FIFO
         enumerateObjects { (obj, idx, stop) in
             if obj.priority > priority {
                 index += 1
@@ -318,7 +320,7 @@ class TDPopupQueue: NSObject {
             }
         }
         
-        insert(PopupElement.element(with: view, priority: priority), at: index)
+        insert(PopupElement.element(with: view, priority: priority, latent: isLatent), at: index)
         
         guard let firstResponderElement = firstFirstResponderElement else { return }
         let firstResponderPopup = firstResponderElement.data
@@ -339,21 +341,42 @@ class TDPopupQueue: NSObject {
             case .discard:
                 discardPopupElement(firstResponderElement)
             case .none:
-                break 
+                break
             }
         }
         
         if reinsert {
-            addPopupView(firstResponderPopup, priority: firstResponderPriority)
+            // 先移除队列中已有的实例
+            removeData(firstResponderPopup)
+            
+            // 重新添加潜伏状态的弹框
+            addPopupView(firstResponderPopup, priority: firstResponderPriority, isLatent: true)
+        }
+        
+        if highPriority {
+            execute()
         }
     }
     
     private func discardPopupElement(_ element: PopupElement) {
         if element.data.responds(to: #selector(TDPopupView.dismissPopupView)) {
             element.data.dismissPopupView?()
+            // 唤醒调度器检查队列
+            DispatchQueue.main.async {
+                TDPopupScheduler.shared.registerFirstPopupViewResponder()
+            }
         } else if element.data.responds(to: #selector(TDPopupView.dismissWithAnimation(_:))) {
             element.data.dismissWithAnimation? {
                 TDLogDebug("-dismissPopupViewWithAnimation: Triggered by a higher priority popover")
+                // 唤醒调度器检查队列
+                DispatchQueue.main.async {
+                    TDPopupScheduler.shared.registerFirstPopupViewResponder()
+                }
+            }
+        } else {
+            // 唤醒调度器检查队列
+            DispatchQueue.main.async {
+                TDPopupScheduler.shared.registerFirstPopupViewResponder()
             }
         }
     }
@@ -370,12 +393,40 @@ class TDPopupQueue: NSObject {
         let view = element.data
         firstFirstResponderElement = element
         
+        // 确保潜伏状态已重置
+        element.latent = false
+        
+        // 检查关联对象是否存在，如果不存在则重新设置
+        if objc_getAssociatedObject(view, &kTDPopupListPopupMonitorKey) == nil {
+            monitorRemoveEvent(with: view)
+        }
+        
         if view.responds(to: #selector(TDPopupView.showWithAnimation(_:))) {
-            view.showWithAnimation?({})
+            view.showWithAnimation? { [weak self] in
+                // 显示完成后检查关联对象
+                if objc_getAssociatedObject(view, &kTDPopupListPopupMonitorKey) == nil {
+                    self?.monitorRemoveEvent(with: view)
+                }
+                // 显示完成后检查队列
+                self?.checkQueueAfterDisplay()
+            }
         } else if view.responds(to: #selector(TDPopupView.showPopupView)) {
             view.showPopupView?()
+            // 显示完成后检查关联对象
+            if objc_getAssociatedObject(view, &kTDPopupListPopupMonitorKey) == nil {
+                monitorRemoveEvent(with: view)
+            }
+            // 显示完成后检查队列
+            checkQueueAfterDisplay()
         } else {
             assertionFailure("You must implement either -showPopupViewWithAnimation: or -showPopupView")
+        }
+    }
+
+    private func checkQueueAfterDisplay() {
+        // 检查队列中是否还有可显示的弹框
+        DispatchQueue.main.async {
+            TDPopupScheduler.shared.registerFirstPopupViewResponder()
         }
     }
     
@@ -471,7 +522,12 @@ class TDPopupQueue: NSObject {
 private var kTDPopupListPopupMonitorKey: UInt8 = 0
 extension TDPopupQueue {
     func monitorRemoveEvent(with popup: TDPopupView) {
-        // 强引用持有监控对象（避免野指针）
+        // 检查是否已经有关联对象，避免重复设置
+        if objc_getAssociatedObject(popup, &kTDPopupListPopupMonitorKey) != nil {
+            return
+        }
+        
+        // 设置新的关联对象
         objc_setAssociatedObject(
             popup,
             &kTDPopupListPopupMonitorKey,
@@ -536,11 +592,32 @@ extension TDPopupQueue {
     }
     
     private static func tryRemovePopupView(_ obj: any TDPopupView) {
-        if let list = objc_getAssociatedObject(obj, &kTDPopupListPopupMonitorKey) as? TDPopupQueue {
+        // 先获取队列实例
+        guard let queue = objc_getAssociatedObject(obj, &kTDPopupListPopupMonitorKey) as? TDPopupQueue else {
+            return
+        }
+        
+        
+        // 检查是否是潜伏状态的弹框，如果是则不移除
+        if let element = queue.list.first(where: { $0.data === obj }) {
+            
+            if element.latent {
+                // 潜伏状态的弹框不应该被移除，只需清除关联对象
+                objc_setAssociatedObject(obj, &kTDPopupListPopupMonitorKey, nil, .OBJC_ASSOCIATION_ASSIGN)
+                return
+            }
+        } else {
+            // 队列中没有找到弹框，说明已经被移除，只需清除关联对象
             objc_setAssociatedObject(obj, &kTDPopupListPopupMonitorKey, nil, .OBJC_ASSOCIATION_ASSIGN)
-            list.removePopupView(obj)
-            // Wake up main thread for hitTest
-            list.perform(#selector(NSObject.hash), with: nil, afterDelay: 0)
+            return
+        }
+        
+        objc_setAssociatedObject(obj, &kTDPopupListPopupMonitorKey, nil, .OBJC_ASSOCIATION_ASSIGN)
+        queue.removePopupView(obj)
+        
+        // 唤醒调度器检查队列
+        DispatchQueue.main.async {
+            TDPopupScheduler.shared.registerFirstPopupViewResponder()
         }
     }
 }
@@ -583,14 +660,21 @@ public class PopupElement: NSObject {
     public var priority: TDPopupPriority
     public var createStamp: Double
     public var latent: Bool = false
+    public var identifier: String // 添加标识符
     
-    init(data: TDPopupView, priority: TDPopupPriority) {
+    init(data: TDPopupView, priority: TDPopupPriority, latent: Bool = false) {
         self.data = data
         self.priority = priority
         self.createStamp = ProcessInfo.processInfo.systemUptime
+        self.identifier = UUID().uuidString // 生成唯一标识
+        self.latent = latent
     }
     
-    static func element(with data: TDPopupView, priority: TDPopupPriority) -> PopupElement {
-        return PopupElement(data: data, priority: priority)
+    static func element(with data: TDPopupView, priority: TDPopupPriority, latent: Bool = false) -> PopupElement {
+        return PopupElement(data: data, priority: priority, latent: latent)
+    }
+    
+    override public var description: String {
+        return "PopupElement(identifier: \(identifier), latent: \(latent), priority: \(priority.value))"
     }
 }

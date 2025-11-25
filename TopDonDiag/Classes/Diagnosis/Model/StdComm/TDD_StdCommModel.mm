@@ -17,6 +17,7 @@
 #import "UIDevice+TDD_Info.h"
 #import "TDD_TDartsManage.h"
 #import "TDD_StdShowModel.h"
+#import "TDD_DeviceTools.h"
 @implementation TDD_StdCommModel
 
 + (void)registSupportTProgMethod
@@ -163,7 +164,7 @@ uint32_t SendToDevice(uint8_t *pSendBuffer, uint32_t SendLength)
  */
 uint32_t ReceiveFromDevice(uint8_t *pRecvBuffer, uint32_t RecvLength)
 {
-    if (![TDD_EADSessionController sharedController].accessory || ![TDD_EADSessionController sharedController].session) {
+    if ([TDD_EADSessionController sharedController].isCloseSession || ![TDD_EADSessionController sharedController].accessory || ![TDD_EADSessionController sharedController].session) {
         BLELog(@"stdComm - 从远端蓝牙接收数据：没有连接蓝牙，返回-1");
         return -1;
     }
@@ -249,7 +250,7 @@ std::string const GetAppDataPath()
     
     NSString * documentsPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
     
-    documentsPath = [documentsPath stringByAppendingPathComponent:@"TD/AD200"];
+    documentsPath = [documentsPath stringByAppendingPathComponent:[TDD_DeviceTools docPathName]];
     
     NSFileManager * fileManager = [NSFileManager defaultManager];
     
@@ -978,18 +979,24 @@ uint32_t ReadPinNum(uint32_t PinNum) {
     return result;
 }
 
++ (int )runMaigc:(NSString *)topDonId magic:(NSString *)magic {
+    int result = CStdComm::RunMagic([TDD_CTools NSStringToCStr:topDonId], [TDD_CTools NSStringToCStr:magic]);
+    HLog(@"runMaigc - topDonId:%@ - magic:%@ - result: %d",topDonId,magic,result);
+    return result;
+}
+
 + (uint32_t )setUnLock {
 #ifdef DEBUG
     //只有 DEBUG 测试使用，不给用户解锁
     if ([TDD_DiagnosisManage sharedManage].appScenarios == AS_INTERNAL_USE) {
         uint32_t result = CStdComm::SetUnLock();
         HLog(@"SetUnLock - %d",result);
-        return false;
+        return result;
     }
-    //JH:固定返回 1
+    //非 DEBUG 不调接口 固定返回 1
     return 1;
 #else
-    //JH:固定返回 1
+    //非 DEBUG 不调接口 固定返回 1
     return 1;
 #endif
 }
@@ -997,6 +1004,7 @@ uint32_t ReadPinNum(uint32_t PinNum) {
 + (uint32_t )getVCILock {
 //    uint32_t result = CStdComm::GetVciLock();
 //    HLog(@"getVCILock，result - %d - 固定返回 1",result);
+
     //JH:固定返回 1(老设备默认返回锁定状态，需要等所有设备升级固件)
     return 1;
 }

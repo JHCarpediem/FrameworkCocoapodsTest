@@ -9,6 +9,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^VoidBlock)(void);
+
 @interface TDD_ArtiReportAttachementEditTableViewCell : UITableViewCell
 
 /// 所有图片
@@ -26,8 +28,28 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 @property (nonatomic, strong) NSMutableArray *addAssets;
 
-- (void)fillCellWithAttachementFilePath:(NSString *)filePath fileArray:(NSString *)fileArrayStr;
+- (void)fillCellWithAttachementFilePath:(NSString *)filePath fileArray:(NSString *)fileArrayStr reloadCellBlock:(VoidBlock)block;
 
+
+@end
+
+@interface TDD_ArtiReportAttachementEditImageCollectionCell : UICollectionViewCell
+
+@property (nonatomic, strong) UIImageView *attachementImageView;
+
+@property (nonatomic, strong) UIButton *deleteBtn;
+
+@property (nonatomic, copy) VoidBlock deleteBlock;
+
+- (void)fillCellWithAttachementImage:(UIImage *)image;
+
+@end
+
+@interface TDD_ArtiReportAttachementEditAddCollectionCell : UICollectionViewCell
+
+@property (nonatomic, strong) UIButton *addBtn;
+
+@property (nonatomic, copy) VoidBlock addBlock;
 
 @end
 

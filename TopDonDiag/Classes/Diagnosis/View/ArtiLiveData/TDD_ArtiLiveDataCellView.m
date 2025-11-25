@@ -179,11 +179,7 @@
     UIButton * chartButton = ({
         UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
         [btn addTarget:self action:@selector(chartButtonClick) forControlEvents:UIControlEventTouchUpInside];
-        if isKindOfTopVCI {
-            [btn setImage:kImageNamed(@"chart_full_carpal") forState:UIControlStateNormal];
-        } else {
-            [btn setImage:kImageNamed(@"chart_full") forState:UIControlStateNormal];
-        }
+        [btn setImage:kImageNamed(@"chart_full") forState:UIControlStateNormal];
         btn;
     });
     [chartView addSubview:chartButton];
@@ -220,6 +216,7 @@
         make.centerY.equalTo(self.topView);
         make.right.equalTo(self.topView.mas_right).inset(_leftSpace);
         make.size.mas_equalTo(CGSizeMake(btnW, btnW));
+        make.left.greaterThanOrEqualTo(self.valueLab.mas_right);
     }];
     
     
@@ -227,7 +224,6 @@
     
     [self.valueLab mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.view).offset(_leftSpace);
-        make.centerX.equalTo(self.view);
         make.top.equalTo(self.topView.mas_bottom).offset(_titleTopSpace );
         make.top.greaterThanOrEqualTo(self.view).offset((isIpad ? 98 : 76) * _scale );
         make.height.mas_greaterThanOrEqualTo((isIpad ? 28 : 24) * _scale);
@@ -235,7 +231,7 @@
 
     [self.value2Label mas_makeConstraints:^(MASConstraintMaker *make) {
         make.left.equalTo(self.valueLab);
-        make.centerX.equalTo(self.view);
+        make.right.equalTo(self.view).offset(-_leftSpace);
         make.top.equalTo(self.valueLab.mas_bottom).offset(6 * _scale);
         make.height.mas_greaterThanOrEqualTo((isIpad ? 28 : 24) * _scale);
 
@@ -258,7 +254,6 @@
     }];
     
     [self.speedView mas_makeConstraints:^(MASConstraintMaker *make) {
-//        make.right.left.equalTo(view).insets(UIEdgeInsetsMake(15, 15, 0, 15));
         make.top.equalTo(self.valueLab.mas_bottom).offset(20 * _scale);
         make.centerX.equalTo(self.view);
         make.size.mas_equalTo(CGSizeMake(240 * _scale, 240 * _scale));
@@ -293,16 +288,13 @@
     
     if (![self.titleLab.text isEqualToString:itemModel.strName]) {
         self.titleLab.text = itemModel.strName;
-//        self.titleLab.attributedText = [[NSAttributedString alloc] initWithString:itemModel.strName];
         
     }
     
     NSMutableAttributedString * attStr = [NSMutableAttributedString mutableAttributedStringWithLTRString:[NSString stringWithFormat:@"%@ %@", itemModel.strChangeValue, itemModel.strChangeUnit]];
     
-//    if (![self.valueLab.text isEqualToString:attStr.mutableString]) {
     attStr.yy_font = [[UIFont systemFontOfSize:18 weight:UIFontWeightSemibold] tdd_adaptHD];
         
-    //    attStr.yy_color = self.valueLab.textColor;
     attStr.yy_color = [UIColor tdd_liveDataValueNormalColor];
     UIFont * unitFont = [[UIFont systemFontOfSize:12] tdd_adaptHD];
         
@@ -357,7 +349,7 @@
         [self.valueLab mas_remakeConstraints:^(MASConstraintMaker *make) {
             make.left.equalTo(self.view).offset(_leftSpace);
             make.top.equalTo(self.topView.mas_bottom).offset(_titleTopSpace);
-            make.top.lessThanOrEqualTo(self.view).offset((IS_IPad ? 98 : 76) * _scale);
+            make.top.greaterThanOrEqualTo(self.view).offset((IS_IPad ? 98 : 76) * _scale);
             make.height.mas_greaterThanOrEqualTo((IS_IPad ? 28 : 24) * _scale);
             make.width.mas_equalTo(_labelWidth * 2);
         }];
@@ -496,10 +488,10 @@
     
     if (freezeItemModel.strHelp.length > 0) {
         self.moreButton.enabled = YES;
-        [self.moreButton setBackgroundImage:[kImageNamed(@"artiFreeze_help") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme] forState:UIControlStateNormal];
+        [self.moreButton setImage:[kImageNamed(@"artiFreeze_help") tdd_imageByTintColor:UIColor.tdd_colorDiagTheme] forState:UIControlStateNormal];
     }else {
         self.moreButton.enabled = NO;
-        [self.moreButton setBackgroundImage:UIImage.tdd_imageDiagHelpUnableIcon forState:UIControlStateNormal];
+        [self.moreButton setImage:UIImage.tdd_imageDiagHelpUnableIcon forState:UIControlStateNormal];
     }
 
 }
@@ -534,7 +526,6 @@
 - (void)layoutSubviews{
     
     [super layoutSubviews];
-//    self.view.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleTopToBottom withFrame:self.view.frame.size];
     self.view.backgroundColor = [UIColor tdd_liveDataCellBackground];
     //[self addLayer];
 }

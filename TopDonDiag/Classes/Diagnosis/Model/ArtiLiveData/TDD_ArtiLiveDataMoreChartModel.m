@@ -59,7 +59,7 @@
 - (NSMutableArray *)selectItmes
 {
     if (!_selectItmes) {
-        _selectItmes = [[NSMutableArray alloc] initWithArray:self.liveDataModel.selectItmes];
+        _selectItmes = [[NSMutableArray alloc] initWithArray:self.liveDataModel.itemArr];
     }
 
     return _selectItmes;

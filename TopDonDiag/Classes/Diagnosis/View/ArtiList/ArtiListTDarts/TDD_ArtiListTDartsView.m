@@ -17,7 +17,7 @@
 @implementation TDD_ArtiListTDartsView
 -(instancetype)initWithFrame:(CGRect)frame{
     if (self = [super initWithFrame:frame]) {
-        self.backgroundColor = UIColor.tdd_colorF5F5F5;
+        self.backgroundColor = UIColor.tdd_viewControllerBackground;
         self.bgView = [UIView new];
         _bgView.layer.cornerRadius = 20;
         [self addSubview:_bgView];
@@ -60,7 +60,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    _bgView.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleTopToBottom withFrame:_tableView.tdd_size];
+    _bgView.backgroundColor = [UIColor tdd_background];
     _bgView.layer.shadowColor = [UIColor colorWithRed:0/255.0 green:0/255.0 blue:0/255.0 alpha:0.0500].CGColor;
     _bgView.layer.shadowOffset = CGSizeMake(0,2);
     _bgView.layer.shadowOpacity = 0.8;

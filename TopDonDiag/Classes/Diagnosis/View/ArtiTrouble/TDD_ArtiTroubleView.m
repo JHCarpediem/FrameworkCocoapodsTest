@@ -46,6 +46,12 @@
     //[self.tableView reloadData];
 }
 
+- (void)setPopupModel:(TDD_ArtiPopupModel *)popupModel {
+    _popupModel = popupModel;
+    [self.collectionView reloadData];
+    
+}
+
 - (void)creatTableView{
     TDD_ButtonTableView *tableView = [[TDD_ButtonTableView alloc] initWithFrame:self.bounds style:UITableViewStylePlain];
     tableView.backgroundColor = [UIColor clearColor];
@@ -104,8 +110,10 @@
 
 #pragma mark - UICollectionView delegate
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    
-    return self.troubleModel.itemArr.count;
+    if (self.troubleModel) {
+        return self.troubleModel.itemArr.count;
+    }
+    return self.popupModel.items.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -161,16 +169,28 @@
     }
  
     NSInteger index = indexPath.item;
-    
-    if (index >= self.troubleModel.itemArr.count) {
-        return;
+    if (self.troubleModel) {
+        if (index >= self.troubleModel.itemArr.count) {
+            return;
+        }
+        
+        TDD_ArtiTroubleItemModel * itemModel = self.troubleModel.itemArr[index];
+        
+        cellView.isShowTranslated = self.troubleModel.isShowTranslated;
+        
+        cellView.itemModel = itemModel;
+    }else {
+        if (index >= self.popupModel.items.count) {
+            return;
+        }
+        
+        TDD_ArtiPopupItemModel * itemModel = self.popupModel.items[index];
+        
+        cellView.isShowTranslated = self.popupModel.isShowTranslated;
+        
+        cellView.popupItemModel = itemModel;
     }
-    
-    TDD_ArtiTroubleItemModel * itemModel = self.troubleModel.itemArr[index];
-    
-    cellView.isShowTranslated = self.troubleModel.isShowTranslated;
-    
-    cellView.itemModel = itemModel;
+
     
     //AI 引导
     if ((([TDD_DiagnosisTools customizedType] == TDD_Customized_Germany) || ([TDD_DiagnosisManage sharedManage].functionConfigMask & 1) || ([TDD_DiagnosisTools softWareIsCarPalSeries])) && indexPath.row == 0) {

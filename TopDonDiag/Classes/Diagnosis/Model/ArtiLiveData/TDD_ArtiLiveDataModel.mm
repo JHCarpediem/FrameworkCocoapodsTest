@@ -377,21 +377,24 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     itemModel.strReference = strReference;
     
     [model.itemArr addObject:itemModel];
-    
+    if (model.startTime == 0) {
+        model.chartTime = 0;
+    }else {
+        NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
+        model.chartTime = time - model.startTime;
+    }
     if (model.isRecording) {
-        TDD_ArtiLiveDataItemModel * newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-        newItemModel.isTempe = YES;
-        newItemModel.startTime = model.startTime;
-        newItemModel.index = MAX(0, (uint32_t)model.itemArr.count - 1);
-        newItemModel.strName = strName;
-        newItemModel.strUnit = strUnit;
-        newItemModel.strValue = strValue;
-        newItemModel.strMin = strMin;
-        newItemModel.strMax = strMax;
-        newItemModel.strReference = strReference;
-
-        NSString *indexStr = [NSString stringWithFormat:@"%u",newItemModel.index];
-        [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel *changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+        changeModel.startTime = model.startTime;
+        changeModel.itemIndex = MAX(0, (uint32_t)model.itemArr.count - 1);
+        changeModel.strName = strName;
+        changeModel.strUnit = strUnit;
+        changeModel.strValue = strValue;
+        changeModel.strMin = strMin;
+        changeModel.strMax = strMax;
+        changeModel.chartTime = model.chartTime;
+        NSString *indexStr = [NSString stringWithFormat:@"%u",changeModel.itemIndex];
+        [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
     }
 
 }
@@ -496,16 +499,15 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     
     if (model.isRecording) {
         NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strName = strName;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel * changeModel = model.recordChangeItemDict[indexStr];
+        if (!changeModel) {
+            changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+            changeModel.itemIndex = uIndex;
+            changeModel.startTime = model.startTime;
+            changeModel.strName = strName;
+            [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
         }else {
-            newItemModel.strName = strName;
+            changeModel.strName = strName;
         }
     }
 }
@@ -529,19 +531,25 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     //去掉前后空格
     strValue = [NSString tdd_removeWhiteSpaceFromPreOrSuff:strValue];
     itemModel.strValue = strValue;
-    
+    if (model.startTime == 0) {
+        model.chartTime = 0;
+    }else {
+        NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
+        model.chartTime = time - model.startTime;
+    }
     if (model.isRecording) {
         NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strValue = strValue;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel * changeModel = model.recordChangeItemDict[indexStr];
+        if (!changeModel) {
+            changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+            changeModel.itemIndex = uIndex;
+            changeModel.startTime = model.startTime;
+            changeModel.strValue = strValue;
+            changeModel.chartTime = model.chartTime;
+            [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
         }else {
-            newItemModel.strValue = strValue;
+            changeModel.strValue = strValue;
+            changeModel.chartTime = model.chartTime;
         }
     }
 }
@@ -566,19 +574,25 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     TDD_ArtiLiveDataItemModel * itemModel = model.itemArr[uIndex];
     
     itemModel.strUnit = strUnit;
-    
+    if (model.startTime == 0) {
+        model.chartTime = 0;
+    }else {
+        NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
+        model.chartTime = time - model.startTime;
+    }
     if (model.isRecording) {
         NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strUnit = strUnit;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel * changeModel = model.recordChangeItemDict[indexStr];
+        if (!changeModel) {
+            changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+            changeModel.itemIndex = uIndex;
+            changeModel.startTime = model.startTime;
+            changeModel.strUnit = strUnit;
+            changeModel.chartTime = model.chartTime;
+            [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
         }else {
-            newItemModel.strUnit = strUnit;
+            changeModel.strUnit = strUnit;
+            changeModel.chartTime = model.chartTime;
         }
     }
 }
@@ -609,18 +623,17 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     
     if (model.isRecording) {
         NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strMin = strMin;
-            newItemModel.strMax = strMax;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel * changeModel = model.recordChangeItemDict[indexStr];
+        if (!changeModel) {
+            changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+            changeModel.itemIndex = uIndex;
+            changeModel.startTime = model.startTime;
+            changeModel.strMin = strMin;
+            changeModel.strMax = strMax;
+            [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
         }else {
-            newItemModel.strMin = strMin;
-            newItemModel.strMax = strMax;
+            changeModel.strMin = strMin;
+            changeModel.strMax = strMax;
         }
     }
 }
@@ -645,21 +658,7 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     TDD_ArtiLiveDataItemModel * itemModel = model.itemArr[uIndex];
     
     itemModel.strReference = strReference;
-    
-    if (model.isRecording) {
-        NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strReference = strReference;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
-        }else {
-            newItemModel.strReference = strReference;
-        }
-    }
+
 }
 
 /**********************************************************
@@ -683,20 +682,6 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     
     itemModel.strHelpText = strHelpText;
     
-    if (model.isRecording) {
-        NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.index = uIndex;
-            newItemModel.startTime = model.startTime;
-            newItemModel.isTempe = YES;
-            newItemModel.strHelpText = strHelpText;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
-        }else {
-            newItemModel.strHelpText = strHelpText;
-        }
-    }
 }
 
 /**********************************************************
@@ -752,19 +737,26 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     //去掉前后空格
     strValue = [NSString tdd_removeWhiteSpaceFromPreOrSuff:strValue];
     itemModel.strValue = strValue;
-    
+    if (model.startTime == 0) {
+        model.chartTime = 0;
+    }else {
+        NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
+        model.chartTime = time - model.startTime;
+    }
+
     if (model.isRecording) {
         NSString *indexStr = [NSString stringWithFormat:@"%u",uIndex];
-        TDD_ArtiLiveDataItemModel * newItemModel = model.recordChangeItemDict[indexStr];
-        if (!newItemModel) {
-            newItemModel = [[TDD_ArtiLiveDataItemModel alloc] init];
-            newItemModel.startTime = model.startTime;
-            newItemModel.index = uIndex;
-            newItemModel.isTempe = YES;
-            newItemModel.strValue = strValue;
-            [model.recordChangeItemDict setValue:newItemModel forKey:indexStr];
+        TDD_ArtiLiveDataRecordeChangeModel * changeModel = model.recordChangeItemDict[indexStr];
+        if (!changeModel) {
+            changeModel = [[TDD_ArtiLiveDataRecordeChangeModel alloc] init];
+            changeModel.startTime = model.startTime;
+            changeModel.itemIndex = uIndex;
+            changeModel.strValue = strValue;
+            changeModel.chartTime = model.chartTime;
+            [model.recordChangeItemDict setValue:changeModel forKey:indexStr];
         }else {
-            newItemModel.strValue = strValue;
+            changeModel.strValue = strValue;
+            changeModel.chartTime = model.chartTime;
         }
     }
 }
@@ -1286,39 +1278,23 @@ uint32_t ArtiLiveDataShow(uint32_t id)
 - (void)setStrValue:(NSString *)strValue
 {
     _strValue = strValue;
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strValue forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strValue))]];
-    
-        if (self.startTime == 0) {
-            [self.recordChangeDict setValue:@(0) forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(chartTime))]];
-        }else {
-            NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
-            [self.recordChangeDict setValue:@(time - self.startTime) forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(chartTime))]];
-        }
-    }else {
-        [self changeUnitAndValue];
-    }
-    
-    
+//    if (_isPlay) {
+//        self.strChangeValue = strValue;
+//        return;
+//    }
+    [self changeUnitAndValue];
+
 }
 
 - (void)setStrUnit:(NSString *)strUnit
 {
     _strUnit = strUnit;
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strUnit forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strUnit))]];
-        if (self.startTime == 0) {
-            [self.recordChangeDict setValue:@(0) forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(chartTime))]];
-        }else {
-            NSTimeInterval time = [NSDate tdd_getTimestampSince1970];
-            [self.recordChangeDict setValue:@(time - self.startTime) forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(chartTime))]];
-        }
-    }else {
-        [self changeUnitAndValue];
-        
-        [self changeMaxAndMin];
-    }
-
+//    if (_isPlay) {
+//        self.strChangeUnit = strUnit;
+//        return;
+//    }
+    [self changeUnitAndValue];
+    [self changeMaxAndMin];
 
 }
 
@@ -1337,12 +1313,9 @@ uint32_t ArtiLiveDataShow(uint32_t id)
     if (self.setStrMin.length == 0) {
         self.setStrMin = strMin;
     }
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strMin forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strMin))]];
-    }else {
-        [self changeMaxAndMin];
-    }
-    
+
+    [self changeMaxAndMin];
+
 }
 
 - (void)setStrMax:(NSString *)strMax
@@ -1353,36 +1326,22 @@ uint32_t ArtiLiveDataShow(uint32_t id)
         self.setStrMax = strMax;
     }
 
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strMax forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strMax))]];
-    }else {
-        [self changeMaxAndMin];
-    }
+    [self changeMaxAndMin];
 }
 
 - (void)setStrName:(NSString *)strName
 {
     _strName = strName;
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strName forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strName))]];
-    }
 }
 
 - (void)setStrReference:(NSString *)strReference
 {
     _strReference = strReference;
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strReference forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strReference))]];
-    }
-    
 }
 
 - (void)setStrHelpText:(NSString *)strHelpText
 {
     _strHelpText = strHelpText;
-    if (_isTempe) {
-        [self.recordChangeDict setValue:strHelpText forKey:[NSString stringWithFormat:@"%@", NSStringFromSelector(@selector(strHelpText))]];
-    }
     
 }
 
@@ -1444,7 +1403,6 @@ uint32_t ArtiLiveDataShow(uint32_t id)
 - (void)setStrChangeValue:(NSString *)strChangeValue
 {
     _strChangeValue = strChangeValue;
-    
     if (strChangeValue.length > 0 && [NSString tdd_isNum:strChangeValue]) {
         
         NSTimeInterval time = [NSDate tdd_getTimestampSince1970];

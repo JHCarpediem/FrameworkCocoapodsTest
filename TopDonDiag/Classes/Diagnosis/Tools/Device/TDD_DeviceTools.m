@@ -8,6 +8,7 @@
 #import "TDD_DeviceTools.h"
 #import <sys/utsname.h>
 #import "TDD_DiagnosisManage.h"
+@import TDBasis;
 
 @implementation TDD_DeviceTools
 
@@ -100,6 +101,10 @@
 + (NSString *)getVersion
 {
     return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+}
+
++ (NSString *)docPathName {
+    return AppInfo.docPathName;
 }
 
 @end

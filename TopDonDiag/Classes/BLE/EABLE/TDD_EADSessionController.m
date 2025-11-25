@@ -56,7 +56,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
     
     while ([_writeData length] > 0 && self.isWriteData)
     {
-        if (!_session || !_writeData) {
+        if (self.isCloseSession || !_session || !_writeData) {
             break;
         }
         if ([[_session outputStream] hasSpaceAvailable]) {
@@ -71,7 +71,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
             {
 //                BLELog(@"当前数据2：%d", (int)[_writeData length]);
                 if ([_writeData length] >= newBytesWritten) {
-                    [_writeData replaceBytesInRange:NSMakeRange(0, newBytesWritten) withBytes:NULL length:0];
+                    [_writeData replaceBytesInRange:NSMakeRange(0, MIN(newBytesWritten, _writeData.length)) withBytes:NULL length:0];
                 }
                 BLELog(@"数据写入成功：%ld", (long)newBytesWritten);
                 bytesWritten += newBytesWritten;
@@ -80,7 +80,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
 //            sleep(0.1);
 //            BLELog(@"hasSpaceAvailable false");
         }
-        if (!_session || !_writeData) {
+        if (self.isCloseSession || !_session || !_writeData) {
             break;
         }
     }
@@ -103,8 +103,8 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
 - (void)_readData {
 #define EAD_INPUT_BUFFER_SIZE 128
     uint8_t buf[EAD_INPUT_BUFFER_SIZE];
-    if (!_session) {
-        BLELog(@"session 为空")
+    if (self.isCloseSession || !_session) {
+        BLELog(@"已关闭 session 或者 session 为空")
         return;
     }
     while ([[_session inputStream] hasBytesAvailable])
@@ -413,7 +413,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
         }
     }
     
-    if (_session) {
+    if (!self.isCloseSession && _session) {
         BLELog(@"蓝牙正在通讯中");
         return YES;
     }
@@ -425,60 +425,38 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
     
     _isOpeningSession = YES;
     
-//    BOOL isMainThread = [[NSThread currentThread] isMainThread];
-//
-//    // 创建信号量
-//    dispatch_semaphore_t semaphore;
-//
-//    if (!isMainThread) {
-//        semaphore = dispatch_semaphore_create(0);
-//    }
-//
-//    dispatch_async(dispatch_get_main_queue(), ^{
+    if (!self.accessory) {
+        [self marryBLE];
+    }
+    
+    if (self.accessory) {
         
-        if (!self.accessory) {
-            [self marryBLE];
-        }
-        
-        if (self.accessory) {
-//            [self.accessory setDelegate:self];
+        if (self.isCloseSession || !self.session) {
+            BLELog("创建session1 %p", self.session);
+            self.session = [[EASession alloc] initWithAccessory:self.accessory forProtocol:self.protocolString];
+            BLELog("创建session2 %p", self.session);
             
-            if (!self.session) {
-                BLELog("创建session1 %p", self.session);
-                self.session = [[EASession alloc] initWithAccessory:self.accessory forProtocol:self.protocolString];
-                BLELog("创建session2 %p", self.session);
-                
-                if (self.session)
-                {
-                    [[self.session inputStream] setDelegate:self];
-                    [[self.session inputStream] scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-                    [[self.session inputStream] open];
+            if (self.session)
+            {
+                self.isCloseSession = false;
+                [[self.session inputStream] setDelegate:self];
+                [[self.session inputStream] scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+                [[self.session inputStream] open];
 
-                    [[self.session outputStream] setDelegate:self];
-                    [[self.session outputStream] scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-                    [[self.session outputStream] open];
-                    self.canEventBLEError = YES;
-                    BLELog(@"创建通讯成功");
-                }
-                else
-                {
-                    BLELog(@"创建通讯失败");
-                    
-                    [self setupControllerForAccessory:nil withProtocolString:nil];
-                }
+                [[self.session outputStream] setDelegate:self];
+                [[self.session outputStream] scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+                [[self.session outputStream] open];
+                self.canEventBLEError = YES;
+                BLELog(@"创建通讯成功");
+            }
+            else
+            {
+                BLELog(@"创建通讯失败");
+                self.isCloseSession = true;
+                [self setupControllerForAccessory:nil withProtocolString:nil];
             }
         }
-        
-//        if (!isMainThread) {
-//            //信号量+1
-//            dispatch_semaphore_signal(semaphore);
-//        }
-//    });
-//
-//    if (!isMainThread) {
-//        //信号量等等
-//        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-//    }
+    }
     
     _isOpeningSession = NO;
 
@@ -490,7 +468,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
 {
     BLELog(@"关闭蓝牙通讯");
     
-    if (!_session || !_session.accessory) {
+    if (self.isCloseSession || !_session || !_session.accessory) {
         if (_session.accessory){
             [[FIRCrashlytics crashlytics] setCustomValue:_session.accessory forKey:@"EADSessionAccessory"];
             BLELog(@"_session.accessory - %@",_session.accessory);
@@ -517,31 +495,24 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
             [[self.session outputStream] setDelegate:nil];
         }
 
-
-        self.session = nil;
-        [self.writeData setData:NSData.new];
-        [self.readData setData:NSData.new];
-        //self.writeData = nil;
-//        self.readData = nil;
+        self.isCloseSession = true;
+        //self.session = nil;
+        [self.writeData setData:NSMutableData.new];
+        [self.readData setData:NSMutableData.new];
         
     } @catch (NSException *exception) {
         [[FIRCrashlytics crashlytics] setCustomValue:_session.accessory forKey:@"EADSessionAccessory"];
         BLELog(@"关闭蓝牙崩溃 - %@", exception.description);
     } @finally {
-        
         BLELog(@"关闭蓝牙通讯成功");
     }
-//    dispatch_async(dispatch_get_main_queue(), ^{
-       
-//        _accessory = nil;
-//    });
 }
 
 - (void)closeSessionWithCloseStream
 {
     
     BLELog(@"关闭蓝牙通讯 -- 流关闭");
-    if (!_session) {
+    if (self.isCloseSession || !_session) {
         BLELog(@"session 不存在")
         return;
     }
@@ -552,11 +523,10 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
         [self.session.outputStream setDelegate:nil];
     }
     
-    self.session = nil;
-    [self.writeData setData:NSData.new];
-    [self.readData setData:NSData.new];
-    //self.writeData = nil;
-//    self.readData = nil;
+    self.isCloseSession = true;
+    //self.session = nil;
+    [self.writeData setData:NSMutableData.new];
+    [self.readData setData:NSMutableData.new];
     BLELog(@"关闭蓝牙通讯成功");
 }
 
@@ -571,7 +541,6 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
         }
     }
     [self.writeData setData:NSData.new];
-    //self.writeData = nil;
     
     [self.writeData appendData:data];
     
@@ -600,9 +569,10 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
         if (bytesToRead > [_readData length]) {
             bytesToRead = [_readData length];
         }
+        bytesToRead = MAX(0, bytesToRead);
         NSRange range = NSMakeRange(0, bytesToRead);
         data = [_readData subdataWithRange:range];
-        [_readData replaceBytesInRange:range withBytes:NULL length:0];
+        [_readData replaceBytesInRange:NSMakeRange(0, MIN(bytesToRead, _readData.length)) withBytes:NULL length:0];
     }
     return data;
 }
@@ -713,7 +683,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
         }
         
         if (self.VCIVersion.length == 0) {
-            self.VCIVersion = self.vciInitModel.fwVersion;
+            self.VCIVersion = [TDD_StdCommModel FwVersion];
             
             if (self.VCIVersion.length != 0) {
                 [[NSUserDefaults standardUserDefaults] setValue:self.VCIVersion forKey:@"HLastVersion"];

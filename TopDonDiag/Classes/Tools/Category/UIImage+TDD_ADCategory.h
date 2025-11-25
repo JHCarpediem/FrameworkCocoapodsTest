@@ -50,15 +50,11 @@ typedef enum {
 
 + (UIImage *)tdd_imageDiagReportPageHeader;
 //选择框
-+ (UIImage *)tdd_imageCheckDidSelect;
++ (UIImage *)tdd_imageCheckboxSquareSelected;
 
-+ (UIImage *)tdd_imageSingleCheckUnSelect;
++ (UIImage *)tdd_imageCheckboxRoundNormal;
 
-+ (UIImage *)tdd_imageSingleCheckDidSelect;
-
-+ (UIImage *)tdd_imageAlertCheckboxNormal;
-
-+ (UIImage *)tdd_imageAlertCheckboxSelect;
++ (UIImage *)tdd_imageCheckboxRoundSelect;
 
 + (UIImage *)tdd_imageLiveDataSetNumLegend;
 
@@ -82,8 +78,6 @@ typedef enum {
 
 + (UIImage *)tdd_imageDiagKeyboardHightlightBG;
 
-+ (UIImage *)tdd_imageDiagNumKeyboardHightlightBG;
-
 + (UIImage *)tdd_imageDiagKeyboardDelete;
 
 + (UIImage *)tdd_imageDiagUpArrow;
@@ -96,17 +90,22 @@ typedef enum {
 
 + (UIImage *)tdd_imageDiagHelpUnableIcon;
 
++ (UIImage *)tdd_imageDiagAuthAreaArrow;
+
++ (UIImage *)tdd_imageDiagAuthAreaArrowDisable;
+
 + (UIImage *)tdd_imageDiagFileDictIcon;
 
-+ (UIImage *)tdd_imageDiagCellSelect;
++ (UIImage *)tdd_imageCheckboxSquareNormal;
 
-+ (UIImage *)tdd_imageDiagCellSelectNO;
++ (UIImage *)tdd_imageCheckboxSquareUnselectDisabled;
 
 + (UIImage *)tdd_imageDiagAIIcon;
 
 + (UIImage *)tdd_imageDiagAIDisableIcon;
 
 + (UIImage *)tdd_imageDiagGuildAIIcon;
++ (UIImage *)tdd_imageDiagGuildAIArrow;
 
 + (UIImage *)tdd_imageDiagBtnLockIcon;
 
@@ -126,6 +125,7 @@ typedef enum {
 + (UIImage *)tdd_imageSFDSharePopBG;
 + (UIImage *)tdd_imageSFDQrIcon;
 + (UIImage *)tdd_imageSFDEmailIcon;
+
 /// 右上角 app logo
 + (nullable UIImage *)tdd_imageDiagReportHeaderLogo;
 

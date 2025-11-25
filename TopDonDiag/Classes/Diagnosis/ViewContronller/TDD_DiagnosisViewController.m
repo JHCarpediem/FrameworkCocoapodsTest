@@ -58,6 +58,7 @@
 #import "TDD_ArtiLiveDataSetModel.h"
 #import "TDD_ArtiLiveDataMoreChartModel.h"
 #import "TDD_ArtiLiveDataMoreChartView.h"
+#import "TDD_ArtiLiveDataHDMoreChartView.h"
 #import "TDD_ArtiFreqWaveModel.h"
 #import "TDD_ArtiFreqWaveView.h"
 #import "TDD_ArtiCoilReaderModel.h"
@@ -116,6 +117,8 @@
 
 #import "UIInterface+HXRotation.h"
 #import "TDD_ArtiButtonCollectionView.h"
+
+#import <TopdonDiagnosis/TopdonDiagnosis-Swift.h>
 
 @import TDUIProvider;
 @interface TDD_DiagnosisViewController ()<TDD_HTipBtnViewDelegate, TDD_ArtiButtonCollectionViewDelegate, TDD_LandscapeLiveButtonViewDelegate, ArtiContentViewDelegate, TDD_ArtiTroubleModelDelegata, TDD_ArtiReportGeneratorModelDelegata,TDD_ArtiGlobalModelDelegata, TDD_NaviMoreBtnViewDelegate,TDD_ArtiPopupModelDelegata,TDD_NaviViewDelegate,TDD_ArtiSystemModelDelegata,TDD_FCALoginModelDelegata>
@@ -184,7 +187,11 @@
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations {
-    return UIInterfaceOrientationMaskLandscape;
+    if (_isLiveDataChartLandscape) {
+        return (UIInterfaceOrientationMaskLandscape | UIInterfaceOrientationMaskPortrait) ;
+    } else {
+        return UIInterfaceOrientationMaskPortrait;
+    }
 }
 
 - (void)viewWillLayoutSubviews {
@@ -342,6 +349,12 @@
         make.centerY.equalTo(self.naviView.backBtn);
         make.height.mas_equalTo(44);
     }];
+    [self.naviView.searchField mas_remakeConstraints:^(MASConstraintMaker *make) {
+        make.centerY.equalTo(self.naviView.backBtn);
+        make.right.equalTo(_rightButtonView.mas_left).offset(-2 * _scale);
+        make.left.equalTo(self.naviView.backBtn.mas_right);
+        make.height.mas_equalTo(32);
+    }];
 }
 
 - (void)gotoTDartsDeviceConnect {
@@ -465,7 +478,7 @@
 }
 
 - (void)setupTopViewConstraintsLandscape: (BOOL)isLandscape {
-    _topTipLabH = [NSString tdd_getHeightWithText:TDDLocalized.tips_vci_unconnect width:IS_IPad ? (IphoneWidth - 112) : (IphoneWidth - 66) fontSize:[[UIFont systemFontOfSize:IS_IPad ? 18 : 14 weight:UIFontWeightMedium] tdd_adaptHD]];
+    _topTipLabH = [NSString tdd_getHeightWithText:_topView.clickEnable ? TDDLocalized.tips_vci_unconnect : TDDLocalized.expiration_reminder width:IS_IPad ? (IphoneWidth - 112) : (IphoneWidth - 66) fontSize:[[UIFont systemFontOfSize:IS_IPad ? 18 : 14 weight:UIFontWeightMedium] tdd_adaptHD]];
     
     CGFloat height = NavigationHeight;
     if (isLandscape && _isWillShow) { height = 44.0; }
@@ -482,7 +495,7 @@
     TDD_ArtiModelBase * model = self.buttonView.model;
     if (isLandscape && _isWillShow) {
         CGFloat height = IS_IPad ? 55.0 : 55.0;
-        CGFloat width = 244.0;
+        CGFloat width = [DiagBridge liveLandscapeLeftCombineWidth];
         
         _bottomView.backgroundColor = UIColor.clearColor;
         _bottomView.layer.shadowColor = nil;
@@ -557,7 +570,7 @@
         if (self.carModel.softType == TDD_SoftType_TDarts) {
             [_contentView mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.left.right.equalTo(self.view);
-                make.top.equalTo(self.naviView.mas_bottom);
+                make.top.equalTo(relativeView.mas_bottom);
                 make.bottom.equalTo(self.view).offset(-kSafeBottomHeight);
             }];
         }else {
@@ -571,7 +584,7 @@
         if (self.carModel.softType == TDD_SoftType_TDarts) {
             [_contentView mas_remakeConstraints:^(MASConstraintMaker *make) {
                 make.left.right.equalTo(self.view);
-                make.top.equalTo(self.naviView.mas_bottom);
+                make.top.equalTo(relativeView.mas_bottom);
                 if (bottomHidden) {
                     make.bottom.equalTo(self.view).offset(-kSafeBottomHeight);
                 } else {
@@ -711,6 +724,9 @@
         
         TDD_ArtiLiveDataSelectModel *liveDataSelectModel = (TDD_ArtiLiveDataSelectModel *)self.model;
         [liveDataSelectModel updateShowLiveData];
+    } else if ([self.model isKindOfClass:[TDD_ArtiLiveDataChartSelectModel class]]) {
+        TDD_ArtiLiveDataChartSelectModel *liveChartSelectModel = (TDD_ArtiLiveDataChartSelectModel *)self.model;
+        [liveChartSelectModel updateShowLiveData];
     }
     [[NSNotificationCenter defaultCenter] postNotificationName:KTDDNotificationArtiShow object:self.model userInfo:nil];
 }
@@ -738,9 +754,15 @@
     
     TDD_ArtiModelBase * model = info.object;
         
-    // LECASON: TEST
-//    model = [[TDD_ArtiReportModel alloc] init];
-    
+    if (([model isKindOfClass:[TDD_ArtiTroubleModel class]] || [model isKindOfClass:[TDD_ArtiPopupModel class]]) && [TDD_DiagnosisTools isLimitedTrialFuction] && [TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+        [_topView setTitleWithContent:TDDLocalized.expiration_reminder];
+        _topView.hidden = false;
+        _topView.clickEnable = false;
+    }else {
+        [_topView setTitleWithContent:TDDLocalized.tips_vci_unconnect];
+        _topView.hidden = (TDD_EADSessionController.sharedController.VciStatus  || [self.carModel.strVehicle isEqualToString:@"DEMO"]);
+        _topView.clickEnable = true;
+    }
     if (self.model != model) {
         //避免相同页面刷新时关闭提示
         [TDD_HTipManage deallocView];
@@ -769,12 +791,8 @@
         HLog(@"移除旧UI");
         if ([TDD_DiagnosisTools softWareIsCarPalSeries] && [model isKindOfClass:[TDD_ArtiSystemModel class]]) {
             //Carpal 系统扫描曝光率埋点
-            NSMutableDictionary *dic = [NSMutableDictionary dictionary];
+            NSMutableDictionary *dic = [TDD_DiagnosisTools commStatisticsEventDict];
             [dic setObject:[TDD_DiagnosisTools selectedVCISerialNum] forKey:@"SN"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carBrand?:@"" forKey:@"Make"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carModel?:@"" forKey:@"Model"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].carYear?:@"" forKey:@"Year"];
-            [dic setObject:[TDD_ArtiGlobalModel sharedArtiGlobalModel].CarVIN?:@"" forKey:@"VIN"];
             [TDD_Statistics event:Event_Cus_SystemList attributes:dic];
         }
         if (self.contentView.subviews.count > 0) {
@@ -787,22 +805,23 @@
         view = nil;
     }
 
-
     [self showBackButton];
-    
     self.model = model;
-    
     
     // portrait or landscape
     if ([model isKindOfClass:[TDD_ArtiLiveDataMoreChartModel class]]) {
+        HLog(@"🟡 [artiShow] 检测到 MoreChart 模型，设置横屏:", @(_isLiveDataChartLandscape));
         if (_isLiveDataChartLandscape == NO) {
             _isLiveDataChartLandscape = YES;
             [self notifyLandscape:YES];
+            HLog(@"🟡 [artiShow] 横屏设置完成");
         }
     } else {
+        HLog(@"🟡 [artiShow] 检测到非 MoreChart 模型，设置竖屏: ", @(_isLiveDataChartLandscape));
         if (_isLiveDataChartLandscape == YES) {
             _isLiveDataChartLandscape = NO;
             [self notifyLandscape:NO];
+            HLog(@"🟡 [artiShow] 竖屏设置完成");
         }
     }
     
@@ -946,17 +965,36 @@
             [(TDD_ArtiTroubleView *)view setTroubleModel:(TDD_ArtiTroubleModel *)model];
         }
     } else if ([model isKindOfClass:[TDD_ArtiPopupModel class]]) {
-        view = [self getUIWithClass:[TDD_ArtiPopupView class]];
-        
-        [self.contentView addSubview:view];
-        
-        [view mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.edges.equalTo(self.contentView);
-        }];
-        
-        [self.view layoutIfNeeded];
-        [(TDD_ArtiPopupModel *)model setDelegate:self];
-        [(TDD_ArtiPopupView *)view setPopupModel:(TDD_ArtiPopupModel *)model];
+        //TopScan 的 popUp 与 troubleModel 样式一致
+        if ([TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+
+            view = [self getUIWithClass:[TDD_ArtiTroubleView class]];
+            
+            [self.contentView addSubview:view];
+            
+            [view mas_remakeConstraints:^(MASConstraintMaker *make) {
+                make.edges.equalTo(self.contentView);
+            }];
+            
+            [self.view layoutIfNeeded];
+            
+            [(TDD_ArtiPopupModel *)model setDelegate:self];
+            
+            [(TDD_ArtiTroubleView *)view setPopupModel:(TDD_ArtiPopupModel *)model];
+        }else {
+            view = [self getUIWithClass:[TDD_ArtiPopupView class]];
+            
+            [self.contentView addSubview:view];
+            
+            [view mas_remakeConstraints:^(MASConstraintMaker *make) {
+                make.edges.equalTo(self.contentView);
+            }];
+            
+            [self.view layoutIfNeeded];
+            [(TDD_ArtiPopupModel *)model setDelegate:self];
+            [(TDD_ArtiPopupView *)view setPopupModel:(TDD_ArtiPopupModel *)model];
+        }
+
     } else if ([model isKindOfClass:[TDD_ArtiInputModel class]]) {
         view = [self getUIWithClass:[TDD_ArtiInputView class]];
         
@@ -1056,7 +1094,6 @@
         isNeedMake = YES;
     }else if ([model isKindOfClass:[TDD_ArtiLiveDataSetModel class]]) {
         view = [self getUIWithClass:[TDD_ArtiLiveDataSetView class]];
-            
         [(TDD_ArtiLiveDataSetView *)view setSetModel:(TDD_ArtiLiveDataSetModel *)model];
         
         isNeedMake = YES;
@@ -1071,7 +1108,6 @@
         
         isNeedMake = YES;
     }else if ([model isKindOfClass:[TDD_ArtiReportGeneratorModel class]]) {
-        [self hiddenBackButton];
         
         BOOL isADASReport = [((TDD_ArtiReportGeneratorModel *)model).reportModel isAdasReport];
         if (isADASReport) {
@@ -1219,26 +1255,17 @@
     if (self.carModel.softType == TDD_SoftType_TDarts) {
         return;
     }
-    if ([TDD_EADSessionController sharedController].VciStatus || [self.carModel.strVehicle isEqualToString:@"DEMO"]) {
-
-        self.topView.hidden = YES;
-        [self.topView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.equalTo(self.view);
-            make.top.equalTo(self.naviView.mas_bottom);
-            make.height.mas_equalTo(0);
-        }];
+    if (([_model isKindOfClass:[TDD_ArtiTroubleModel class]] || [_model isKindOfClass:[TDD_ArtiPopupModel class]]) && [TDD_DiagnosisTools isLimitedTrialFuction] && [TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+        [self.topView setTitleWithContent:TDDLocalized.expiration_reminder];
+        self.topView.hidden = false;
+        self.topView.clickEnable = false;
     }else {
-//        self.vciTipsLabel.hidden = NO;
-        self.topView.hidden = NO;
-
-        [self.topView mas_remakeConstraints:^(MASConstraintMaker *make) {
-            make.left.right.equalTo(self.view);
-            make.top.equalTo(self.view).offset(NavigationHeight);
-            make.height.mas_equalTo(_topTipLabH + (IS_IPad ? 40 : 25));
-        }];
-        
+        [self.topView setTitleWithContent:TDDLocalized.tips_vci_unconnect];
+        self.topView.hidden = (TDD_EADSessionController.sharedController.VciStatus  || [self.carModel.strVehicle isEqualToString:@"DEMO"]);
+        self.topView.clickEnable = true;
     }
-    
+
+    [self setupContentViewConstraintsLandscape:_isLiveDataChartLandscape bottomHidden:_bottomView.hidden];
 }
 
 #pragma mark 浮窗UI展示
@@ -1293,7 +1320,7 @@
         }
         
     } else if ([model isKindOfClass:[TDD_ArtiLiveDataSelectModel class]] ||
-               [model isKindOfClass:[TDD_ArtiLiveDataModel class]]) {
+               [model isKindOfClass:[TDD_ArtiLiveDataModel class]] || [model isKindOfClass:[TDD_ArtiLiveDataChartSelectModel class]]) {
         btnArr = @[@(kVCIStatusBtn), @(kFeedBackBtn), @(kSearchBtn)];
         [self.rightButtonView updateShowBtn:btnArr isSearch:model.isSearch];
     } else if ([model isKindOfClass:[TDD_ArtiEcuInfoModel class]] || [model isKindOfClass:[TDD_ArtiFreezeModel class]] || [model isKindOfClass:[TDD_ArtiInputModel class]] || [model isKindOfClass:[TDD_ArtiMsgBoxModel class]] || [model isKindOfClass:[TDD_ArtiPictureModel class]] || [model isKindOfClass:[TDD_ArtiTroubleModel class]] || [model isKindOfClass:[TDD_ArtiSystemModel class]] || [model isKindOfClass:[TDD_ArtiMsgBoxGroupModel class]] || [model isKindOfClass:[TDD_ArtiMsgBoxDsModel class]] || [model isKindOfClass:[TDD_ArtiWheelBrowModel class]] || [model isKindOfClass:[TDD_ArtiFuelLevelModel class]]) {
@@ -1328,11 +1355,16 @@
             btnArr = @[@(kVCIStatusBtn), @(kIMMOTDartsStatusBtn)];
         }
         [self.rightButtonView updateShowBtn:btnArr isSearch:model.isSearch];
-    } else if ([model isKindOfClass:[TDD_ArtiPopupModel class]] || [model isKindOfClass:[TDD_ArtiTroubleModel class]]) {
-        btnArr = @[@(kVCIStatusBtn),@(kHelpBtn), @(kFeedBackBtn),@(kTranslateBtn)];
-        if (self.diagNavType == TDD_DiagShowType_IMMO) {
-            btnArr = @[@(kVCIStatusBtn),@(kHelpBtn),  @(kIMMOTDartsStatusBtn), @(kFeedBackBtn)];
+    } else if ([model isKindOfClass:[TDD_ArtiPopupModel class]]) {
+        if ([TDD_DiagnosisTools softWareIsKindOfTopScan]) {
+            btnArr = @[@(kVCIStatusBtn), @(kFeedBackBtn), @(kTranslateBtn)];
+        }else {
+            btnArr = @[@(kVCIStatusBtn),@(kHelpBtn), @(kFeedBackBtn),@(kTranslateBtn)];
+            if (self.diagNavType == TDD_DiagShowType_IMMO) {
+                btnArr = @[@(kVCIStatusBtn),@(kHelpBtn),  @(kIMMOTDartsStatusBtn), @(kFeedBackBtn)];
+            }
         }
+
         [self.rightButtonView updateShowBtn:btnArr isSearch:model.isSearch];
     }  else if([model isKindOfClass:[TDD_ArtiLiveDataSetModel class]]){
         btnArr = @[];
@@ -1351,7 +1383,7 @@
 - (void)showBackButton {
     [self.naviView.titleLabel mas_remakeConstraints:^(MASConstraintMaker *make) {
         make.centerY.equalTo(self.naviView.backBtn);
-        make.left.equalTo(self.naviView.backBtn.mas_right).offset(12);
+        make.left.equalTo(self.naviView.backBtn.mas_right);
         make.right.equalTo(self.rightButtonView.mas_left).offset(-10);
         make.height.mas_equalTo(40);
     }];

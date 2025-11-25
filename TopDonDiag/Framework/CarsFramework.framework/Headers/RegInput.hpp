@@ -59,6 +59,18 @@ public:
     static void InitOneInputBox(std::function<bool(uint32_t, const std::string&, const std::string&, const std::string&, const std::string&)> fnInitOneInputBox);
     
     /*
+     *   注册CArtiInput成员函数 SetInputBoxInnerTips 的回调函数
+     *
+     *   uint32_t SetInputBoxInnerTips(uint32_t id, const std::string& strInnerTips);
+     *
+     *   id, 对象编号，表示哪一个对象调用的成员方法
+     *   其他参数见ArtiInput.h的说明
+     *
+     *   SetInputBoxInnerTips 函数说明见 ArtiInput.h
+     */
+    static void SetInputBoxInnerTips(std::function<uint32_t(uint32_t, const std::string&)> fnSetInputBoxInnerTips);
+    
+    /*
      *   注册CArtiInput成员函数GetOneInputBox的回调函数
      *
      *   std::string const GetOneInputBox(uint32_t id);
@@ -74,6 +86,7 @@ public:
      *   注册CArtiInput成员函数AddButton的回调函数
      *
      *   void AddButton(uint32_t id, const std::string& strButtonText);
+     *   uint32_t AddButtonEx(uint32_t id, const string& strButtonText);
      *
      *   id, 对象编号，表示哪一个对象调用的成员方法
      *   其他参数见ArtiInput.h的说明
@@ -81,6 +94,7 @@ public:
      *   AddButton 函数说明见 ArtiInput.h
      */
     static void AddButton(std::function<void(uint32_t, const std::string&)> fnAddButton);
+    static void AddButtonEx(std::function<uint32_t(uint32_t, const std::string&)> fnAddButtonEx);
 
     /*
      *   注册CArtiInput成员函数SetVisibleButtonQR的回调函数
@@ -123,6 +137,18 @@ public:
                                                     const std::vector<std::string>&,
                                                     const std::vector<std::string>&)> fnInitManyInputBox);
 
+    /*
+     *   注册CArtiInput成员函数SetManyInputBoxInnerTips的回调函数
+     *
+     *   uint32_t SetManyInputBoxInnerTips(uint32_t id, const std::vector<std::string>& vctInnerTips);
+     *
+     *   id, 对象编号，表示哪一个对象调用的成员方法
+     *   其他参数见ArtiInput.h的说明
+     *
+     *   SetManyInputBoxInnerTips 函数说明见 ArtiInput.h
+     */
+    static void SetManyInputBoxInnerTips(std::function<uint32_t(uint32_t, const std::vector<std::string>&)> fnSetManyInputBoxInnerTips);
+    
     /*
      *   注册CArtiInput成员函数GetManyInputBox的回调函数
      *

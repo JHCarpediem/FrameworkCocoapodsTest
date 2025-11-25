@@ -60,6 +60,7 @@ typedef enum {
 #pragma mark - 数据获取
 + (eProductName )appProduct;
 + (eAppProductGroup )appProductGroup;
++ (NSString *)selectedVCIProductModel;
 + (BOOL )isIpad;
 /// 获取选中VCI sn
 + (NSString *)selectedVCISerialNum;
@@ -111,6 +112,9 @@ typedef enum {
 /// 是否是北美 autoAuth
 + (NSInteger )isAutoAuthNa;
 
+/// 通用埋点数据
++ (NSMutableDictionary *)commStatisticsEventDict;
+
 #pragma mark 车型功能与系统 无序
 + (NSArray *)carMaintenanceArr;
 + (NSArray *)carMaintenanceExArr;
@@ -139,7 +143,13 @@ typedef enum {
 + (void)showBackgroundAlert;
 // 软件过期续费弹框
 + (void)showSoftExpiredToBuyAlert:(nullable void (^)(void))completionHandler;
++ (void)showUnScanSoftExpiredAlert:(nullable void (^)(void))completionHandler;
 
++ (NSString *)AESEncrypt:(NSString *)str;
+
++ (NSString *)AESLocalEncrypt:(NSString *)str;
+
++ (NSString *)AESLocalDecryption:(NSString *)str;
 @end
 
 NS_ASSUME_NONNULL_END

@@ -236,7 +236,7 @@
 /// 根据userDefault的单位字符串 转换成 显示的单位 metric： Km //  imperial : Mile
 /// - Parameter unit: 返回展示的单位 Km / Mile
 - (NSString *)unitDisplayWithDiagUnit:(NSString *)unit {
-    if ([unit isEqualToString:@"imperial"]) return @"Miles";
+    if ([unit isEqualToString:@"imperial"]) return @"miles";
     if ([unit isEqualToString:@"metric"]) return @"km";
     return unit;
 }
@@ -274,8 +274,8 @@
     }
     
     NSString * temp = [text stringByReplacingOccurrencesOfString:@"km" withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@"Miles" withString:@""];
-    temp = [temp stringByReplacingOccurrencesOfString:@"Mile" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"miles" withString:@""];
+    temp = [temp stringByReplacingOccurrencesOfString:@"mile" withString:@""];
     temp = [temp stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     if ([NSString tdd_isNum:temp]) {
         self.inputTextField.text = [NSString stringWithFormat:@"%@", temp];
@@ -287,7 +287,7 @@
 #pragma - mark 懒加载
 - (NSArray<NSString *> *)datas {
     if (!_datas) {
-        _datas = @[@"km", @"Miles"];
+        _datas = @[@"km", @"miles"];
     }
     return _datas;
 }
@@ -323,7 +323,7 @@
     if (!_mlUnitBtn) {
         _mlUnitBtn = [UIButton buttonWithType:UIButtonTypeCustom];
         if (!isTopVCI) {
-            [_mlUnitBtn setImage:kImageNamed(@"down_arrow") forState:UIControlStateNormal];
+            [_mlUnitBtn setImage:kImageNamed(@"input_down_arrow") forState:UIControlStateNormal];
         }
         [_mlUnitBtn setTitleColor:[UIColor tdd_title] forState:UIControlStateNormal];
         _mlUnitBtn.titleLabel.font = [UIFont systemFontOfSize:IS_IPad ? 18 : 14 weight:UIFontWeightMedium];

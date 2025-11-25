@@ -76,7 +76,7 @@
         str = [[NSUserDefaults standardUserDefaults] objectForKey:KTDDUDFCAAccount];
     }
 
-    return str;
+    return str?:@"";
     
     
 }
@@ -144,4 +144,37 @@
     
 }
 
++ (NSString *)getAuthPassword:(NSInteger)type {
+    return [TDD_UserdefaultManager getAuthPassword:type unlockType:0];
+}
+
++ (NSString *)getAuthPassword:(NSInteger)type unlockType:(NSInteger)unlockType {
+    NSString *str;
+    NSString *key;
+    if (unlockType > 0) {
+        key = [KTDDUDAutoAUTHPassword stringByAppendingFormat:@"_%ld_%ld",type,unlockType];
+    }else {
+        key = [KTDDUDAutoAUTHPassword stringByAppendingFormat:@"_%ld",type];
+    }
+
+    str = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+
+    return str?:@"";
+}
+
++ (void)setAuthPassword:(NSString *)password type:(NSInteger)type {
+    [TDD_UserdefaultManager setAuthPassword:password type:type unlockType:0];
+}
+
++ (void)setAuthPassword:(NSString *)password type:(NSInteger)type unlockType:(NSInteger)unlockType {
+    NSString *key;
+    if (unlockType > 0) {
+        key = [KTDDUDAutoAUTHPassword stringByAppendingFormat:@"_%ld_%ld",type,unlockType];
+    }else {
+        key = [KTDDUDAutoAUTHPassword stringByAppendingFormat:@"_%ld",type];
+    }
+
+    [[NSUserDefaults standardUserDefaults] setObject:password forKey:key];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
 @end

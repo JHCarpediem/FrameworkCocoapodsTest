@@ -251,7 +251,7 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    _contentView.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleTopToBottom withFrame:_contentView.tdd_size];
+    _contentView.backgroundColor = [UIColor tdd_background];
 }
 
 - (void)dealloc {

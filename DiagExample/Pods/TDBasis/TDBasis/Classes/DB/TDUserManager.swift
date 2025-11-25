@@ -8,7 +8,6 @@
 import UIKit
 import TopdonLog
 
-public let TDUserDefaults = UserDefaults.standard
 @objc public class TDUserManager: NSObject {
     
     /// 退出登录
