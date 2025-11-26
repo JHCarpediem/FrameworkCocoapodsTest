@@ -114,9 +114,33 @@ public extension TDBasisWrap where Base: UITableView {
         guard isValidIndexPath(indexPath) else { return }
         base.scrollToRow(at: indexPath, at: scrollPosition, animated: animated)
     }
+    
+    /// Adds a tap gesture recognizer to hide the keyboard when tapping outside the specified view.
+    func setTapHideKeyboard(from view: UIView? = nil) {
+        let view = view ?? UI.topViewController?.view
+        let tapGesture = UITapGestureRecognizer { [weak base] gesture in
+            guard let base = base else { return }
+            guard let gesture = gesture as? UITapGestureRecognizer else {
+                return
+            }
+            let location = gesture.location(in: base)
+            view?.endEditing(true)
+        }
+        tapGesture.cancelsTouchesInView = false
+        base.addGestureRecognizer(tapGesture)
+    }
 }
 
 
+
 @objc public extension UITableView {
+    
+    
+    /// 快捷设置 tableView 点击收键盘
+    /// - Parameter view: view.endEditing(true)中的 view，一般要传入 输入框所在的 view 不传默认为 UI.topViewContorller.view
+    @objc
+    public func tapHideKeyBoard(from view: UIView? = nil) {
+        td.setTapHideKeyboard(from: view)
+    }
     
 }

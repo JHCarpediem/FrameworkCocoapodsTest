@@ -141,3 +141,81 @@ extension UIScrollView: SwiftAwakeProtocol {
         }
     }
 }
+
+extension TDBasisWrap where Base: UIScrollView {
+    
+    /// scrollView 引导动画 （弹性左右滑动）
+    /// - Parameters:
+    ///   - peekDistance: 滑动比例 默认为 scrollView 宽度的 0.3 倍
+    ///   - springDamping: 弹性阻尼 默认为 0.7  值为 0-1
+    ///   - duration: 动画持续时间 默认为 1s
+    public func playScrollGuideAnimation(peekDistance: CGFloat = 0.3,
+                                         springDamping: CGFloat = 0.7,
+                                         duration: TimeInterval = 1.0) {
+        // 确保内容宽度大于可见宽度
+        guard base.contentSize.width > base.bounds.width else { return }
+        
+        // 计算最大偏移量
+        let maxOffset = base.contentSize.width - base.bounds.width + base.contentInset.right
+        guard maxOffset > 0 else { return }
+        
+        // 动画参数
+        let peekDistance = base.bounds.width * peekDistance  // 滑动距离（屏幕宽度的30%）
+        let springDamping: CGFloat = springDamping       // 弹性阻尼（0.0-1.0）
+        let duration: TimeInterval = duration       // 单次动画时间
+        
+        // 初始位置
+        let startPoint = base.contentOffset
+        
+        // 1. 向右滑动
+        UIView.animate(withDuration: duration * 0.5, animations: {
+            base.contentOffset.x = min(startPoint.x + peekDistance, maxOffset)
+        }, completion: { _ in
+            // 2. 弹性回归原位
+            UIView.animate(withDuration: duration,
+                           delay: 0,
+                           usingSpringWithDamping: springDamping,
+                           initialSpringVelocity: 0.5,
+                           options: [.curveEaseInOut],
+                           animations: {
+                base.contentOffset = startPoint
+            }, completion: { _ in
+                // 3. 向左滑动
+                UIView.animate(withDuration: duration * 0.5, animations: {
+                    base.contentOffset.x = max(startPoint.x - peekDistance, 0)
+                }, completion: { _ in
+                    // 4. 弹性回归原位
+                    UIView.animate(withDuration: duration,
+                                   delay: 0,
+                                   usingSpringWithDamping: springDamping,
+                                   initialSpringVelocity: 0.5,
+                                   options: [.curveEaseInOut],
+                                   animations: {
+                        base.contentOffset = startPoint
+                    })
+                })
+            })
+        })
+    }
+}
+
+extension UIScrollView {
+    
+    /// 引导动画提示（弹性左右滑动）
+    @objc
+    public func playScrollGuideAnimation() {
+        td.playScrollGuideAnimation()
+    }
+    
+    /// scrollView 引导动画 （弹性左右滑动）
+    /// - Parameters:
+    ///   - peekDistance: 滑动比例 默认为 scrollView 宽度的 0.3 倍
+    ///   - springDamping: 弹性阻尼 默认为 0.7  值为 0-1
+    ///   - duration: 动画持续时间 默认为 1s
+    @objc
+    public func playScrollGuideAnimation(peekDistance: CGFloat = 0.3,
+                                         springDamping: CGFloat = 0.7,
+                                         duration: TimeInterval = 1) {
+        td.playScrollGuideAnimation(peekDistance: peekDistance, springDamping: springDamping, duration: duration)
+    }
+}

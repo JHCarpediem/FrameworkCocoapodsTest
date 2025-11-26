@@ -1,0 +1,6 @@
+framework module Diagnosis {
+  umbrella header "Diagnosis.h"
+
+  export *
+  module * { export * }
+}

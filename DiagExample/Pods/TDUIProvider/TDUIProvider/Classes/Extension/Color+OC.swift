@@ -29,7 +29,7 @@ public extension UIColor {
     @objc public static var theme_line: ThemeColorPicker? { theme.line }
     
     /// 主题色 #F22222
-    @objc public static var theme_theme: ThemeColorPicker? { theme.line }
+    @objc public static var theme_theme: ThemeColorPicker? { theme.theme }
     
     /// 按钮/视图 不可用背景灰色 #424D59
     @objc public static var theme_disableBackground: ThemeColorPicker? { theme.disableBackground }
@@ -61,6 +61,8 @@ public extension UIColor {
     /// 输入框占位文本颜色 #999999
     @objc public static var theme_textFieldPlaceholder: ThemeColorPicker? { theme.textFieldPlaceholder }
     
+    /// 卡片背景色
+    @objc public static var theme_cardBackground: ThemeColorPicker? { theme.cardBackground }
 }
 
 public extension UIColor {
@@ -83,7 +85,7 @@ public extension UIColor {
     @objc public static var td_line: UIColor { td.line }
     
     /// 主题色 #F22222
-    @objc public static var td_theme: UIColor { td.line }
+    @objc public static var td_theme: UIColor { td.theme }
     
     /// 按钮/视图 不可用背景灰色 #424D59
     @objc public static var td_disableBackground: UIColor { td.disableBackground }
@@ -121,6 +123,8 @@ public extension UIColor {
     /// 导航栏 右边按钮颜色
     @objc public static var td_navigationRightItemsText: UIColor { .td.navigationRightItemsText }
     
+    /// 卡片背景色
+    @objc public static var td_cardBackground: UIColor { .td.cardBackground }
 }
 
 public extension ThemeColorPicker {
@@ -143,7 +147,7 @@ public extension ThemeColorPicker {
     @objc public static var theme_line: ThemeColorPicker? { theme.line }
     
     /// 主题色 #F22222
-    @objc public static var theme_theme: ThemeColorPicker? { theme.line }
+    @objc public static var theme_theme: ThemeColorPicker? { theme.theme }
     
     /// 按钮/视图 不可用背景灰色 #424D59
     @objc public static var theme_disableBackground: ThemeColorPicker? { theme.disableBackground }
@@ -180,5 +184,8 @@ public extension ThemeColorPicker {
     
     /// 导航栏 右边按钮颜色
     @objc public static var theme_navigationRightItemsText: ThemeColorPicker? { .theme.navigationRightItemsText }
+    
+    /// 卡片背景色
+    @objc public static var theme_cardBackground: ThemeColorPicker? { .theme.cardBackground }
 }
 

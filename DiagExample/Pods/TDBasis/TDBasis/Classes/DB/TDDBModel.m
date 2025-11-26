@@ -19,9 +19,7 @@
 + (void)initialize
 {
     if (self != [TDDBModel self]) {
-        dispatch_async(dispatch_get_global_queue(0, 0), ^{
-            [self createTable];
-        });
+        [self createTable];
     }
 }
 
@@ -153,25 +151,9 @@
  */
 + (BOOL)createTable {
     __block BOOL res = YES;
-
-    // 使用 `inDatabase` 避免事务嵌套
-    [self.dbQueue inDatabase:^(FMDatabase *db) {
-        if (![db isInTransaction]) {
-            [db beginTransaction];
-        } else {
-            NSLog(@" 创建表 - %@ FMDB 当前处于事物中。。。", [self classForCoder]);
-        }
-
-        BOOL rollback = NO;
-        res = [self createTable:db rollback:&rollback];
-        NSLog(@"创建表 - %@ 结果：%d", [self classForCoder], res);
-        if ([db isInTransaction]) {
-            if (rollback) {
-                [db rollback];
-            } else {
-                [db commit];
-            }
-        }
+    NSLog(@"创建表 %@", [self class]);
+    [self.dbQueue inTransaction:^(FMDatabase * _Nonnull db, BOOL * _Nonnull rollback) {
+        [self createTable:db rollback:rollback];
     }];
 
     return res;
@@ -213,50 +195,6 @@
     }
     return res;
 }
-
-/**
- * 创建表
- * 如果已经创建，返回YES
- */
-//+ (BOOL)createTable
-//{
-//    FMDatabase *db = [FMDatabase databaseWithPath:[JKDBHelper dbPath]];
-//    if (![db open]) {
-//        TDNSLog(@"数据库打开失败!");
-//        return NO;
-//    }
-//    
-//    NSString *tableName = [self getClassName];
-//    NSString *columeAndType = [self.class getColumeAndTypeString];
-//    NSString *sql = [NSString stringWithFormat:@"CREATE TABLE IF NOT EXISTS %@(%@);",tableName,columeAndType];
-//    if (![db executeUpdate:sql]) {
-//        return NO;
-//    }
-//    
-//    NSMutableArray *columns = [NSMutableArray array];
-//    FMResultSet *resultSet = [db getTableSchema:tableName];
-//    while ([resultSet next]) {
-//        NSString *column = [resultSet stringForColumn:@"name"];
-//        [columns addObject:column];
-//    }
-//    NSDictionary *dict = [self.class getAllProperties];
-//    NSArray *properties = [dict objectForKey:@"name"];
-//    NSPredicate *filterPredicate = [NSPredicate predicateWithFormat:@"NOT (SELF IN %@)",columns];
-//    //过滤数组
-//    NSArray *resultArray = [properties filteredArrayUsingPredicate:filterPredicate];
-//
-//    for (NSString *column in resultArray) {
-//        NSUInteger index = [properties indexOfObject:column];
-//        NSString *proType = [[dict objectForKey:@"type"] objectAtIndex:index];
-//        NSString *fieldSql = [NSString stringWithFormat:@"%@ %@",column,proType];
-//        NSString *sql = [NSString stringWithFormat:@"ALTER TABLE %@ ADD COLUMN %@ ",[self getClassName],fieldSql];
-//        if (![db executeUpdate:sql]) {
-//            return NO;
-//        }
-//    }
-//    [db close];
-//    return YES;
-//}
 
 - (BOOL)saveOrUpdate
 {

@@ -82,8 +82,14 @@ extension TDBasisWrap where Base == String {
         TDHAESEncryption.td_AES128ParmDecrypt(withContent: base)
     }
     
+    /// 本地 AES 128 加密
     public var AESLocalEncrypt: String? {
         TDHAESEncryption.td_AESLocalEncryption(withContent: base)
+    }
+    
+    /// 本地 AES 128 解密
+    public var AESLocalDecrypt: String? {
+        TDHAESEncryption.td_AESLocalDecryption(withContent: base)
     }
     
     /// 字符串URL 编码

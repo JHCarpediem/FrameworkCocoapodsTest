@@ -11,6 +11,7 @@
 #endif
 
 #import "TDBasis.h"
+#import "TDCacheHelper.h"
 #import "TDDBHelper.h"
 #import "TDDBModel.h"
 #import "TDGTMBase64.h"

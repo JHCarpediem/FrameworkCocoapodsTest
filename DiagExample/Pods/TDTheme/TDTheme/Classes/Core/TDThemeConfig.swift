@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import TDBasis
 
 public enum TDThemeType {
     case `default`

@@ -51,8 +51,7 @@ protected:
 };
 
 template<class T, bool = std::is_trivially_destructible<T>::value>
-class _OptionalValueDestruct : public _OptionalValueFlag {
-};
+class _OptionalValueDestruct : public _OptionalValueFlag {};
 
 template<class T>
 class _OptionalValueDestruct<T, false> : public _OptionalValueFlag {
@@ -124,6 +123,45 @@ public:
     constexpr inline const T&& value() const&&
     {
         return std::move(this->m_value);
+    }
+
+    template<class U>
+    constexpr T valueOr(U&& v) const&
+    {
+        static_assert(std::is_copy_constructible<T>::value,
+                      "Optional<T>::valueOr: T must be copy constructible");
+        static_assert(std::is_convertible<U, T>::value,
+                      "Optional<T>::valueOr: U must be convertible to T");
+        return this->hasValue() ? this->value() : static_cast<T>(std::forward<U>(v));
+    }
+
+    template<class U>
+    constexpr T valueOr(U&& v) &&
+    {
+        static_assert(std::is_move_constructible<T>::value,
+                      "Optional<T>::valueOr: T must be copy constructible");
+        static_assert(std::is_convertible<U, T>::value,
+                      "Optional<T>::valueOr: U must be convertible to T");
+        return this->hasValue() ? std::move(this->value()) :
+                                  static_cast<T>(std::forward<U>(v));
+    }
+
+    constexpr T valueOrDefault() const&
+    {
+        static_assert(std::is_copy_constructible<T>::value,
+                      "Optional<T>::valueOrDefault: T must be copy constructible");
+        static_assert(std::is_default_constructible<T>::value,
+                      "Optional<T>::valueOrDefault: T must be have default constructor");
+        return this->hasValue() ? this->value() : T();
+    }
+
+    constexpr T valueOrDefault() &&
+    {
+        static_assert(std::is_move_constructible<T>::value,
+                      "Optional<T>::valueOrDefault: T must be copy constructible");
+        static_assert(std::is_default_constructible<T>::value,
+                      "Optional<T>::valueOrDefault: T must be have default constructor");
+        return this->hasValue() ? std::move(this->value()) : T();
     }
 
 protected:
@@ -204,7 +242,9 @@ public:
     _OptionalMoveBase& operator=(_OptionalMoveBase&&) = default;
 };
 
-template<class T, bool = std::is_trivially_destructible<T>::value&& std::is_trivially_copy_constructible<T>::value&& std::is_trivially_copy_assignable<T>::value>
+template<class T,
+         bool = std::is_trivially_destructible<T>::value && std::is_trivially_copy_constructible<T>::value
+                && std::is_trivially_copy_assignable<T>::value>
 class _OptionalCopyAssignBase : public _OptionalMoveBase<T> {
 public:
     using _OptionalMoveBase<T>::_OptionalMoveBase;
@@ -227,7 +267,9 @@ public:
     _OptionalCopyAssignBase& operator=(_OptionalCopyAssignBase&&) = default;
 };
 
-template<class T, bool = std::is_trivially_destructible<T>::value&& std::is_trivially_move_constructible<T>::value&& std::is_trivially_move_assignable<T>::value>
+template<class T,
+         bool = std::is_trivially_destructible<T>::value && std::is_trivially_move_constructible<T>::value
+                && std::is_trivially_move_assignable<T>::value>
 class _OptionalMoveAssignBase : public _OptionalCopyAssignBase<T> {
 public:
     using _OptionalCopyAssignBase<T>::_OptionalCopyAssignBase;
@@ -259,24 +301,12 @@ public:
     typedef T ValueType;
 #pragma mark - Interface
 
-    inline bool succeed() const
-    {
-        return this->m_hasValue;
-    }
-    inline bool failed() const
-    {
-        return !this->m_hasValue;
-    };
+    inline bool succeed() const { return this->m_hasValue; }
+    inline bool failed() const { return !this->m_hasValue; };
 
-    constexpr inline T* operator->()
-    {
-        return &this->m_value;
-    }
+    constexpr inline T* operator->() { return &this->m_value; }
 
-    constexpr inline const T* operator->() const
-    {
-        return &this->m_value;
-    }
+    constexpr inline const T* operator->() const { return &this->m_value; }
 
     T& getOrCreate()
     {
@@ -298,22 +328,16 @@ public:
 
 #pragma mark - Constructor
 
-    Optional() : _OptionalMoveAssignBase<T>()
-    {
-    }
+    Optional() : _OptionalMoveAssignBase<T>() {}
 
-    Optional(const NullOpt_T&) : _OptionalMoveAssignBase<T>()
-    {
-    }
+    Optional(const NullOpt_T&) : _OptionalMoveAssignBase<T>() {}
 
     template<typename U, typename Enable = void>
-    struct Constructable : public std::false_type {
-    };
+    struct Constructable : public std::false_type {};
 
     template<typename U>
     struct Constructable<U, typename std::enable_if<!std::is_base_of<Optional, U>::value && std::is_constructible<T, U>::value>::type>
-    : public std::true_type {
-    };
+    : public std::true_type {};
 
     template<typename U, typename Enable = typename std::enable_if<Constructable<U>::value && std::is_copy_constructible<U>::value>::type>
     Optional(const Optional<U>& opt)
@@ -336,7 +360,7 @@ public:
     template<typename U, typename Enable = typename std::enable_if<Constructable<U>::value && std::is_move_constructible<U>::value>::type>
     Optional(U&& value)
     {
-        this->construct(std::move(value));
+        this->construct(std::forward<U>(value));
     }
 
 #pragma mark - Assignment
@@ -372,15 +396,9 @@ public:
         return *this;
     }
 
-    bool operator==(const NullOpt_T&) const
-    {
-        return !this->m_hasValue;
-    }
+    bool operator==(const NullOpt_T&) const { return !this->m_hasValue; }
 
-    bool operator!=(const NullOpt_T&) const
-    {
-        return this->m_hasValue;
-    }
+    bool operator!=(const NullOpt_T&) const { return this->m_hasValue; }
 
     template<typename U, typename Enable = typename std::enable_if<Constructable<U>::value>::type>
     bool operator==(const Optional<U>& other) const
@@ -409,10 +427,7 @@ public:
         return this->m_value;
     }
 
-    inline constexpr ValueType& operator*() & noexcept
-    {
-        return this->m_value;
-    }
+    inline constexpr ValueType& operator*() & noexcept { return this->m_value; }
 
     inline constexpr ValueType&& operator*() && noexcept
     {
@@ -426,11 +441,9 @@ public:
 };
 
 template<class T>
-struct IsWCDBOptional : std::false_type {
-};
+struct IsWCDBOptional : std::false_type {};
 
 template<class T>
-struct IsWCDBOptional<Optional<T>> : std::true_type {
-};
+struct IsWCDBOptional<Optional<T>> : std::true_type {};
 
 } // namespace WCDB

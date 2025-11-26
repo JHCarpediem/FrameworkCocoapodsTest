@@ -10,7 +10,7 @@ import UIKit
 @objc public extension UILabel {
     @objc public convenience init(text: String?, themeColor: ThemeColorPicker?, font: UIFont?) {
         self.init()
-        
+        self.textAlignment = .left
         self.text = text
         self.theme.textColor = themeColor
         self.font = font 

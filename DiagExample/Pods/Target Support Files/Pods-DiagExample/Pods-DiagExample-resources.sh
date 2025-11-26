@@ -97,10 +97,12 @@ EOM
   esac
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_resource "${PODS_ROOT}/../../TopDonDiag/Classes/TopdonDiagnosis.bundle"
+  install_resource "${PODS_ROOT}/../../Diagnosis/Classes/Diagnosis.bundle"
+  install_resource "${PODS_ROOT}/TDUIProvider/TDUIProvider/Assets/TDUIProvider.bundle"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_resource "${PODS_ROOT}/../../TopDonDiag/Classes/TopdonDiagnosis.bundle"
+  install_resource "${PODS_ROOT}/../../Diagnosis/Classes/Diagnosis.bundle"
+  install_resource "${PODS_ROOT}/TDUIProvider/TDUIProvider/Assets/TDUIProvider.bundle"
 fi
 
 mkdir -p "${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}"

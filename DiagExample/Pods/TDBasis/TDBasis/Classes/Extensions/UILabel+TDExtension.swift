@@ -30,7 +30,7 @@ public extension TDBasisWrap where Base: UILabel {
     
     @objc convenience init(text: String?, textColor: UIColor?, font: UIFont?) {
         self.init()
-        
+        self.textAlignment = .left
         self.text = text
         if let textColor = textColor {
             self.textColor = textColor
@@ -38,5 +38,26 @@ public extension TDBasisWrap where Base: UILabel {
         if let font = font {
             self.font = font
         }
+    }
+}
+
+extension NSMutableAttributedString {
+    @objc
+    public convenience init(string: String, attributes: [NSAttributedString.Key: Any]? = nil, aligment: NSTextAlignment) {
+        let style = NSMutableParagraphStyle()
+        style.alignment = aligment
+        var tmpAttribute = attributes
+        if tmpAttribute != nil {
+            if let oriStyle = tmpAttribute?[.paragraphStyle] as? NSMutableParagraphStyle {
+                oriStyle.alignment = aligment
+                tmpAttribute?[.paragraphStyle] = oriStyle
+            } else {
+                tmpAttribute?[.paragraphStyle] = style
+            }
+        } else {
+            tmpAttribute = [.paragraphStyle: style]
+        }
+        
+        self.init(string: string, attributes: tmpAttribute)
     }
 }

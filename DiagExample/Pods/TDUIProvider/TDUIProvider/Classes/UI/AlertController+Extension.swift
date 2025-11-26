@@ -7,6 +7,22 @@
 
 import Foundation
 
+extension LMSAlertController {
+    @available(swift, deprecated: 3, unavailable, message: "请使用 show(CustomView:) 方法")
+    @objc
+    public static func showCustomView(_ customView: UIView,
+                            priority: Float,
+                            untriggeredBehavior: TDPopupViewUntriggeredBehavior = .await,
+                            switchBehavior: TDPopupViewSwitchBehavior = .latent,
+                            actions: [LMSAlertAction]) -> Self {
+        show(customView: customView,
+             priority: .init(priority),
+             untriggeredBehavior: untriggeredBehavior,
+             switchBehavior: switchBehavior,
+             actions: actions)
+    }
+}
+
 @objc public extension LMSAlertController {
     @objc public convenience init(
         title: String?,

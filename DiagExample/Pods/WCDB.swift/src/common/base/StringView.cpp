@@ -83,16 +83,12 @@ UnsafeStringView::UnsafeStringView(UnsafeStringView&& other)
 
 UnsafeStringView::~UnsafeStringView()
 {
-    if ((uint64_t) m_referenceCount <= ConstanceReference) {
-        return;
-    }
-    if (--(*m_referenceCount) == 0) {
-        clearSpace();
-    }
+    tryClearSpace();
 };
 
 UnsafeStringView& UnsafeStringView::operator=(const UnsafeStringView& other)
 {
+    tryClearSpace();
     m_data = other.m_data;
     m_length = other.m_length;
     m_referenceCount = other.m_referenceCount;
@@ -104,6 +100,7 @@ UnsafeStringView& UnsafeStringView::operator=(const UnsafeStringView& other)
 
 UnsafeStringView& UnsafeStringView::operator=(UnsafeStringView&& other)
 {
+    tryClearSpace();
     m_data = other.m_data;
     m_length = other.m_length;
     m_referenceCount = other.m_referenceCount;
@@ -169,6 +166,20 @@ bool UnsafeStringView::empty() const
 const char& UnsafeStringView::at(offset_t off) const
 {
     return m_data[off];
+}
+
+UnsafeStringView UnsafeStringView::subStr(offset_t off, size_t length) const
+{
+    WCTRemedialAssert(off + length <= m_length, "invalid parameter", UnsafeStringView(););
+    if (length == 0) {
+        length = m_length - off;
+    }
+    UnsafeStringView ret(m_data + off, length);
+    ret.m_referenceCount = m_referenceCount;
+    if (((uint64_t) m_referenceCount > ConstanceReference)) {
+        (*m_referenceCount)++;
+    }
+    return ret;
 }
 
 #pragma mark - UTF16
@@ -344,16 +355,20 @@ int UnsafeStringView::compare(const UnsafeStringView& other) const
     }
 }
 
-size_t UnsafeStringView::find(const UnsafeStringView& other) const
+size_t UnsafeStringView::find(const UnsafeStringView& other, off_t off) const
 {
-    if (other.m_length > m_length || other.m_length == 0) {
+    if (off + other.m_length > m_length || other.m_length == 0 || off < 0) {
         return npos;
     }
-    const char* ret = strstr(m_data, other.m_data);
+    const char* ret = strstr(m_data + off, other.m_data);
     if (ret == nullptr) {
         return npos;
     }
-    return ret - m_data;
+    size_t pos = ret - m_data;
+    if (pos >= m_length) {
+        return npos;
+    }
+    return pos;
 }
 
 #pragma mark - UnsafeStringView - Memory Management
@@ -401,11 +416,23 @@ void UnsafeStringView::createNewSpace(size_t newSize)
     }
 }
 
+void UnsafeStringView::tryClearSpace()
+{
+    if ((uint64_t) m_referenceCount <= ConstanceReference) {
+        return;
+    }
+    if (--(*m_referenceCount) == 0) {
+        clearSpace();
+    }
+}
+
 void UnsafeStringView::clearSpace()
 {
     m_referenceCount->~atomic<int>();
     free(m_referenceCount);
     m_referenceCount = nullptr;
+    m_data = "";
+    m_length = 0;
 }
 
 #ifdef __ANDROID__
@@ -444,7 +471,7 @@ char** UnsafeStringView::preAllocStringMemorySlot(int count)
 
 void UnsafeStringView::allocStringMemory(char** slot, int size)
 {
-    if (size == 0 || slot == nullptr) {
+    if (slot == nullptr) {
         return;
     }
     char* buffer = (char*) malloc((size + 1 + kReferenceSize) * sizeof(char));
@@ -452,6 +479,7 @@ void UnsafeStringView::allocStringMemory(char** slot, int size)
         return;
     }
     *slot = buffer + kReferenceSize;
+    *(*slot + size) = '\0';
 }
 
 void UnsafeStringView::clearAllocatedMemory(int count)
@@ -487,8 +515,7 @@ bool UnsafeStringView::tryRetrievePreAllocatedMemory(const char* string)
         g_preAllocatedMemory.memory[i] = nullptr;
         if (g_preAllocatedMemory.usedCount == i + 1) {
             int j = i - 1;
-            for (; j >= 0 && g_preAllocatedMemory.memory[j] == nullptr; j--)
-                ;
+            for (; j >= 0 && g_preAllocatedMemory.memory[j] == nullptr; j--);
             g_preAllocatedMemory.usedCount = j + 1;
         }
         WCTAssert(g_preAllocatedMemory.usedCount >= 0);
@@ -666,15 +693,25 @@ StringView StringView::createConstant(const char* string, size_t length)
     return ret;
 }
 #ifdef _WIN32
-StringView StringView::createFromWString(const wchar_t* string)
+StringView StringView::createFromWString(const wchar_t* string, size_t length)
 {
-    int length = WideCharToMultiByte(CP_UTF8, 0, string, -1, NULL, 0, NULL, NULL);
-    if (length <= 1) {
+    if (!string || (length == 0 && string[0] == L'\0')) {
         return StringView();
     }
-    char buffer[_MAX_PATH];
-    WideCharToMultiByte(CP_UTF8, 0, string, -1, buffer, length, NULL, NULL);
-    return StringView(buffer, length - 1);
+
+    int srcLen = (length > 0) ? length : -1;
+    int utf8Size = WideCharToMultiByte(CP_UTF8, 0, string, srcLen, nullptr, 0, nullptr, nullptr);
+    if (utf8Size <= 0) {
+        return StringView();
+    }
+
+    std::string utf8Str(utf8Size, 0);
+    WideCharToMultiByte(CP_UTF8, 0, string, srcLen, &utf8Str[0], utf8Size, nullptr, nullptr);
+
+    if (srcLen == -1) {
+        utf8Str.resize(utf8Size - 1);
+    }
+    return utf8Str;
 }
 #endif
 

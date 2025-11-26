@@ -2,13 +2,12 @@
 //  TDUserManager.swift
 //  TDBasis
 //
-//  Created by fench on 2023/7/13.
+//  Created by Diag on 2023/7/13.
 //
 
 import UIKit
-import TopdonLog
 
-public let TDUserDefaults = UserDefaults.standard
+
 @objc public class TDUserManager: NSObject {
     
     /// 退出登录
@@ -20,22 +19,22 @@ public let TDUserDefaults = UserDefaults.standard
 //        TDUserModel.current.deleteObject()
         
         /// 清空保存的userID
-//        UserDefaults.saveTopdonId = ""
+//        UserDefaults.savediagId = ""
 //        UserDefaults.saveUserId = 0
         UserDefaults.userId = 0
-        UserDefaults.topdonId = ""
+        UserDefaults.diagId = ""
         UserDefaults.savedAppleUid = nil
         TDUserModel.logout()
         NotificationCenter.default.post(name: .loginStatusChanged, object: nil)
-        TDLogDebug("退出登录")
+
     }
     
     @objc public static var isLogin: Bool {
-        if !UserDefaults.hasBackupUser && !UserDefaults.saveTopdonId.isEmpty && UserDefaults.topdonId.isEmpty {
+        if !UserDefaults.hasBackupUser && !UserDefaults.savediagId.isEmpty && UserDefaults.diagId.isEmpty {
             UserDefaults.hasBackupUser = true
-            UserDefaults.topdonId = UserDefaults.saveTopdonId
+            UserDefaults.diagId = UserDefaults.savediagId
         }
-        let result = (!UserDefaults.topdonId.isEmpty || (!isAppIsolation && !UserDefaults.saveTopdonId.isEmpty)) && TDUserModel.current.isValid
+        let result = (!UserDefaults.diagId.isEmpty || (!isAppIsolation && !UserDefaults.savediagId.isEmpty)) && TDUserModel.current.isValid
         return result
     }
     
@@ -108,44 +107,44 @@ public let TDUserDefaults = UserDefaults.standard
 extension UserDefaults {
    
     /// 保存`userID`
-    @available(*, deprecated, message: "方法已过期，请使用 `UserDefaults.topdonId`")
-    public static var saveTopdonId: String {
+    @available(*, deprecated, message: "方法已过期，请使用 `UserDefaults.diagId`")
+    public static var savediagId: String {
         get {
-            UserDefaults.topdon.string(forKey: TDGlobalKey.kTopdonId) ?? ""
+            UserDefaults.diag.string(forKey: TDGlobalKey.kDiagId) ?? ""
         }
         set {
-            UserDefaults.topdon.set(newValue, forKey: TDGlobalKey.kTopdonId)
-            UserDefaults.topdon.synchronize()
+            UserDefaults.diag.set(newValue, forKey: TDGlobalKey.kDiagId)
+            UserDefaults.diag.synchronize()
         }
     }
     
     @available(*, deprecated, message: "方法已过期，请使用 `UserDefaults.userId`")
     public static var saveUserId: Int {
         get {
-            UserDefaults.topdon.integer(forKey: TDGlobalKey.kUserId)
+            UserDefaults.diag.integer(forKey: TDGlobalKey.kUserId)
         }
         set {
-            UserDefaults.topdon.set(newValue, forKey: TDGlobalKey.kUserId)
-            UserDefaults.topdon.synchronize()
+            UserDefaults.diag.set(newValue, forKey: TDGlobalKey.kUserId)
+            UserDefaults.diag.synchronize()
         }
     }
     
-    @UserDefault(key: "com.TDBasis.userId", defaultValue: 0)
-    @objc public static var userId: Int
+
+    @objc public static var userId: Int  = 0
     
     
-    @UserDefault(key: "com.TDBasis.topdonId", defaultValue: "")
-    @objc public static var topdonId: String
+
+    @objc public static var diagId: String  = ""
    
     /// 保存的邮箱
     public static var savedEmail: String? {
         get {
-            UserDefaults.topdon.string(forKey: TDGlobalKey.kRememberEmail)
+            UserDefaults.diag.string(forKey: TDGlobalKey.kRememberEmail)
         }
         set {
             if let email = newValue {
-                UserDefaults.topdon.setValue(email, forKey: TDGlobalKey.kRememberEmail)
-                UserDefaults.topdon.synchronize()
+                UserDefaults.diag.setValue(email, forKey: TDGlobalKey.kRememberEmail)
+                UserDefaults.diag.synchronize()
             }
         }
     }
@@ -153,35 +152,35 @@ extension UserDefaults {
     /// `token`更新时间
     public static var updateTokenTime: TimeInterval {
         get {
-            UserDefaults.topdon.double(forKey: TDGlobalKey.kUpdateTokenTime)
+            UserDefaults.diag.double(forKey: TDGlobalKey.kUpdateTokenTime)
         }
         set {
-            UserDefaults.topdon.set(newValue, forKey: TDGlobalKey.kUpdateTokenTime)
-            UserDefaults.topdon.synchronize()
+            UserDefaults.diag.set(newValue, forKey: TDGlobalKey.kUpdateTokenTime)
+            UserDefaults.diag.synchronize()
         }
     }
     
     public static var savedAvatarData: Data? {
         get {
-            if TDUserModel.current.topdonId.isEmpty { return nil }
-            return UserDefaults.topdon.data(forKey: TDGlobalKey.kSavedAvatarData + "_\(TDUserModel.current.topdonId)")
+            if TDUserModel.current.diagId.isEmpty { return nil }
+            return UserDefaults.diag.data(forKey: TDGlobalKey.kSavedAvatarData + "_\(TDUserModel.current.diagId)")
         }
         set {
-            if TDUserModel.current.topdonId.isEmpty { return }
-            UserDefaults.topdon.set(newValue, forKey: TDGlobalKey.kSavedAvatarData + "_\(TDUserModel.current.topdonId)")
-            UserDefaults.topdon.synchronize()
+            if TDUserModel.current.diagId.isEmpty { return }
+            UserDefaults.diag.set(newValue, forKey: TDGlobalKey.kSavedAvatarData + "_\(TDUserModel.current.diagId)")
+            UserDefaults.diag.synchronize()
         }
     }
     
     public static var savedAvatarUrl: String? {
         get {
-            if TDUserModel.current.topdonId.isEmpty { return nil }
-            return UserDefaults.topdon.string(forKey: TDGlobalKey.kSavedAvatarUrl + "_\(TDUserModel.current.topdonId)")
+            if TDUserModel.current.diagId.isEmpty { return nil }
+            return UserDefaults.diag.string(forKey: TDGlobalKey.kSavedAvatarUrl + "_\(TDUserModel.current.diagId)")
         }
         set {
-            if TDUserModel.current.topdonId.isEmpty { return }
-            UserDefaults.topdon.set(newValue, forKey: TDGlobalKey.kSavedAvatarUrl + "_\(TDUserModel.current.topdonId)")
-            UserDefaults.topdon.synchronize()
+            if TDUserModel.current.diagId.isEmpty { return }
+            UserDefaults.diag.set(newValue, forKey: TDGlobalKey.kSavedAvatarUrl + "_\(TDUserModel.current.diagId)")
+            UserDefaults.diag.synchronize()
         }
     }
     
@@ -238,8 +237,8 @@ extension UserDefaults {
         }
     }
    
-    /// 获取Topdon 的`userDefaults`
-    @objc public static var topdon: UserDefaults {
+    /// 获取diag 的`userDefaults`
+    @objc public static var diag: UserDefaults {
         UserDefaults(suiteName: TDGlobalKey.kGroupId) ?? UserDefaults.standard
     }
 }

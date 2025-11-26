@@ -2,17 +2,17 @@
 //  TDUserModel.swift
 //  TDNetwork
 //
-//  Created by fench on 2023/7/12.
+//  Created by Diag on 2023/7/12.
 //
 
 import UIKit
 
 @objc
 public class TDUserModel: TDDBModel {
-    /// id 新版的UserID == topdonId
+    /// id 新版的UserID == diagId
     @objc dynamic public var userId: Int = 0
-    /// topdonId
-    @objc dynamic public var topdonId: String = ""
+    /// diagId
+    @objc dynamic public var diagId: String = ""
     /// 令牌
     @objc dynamic public var token: String = ""
     /// 刷新令牌
@@ -85,6 +85,20 @@ public class TDUserModel: TDDBModel {
     
     @objc dynamic public var pointCardBalance: Int = 0
     
+    /// 是否已开启二次验证
+    @objc dynamic public var twoFactorStatus: Bool = false
+    
+    /// 我的身份
+    @objc dynamic public var userIdentity: Int = 0
+    
+    @nonobjc
+    public var identity: TDUserIdentityType {
+        .init(rawValue: userIdentity) ?? .confidentiality
+    }
+    
+    /// nastf账号
+    @objc dynamic public var vspId: String = ""
+    
     @objc dynamic public var pointCardBalanceDisplay: String {
         pointCardBalance.decimalFormatString
     }
@@ -110,7 +124,7 @@ public class TDUserModel: TDDBModel {
     }
     
     /// 构建方法
-    public convenience init(topdonId: String,
+    public convenience init(diagId: String,
                             token: String,
                             refreshToken: String,
                             userName: String,
@@ -121,7 +135,7 @@ public class TDUserModel: TDDBModel {
                             gender: Int = 1,
                             birthday: String = "") {
         self.init()
-        self.topdonId = topdonId
+        self.diagId = diagId
         self.token = token
         self.refreshToken = refreshToken
         self.userName = userName
@@ -139,16 +153,16 @@ public class TDUserModel: TDDBModel {
         }
         
         let emptyUser = TDUserModel()
-        let topdonId = UserDefaults.topdonId
+        let diagId = UserDefaults.diagId
         let userID = UserDefaults.userId
-        if userID == 0 && topdonId.isEmpty {
+        if userID == 0 && diagId.isEmpty {
             return emptyUser // 没有保存UserID
         }
         var criteria: String
         if userID != 0 {
             criteria = " WHERE userId = \(userID) "
         } else {
-            criteria = " WHERE topdonId = '\(topdonId)' "
+            criteria = " WHERE diagId = '\(diagId)' "
         }
         if !BasisInfo.userDBSoftCode.isEmpty {
             criteria += "AND LOWER(loginApps) LIKE '%\(BasisInfo.userDBSoftCode.lowercased())%'"
@@ -162,16 +176,16 @@ public class TDUserModel: TDDBModel {
     }
     
     private static var unIsolationModel: TDUserModel? {
-        let topdonId = UserDefaults.saveTopdonId
+        let diagId = UserDefaults.savediagId
         let userID = UserDefaults.saveUserId
-        if userID == 0 && topdonId.isEmpty {
+        if userID == 0 && diagId.isEmpty {
             return nil // 没有保存UserID
         }
         var criteria: String
         if userID != 0 {
             criteria = " WHERE userId = \(userID) "
         } else {
-            criteria = " WHERE topdonId = '\(topdonId)' "
+            criteria = " WHERE diagId = '\(diagId)' "
         }
         
         if let current = TDUserModel.findFirst(byCriteria: criteria) {
@@ -188,7 +202,7 @@ public class TDUserModel: TDDBModel {
     
     /// 当前用户是否有效
     public var isValid: Bool {
-        return userId != 0 && !topdonId.isEmpty
+        return userId != 0 && !diagId.isEmpty
     }
     
     private static var _currentUser: TDUserModel?
@@ -208,16 +222,16 @@ public class TDUserModel: TDDBModel {
     /// - Parameter userModel: 用户模型
     public static func updateUser(_ userModel: TDUserModel) {
         _currentUser = userModel
-        if TDUserManager.isLogin, !userModel.topdonId.isEmpty {
-//            UserDefaults.saveTopdonId = userModel.topdonId
+        if TDUserManager.isLogin, !userModel.diagId.isEmpty {
+//            UserDefaults.savediagId = userModel.diagId
 //            UserDefaults.saveUserId = userModel.userId
             UserDefaults.userId = userModel.userId
-            UserDefaults.topdonId = userModel.topdonId
+            UserDefaults.diagId = userModel.diagId
         }
     }
     
     public override class func customPk() -> String? {
-        return "topdonId"
+        return "diagId"
     }
     
     public override class func storeGroupID() -> String! {
@@ -245,7 +259,7 @@ public class TDUserModel: TDDBModel {
 @objc public extension TDUserModel {
     @objc public func setSelect() {
         if !isValid { return }
-        UserDefaults.topdonId = topdonId
+        UserDefaults.diagId = diagId
         UserDefaults.userId = userId
         if !exsitApps.contains(where: { $0.lowercased() == BasisInfo.userDBSoftCode.lowercased() }) {
             exsitApps.append(BasisInfo.userDBSoftCode)
@@ -300,15 +314,29 @@ public class TDUserModel: TDDBModel {
 extension UserDefaults {
     static public var hasBackupUser: Bool {
         get {
-            let value = UserDefaults.topdon.bool(forKey: "kHasBackupUser_\(BasisInfo.userDBSoftCode)")
-            if !value , UserDefaults.topdonId.isEmpty, !UserDefaults.saveTopdonId.isEmpty {
-                UserDefaults.topdonId = UserDefaults.saveTopdonId
+            let value = UserDefaults.diag.bool(forKey: "kHasBackupUser_\(BasisInfo.userDBSoftCode)")
+            if !value , UserDefaults.diagId.isEmpty, !UserDefaults.savediagId.isEmpty {
+                UserDefaults.diagId = UserDefaults.savediagId
             }
             return value
         }
         set {
-            UserDefaults.topdon["kHasBackupUser_\(BasisInfo.userDBSoftCode)"] = newValue
-            UserDefaults.topdon.synchronize()
+            UserDefaults.diag["kHasBackupUser_\(BasisInfo.userDBSoftCode)"] = newValue
+            UserDefaults.diag.synchronize()
         }
     }
+}
+
+public enum TDUserIdentityType: Int {
+    /// 未知
+    case `unknown` = 0
+    /// 车主 `DIYer`
+    case owner = 1
+    /// 技师
+    case technician = 2
+    /// 发烧友 `carGuy`
+    case enthusiast = 3
+    /// 保密
+    case confidentiality = 4
+    
 }

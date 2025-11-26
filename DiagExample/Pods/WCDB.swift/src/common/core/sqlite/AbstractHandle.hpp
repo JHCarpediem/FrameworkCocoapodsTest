@@ -77,6 +77,8 @@ public:
 
     void enableWriteMainDB(bool enable);
     bool canWriteMainDB();
+    void setLiteModeEnable(bool enable);
+    bool liteModeEnable() const;
 
     long long getLastInsertedRowID();
     //    const char *getErrorMessage();
@@ -84,6 +86,7 @@ public:
     //    Error::Code getResultCode();
     int getChanges();
     int getTotalChange();
+    void setReadOnly();
     bool isReadonly();
     bool isInTransaction();
 
@@ -96,6 +99,8 @@ public:
 protected:
     int m_customOpenFlag;
     Tag m_tag;
+    bool m_enableLiteMode = false;
+    bool m_isReadOnly = false;
 
 #pragma mark - Statement
 public:
@@ -138,6 +143,7 @@ public:
 public:
     virtual bool beginTransaction();
     bool commitOrRollbackTransaction();
+    virtual bool commitTransaction();
     virtual void rollbackTransaction();
 
     void markErrorNotAllowedWithinTransaction();
@@ -147,7 +153,6 @@ public:
 protected:
     void cacheCurrentTransactionError();
     void resumeCacheTransactionError();
-    virtual bool commitTransaction();
 
 private:
     int m_transactionLevel;
@@ -169,7 +174,7 @@ public:
         Restart,
         Truncate,
     };
-    bool checkpoint(CheckpointMode mode);
+    bool checkpoint(CheckpointMode mode = CheckpointMode::Passive);
     void disableCheckpointWhenClosing(bool disable);
     void setWALFilePersist(int persist);
     bool setCheckPointLock(bool enable);
@@ -283,6 +288,11 @@ public:
     bool setCipherPageSize(int pageSize);
     StringView getCipherSalt();
     bool setCipherSalt(const UnsafeStringView &salt);
+
+#pragma mark - Extra
+public:
+    void tryPreloadAllPages();
+    void setFileChunkSize(int size);
 };
 
 } //namespace WCDB

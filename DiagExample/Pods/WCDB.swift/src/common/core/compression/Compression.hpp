@@ -26,6 +26,7 @@
 
 #include "CompressionInfo.hpp"
 #include "Lock.hpp"
+#include "Progress.hpp"
 #include "ThreadLocal.hpp"
 #include <functional>
 #include <map>
@@ -45,7 +46,7 @@ protected:
     virtual void didCompress(const CompressionTableBaseInfo* info) = 0;
 };
 
-class Compression final {
+class Compression final : public Progress {
 #pragma mark - Initialize
 public:
     Compression(CompressionEvent* event);
@@ -53,9 +54,9 @@ public:
     typedef std::function<void(CompressionTableUserInfo&)> TableFilter;
     void setTableFilter(const TableFilter& tableFilter);
     bool shouldCompress() const;
+    void purge();
 
 private:
-    void purge();
     TableFilter m_tableFilter;
 
     volatile int m_dataVersion;
@@ -76,8 +77,9 @@ protected:
     };
 
     bool initInfo(InfoInitializer& initializer, const UnsafeStringView& table);
-    bool hintThatTableWillBeCreated(InfoInitializer& initializer,
-                                    const UnsafeStringView& table);
+    Optional<std::list<CompressionColumnInfo>>
+    tryGetCompressingColumnsForNewTable(InfoInitializer& initializer,
+                                        const UnsafeStringView& table);
     void markAsNoNeedToCompress(const UnsafeStringView& table);
     void markAsCompressed(const CompressionTableInfo* info);
     Optional<const CompressionTableInfo*> getInfo(const UnsafeStringView& table);
@@ -94,7 +96,7 @@ private:
     ThreadLocal<std::set<const CompressionTableInfo*>> m_commitingTables;
     std::set<const CompressionTableInfo*> m_compressings;
     StringViewMap<const CompressionTableInfo*> m_filted;
-    StringViewSet m_hints;
+    StringViewMap<CompressionTableUserInfo> m_hints;
     std::list<CompressionTableInfo> m_holder;
     mutable SharedLock m_lock;
 
@@ -113,7 +115,8 @@ public:
         Optional<const CompressionTableInfo*>
         tryGetCompressionInfo(const UnsafeStringView& table);
         bool tryFixCompressingColumn(const UnsafeStringView& table);
-        bool hintThatTableWillBeCreated(const UnsafeStringView& table);
+        Optional<std::list<CompressionColumnInfo>>
+        tryGetCompressingColumnsForNewTable(const UnsafeStringView& table);
         void notifyTransactionCommitted(bool committed);
         bool canCompressNewData() const;
 
@@ -129,7 +132,7 @@ private:
 
 #pragma mark - Step
 public:
-    class Stepper : public InfoInitializer {
+    class Stepper : public InfoInitializer, public Progress {
         friend class Compression;
 
     public:
@@ -141,9 +144,15 @@ public:
         filterComplessingTables(std::set<const CompressionTableInfo*>& allTableInfos)
         = 0;
         virtual Optional<bool> compressRows(const CompressionTableInfo* info) = 0;
+
+        typedef std::function<void(double)> ProgressCallback;
+        virtual bool rollbackCompression(const CompressionTableInfo* info) = 0;
+        virtual bool deleteCompressionRecord() = 0;
     };
 
     Optional<bool> step(Compression::Stepper& stepper);
+
+    bool rollbackCompression(Compression::Stepper& stepper);
 
 protected:
     // worked

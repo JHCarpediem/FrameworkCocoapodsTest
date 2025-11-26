@@ -64,6 +64,9 @@ public extension TDBasisWrap where Base: UIColor {
     /// 导航栏背景色
     static var navigationBackground: UIColor { .theme.navigationBackground?.color ?? .clear }
     
+    /// 卡片背景色
+    static var cardBackground: UIColor { .theme.cardBackground?.color ?? UIColor.td.color(hex6: 0xF8F8F8) }
+    
     /// 导航栏 右边按钮颜色
     static var navigationRightItemsText: UIColor { .theme.navigationRightItemsText?.color ?? UIColor.td.title }
 }
@@ -122,6 +125,9 @@ public extension TDThemeBasis where Base: UIColor {
     
     /// 导航栏背景色
     static var navigationBackground: ThemeColorPicker? { UIConfig.color(with: "navigationBar.backgroundColor") }
+    
+    /// 卡片背景色
+    static var cardBackground: ThemeColorPicker? { UIConfig.color(with: "global.cardBackground")}
     
     /// 导航栏 右边按钮颜色
     static var navigationRightItemsText: ThemeColorPicker? { UIConfig.color(with: "navigationBar.rightItemTextColor") }
@@ -185,6 +191,9 @@ public extension TDThemeBasis where Base: ThemeColorPicker {
     
     /// 导航栏 右边按钮颜色
     static var navigationRightItemsText: ThemeColorPicker? { UIColor.theme.navigationRightItemsText }
+    
+    /// 卡片背景色
+    static var cardBackground: ThemeColorPicker? { UIColor.theme.cardBackground }
 }
 
 

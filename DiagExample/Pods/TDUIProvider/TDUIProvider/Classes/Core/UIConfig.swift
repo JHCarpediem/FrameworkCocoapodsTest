@@ -2,7 +2,7 @@
 //  UIConfig.swift
 //  TDUIProvider
 //
-//  Created by Fench on 2025/1/6.
+//  Created by Diag on 2025/1/6.
 //
 
 import Foundation
@@ -12,6 +12,7 @@ import TDTheme
 @objc(TDUIConfig)
 @objcMembers
 open class UIConfig: NSObject {
+    
     /// 获取资源所在的 bundle
     @objc public private(set) static var resourceBundle: Bundle?
     
@@ -19,7 +20,9 @@ open class UIConfig: NSObject {
     @objc public private(set) static var themeName: String?
     
     /// 中间件资源文件 bundle eg: LMS 的默认资源 bundle
-    private(set) static var middlewareConfigs: [MiddlewareConfig] = []
+    private(set) static var middlewareConfigs: [String: ResourceConfig] = [:]
+    
+    private(set) static var appConfigs: [String: ResourceConfig] = [:]
     
     /// 配置 json 和 bundle 如果通过这个方法配置了 JSON 和 bundle，将会优先生效。（会覆盖 provider 中的值）
     /// 通过快捷配置 json 和 bundle 实现 LMS 的项目配置
@@ -35,16 +38,21 @@ open class UIConfig: NSObject {
     /// 通过快捷配置 json 和 bundle 实现 LMS 的项目配置
     /// 相应的 json 文件参考 对应的 bundle 里面的 Theme.json
     /// eg: 配置国内版 将 National.bundle 复制到主工程，将对应图片替换（注意清不要修改图片名），修改 Theme.json 中的颜色的色值
-    @objc public static func configMiddleware(key: String, themeName: String = "Theme.json", bundle: Bundle?) {
-        middlewareConfigs.removeAll(where: { $0.key == key })
-        middlewareConfigs.append(MiddlewareConfig(bundle: bundle, themeName: themeName, key: key))
+    @objc public static func configMiddleware(key: String, themeName: String = "Theme.json", bundle: Bundle?, middleImagePath: String? = nil) {
+        middlewareConfigs[key] = ResourceConfig(bundle: bundle, themeName: themeName, imagePath: middleImagePath, key: key)
+        
+    }
+    
+    @objc public static func appConfig(key: String, themeName: String = "Theme.json", bundle: Bundle?, imagePath: String? = nil) {
+        appConfigs[key] = ResourceConfig(bundle: bundle, themeName: themeName, imagePath: imagePath, key: key)
     }
 }
 
 extension UIConfig {
-    class MiddlewareConfig {
+    class ResourceConfig {
         var bundle: Bundle?
         var themeName: String?
+        var imagePath: String?
         var key: String
         
         private var _themedDict: NSDictionary?
@@ -58,15 +66,16 @@ extension UIConfig {
                 let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
                 let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
                 let themeDict = json as? NSDictionary else {
-                TDLogError("加载配置警告: App 未配置主题 json '\(jsonName)' at: \(path)")
+
                 return nil
             }
             _themedDict = themeDict
             return themeDict
         }
         
-        required init(bundle: Bundle?, themeName: String?, key: String) {
+        required init(bundle: Bundle?, themeName: String?, imagePath: String? = nil, key: String) {
             self.bundle = bundle
+            self.imagePath = imagePath
             self.themeName = themeName
             self.key = key
         }
@@ -95,7 +104,7 @@ extension UIConfig {
             let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
             let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
             let jsonDict = json as? NSDictionary else {
-            TDLogError("加载配置警告: App 未配置主题 json '\(jsonName)' at: \(path)")
+
             return nil
         }
         _jsonDict = jsonDict
@@ -113,7 +122,7 @@ extension UIConfig {
             let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
             let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
             let jsonDict = json as? NSDictionary else {
-            TDLogError("加载配置警告: 无法读取 LMS 内置的配置文件 Theme.json at: \(path)")
+ 
             return nil
         }
         _internalJson = jsonDict
@@ -126,15 +135,20 @@ extension UIConfig {
             return value
         }
         
-        if let middlewareKey, let jsonDict = middlewareConfigs.first(where: { $0.key == middlewareKey })?.themeDict, let value = jsonDict.value(forKeyPath: keyPath) {
-            return value
+        if let middlewareKey {
+            if let jsonDict = appConfigs[middlewareKey]?.themeDict, let value = jsonDict.value(forKeyPath: keyPath) {
+                return value
+            }
+            if let jsonDict = middlewareConfigs[middlewareKey]?.themeDict, let value = jsonDict.value(forKeyPath: keyPath) {
+                return value
+            }
         }
         
         if let internalJson, let value = internalJson.value(forKeyPath: keyPath) {
             return value
         }
         
-        TDLogError("加载配置错误，未知的 keyPath: \(keyPath)")
+
         return nil
     }
 }
@@ -144,7 +158,7 @@ extension UIConfig {
     /// 从配置中读取颜色
     public static func color(with keyPath: String, middlewareKey: String? = nil) -> ThemeColorPicker? {
         guard let rgba = readValue(for: keyPath, middlewareKey: middlewareKey) as? String, let color = try? UIColor(rgba_throws: rgba) else {
-            TDLogError("配置错误 - 无法读取颜色配置: \(keyPath)")
+
             return nil
         }
         return ThemeColorPicker(v: { color })
@@ -181,7 +195,9 @@ extension UIConfig {
     /// 从配置中读取渐变色 色值数组
     public static func gradient(keyPath: String, middlewareKey: String? = nil) -> [UIColor]? {
         guard let colorValue = readValue(for: keyPath, middlewareKey: middlewareKey) as? String, !colorValue.isEmpty else { return nil }
-        let colors = colorValue.td.nsString.components(separatedBy: ",").map { UIColor.td.color(with: $0) ?? .clear }
+        let colors = colorValue.td.nsString
+            .components(separatedBy: ",")
+            .map { UIColor.td.color(with: $0.trimmingCharacters(in: .whitespacesAndNewlines)) ?? .clear }
         return colors
     }
     
@@ -244,22 +260,33 @@ extension UIConfig {
     
     /// 根据图片名 从配置的 bundle 中读取图片
     public static func image(named: String, middlewareKey: String? = nil) -> ThemeImagePicker? {
+        
+        // 先从 App Bundle 中获取图片资源
         if let image = image(named: named, bundle: UIConfig.resourceBundle) {
             return image
         }
         
-        if let bundle = middlewareConfigs.first(where: { $0.key == middlewareKey } )?.bundle {
-            if let image = image(named: named, bundle: bundle) {
-                return image
+        if let middlewareKey, let appConfig = appConfigs[middlewareKey], let bundle = appConfig.bundle {
+            var imageName = named
+            if let middleImagePath = appConfig.imagePath {
+                imageName = middleImagePath.td.appendingPathComponent(named)
             }
-        } else {
-            for bundle in middlewareConfigs.map(\.bundle) {
-                if let image = image(named: named, bundle: bundle) {
-                    return image 
-                }
+            if let image = image(named: imageName, bundle: bundle) {
+                return image
             }
         }
         
+        if let middlewareKey, let config = middlewareConfigs[middlewareKey], let bundle = config.bundle {
+            var imageName = named
+            if let middleImagePath = config.imagePath {
+                imageName = middleImagePath.td.appendingPathComponent(named)
+            }
+            if let image = image(named: imageName, bundle: bundle) {
+                return image
+            }
+        }
+        
+        // 从底层的 UIProvider 资源 bundle 中获取图片资源
         var named = named
         if !named.contains("/") {
             named = "TDUIProvider.bundle/Image/\(named)"

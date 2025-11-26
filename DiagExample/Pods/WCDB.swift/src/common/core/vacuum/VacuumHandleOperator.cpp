@@ -73,12 +73,14 @@ bool VacuumHandleOperator::executeVacuum()
         if (attribute.failed()) {
             return false;
         }
-        if (attribute.value().withoutRowid || attribute.value().isVirtual) {
-            needCheckShadowTable = attribute.value().isVirtual;
+        if (attribute.value().withoutRowid) {
             if (!copyWithouRowidTable(table.second)) {
                 return false;
             }
         } else {
+            if (attribute.value().isVirtual) {
+                needCheckShadowTable = true;
+            }
             if (!copyNormalTable(table.second)) {
                 return false;
             }
@@ -89,6 +91,7 @@ bool VacuumHandleOperator::executeVacuum()
             return false;
         }
     }
+    handle->close();
     return finishProgress();
 }
 
@@ -197,8 +200,13 @@ bool VacuumHandleOperator::copyWithouRowidTable(const TableInfo &info)
     if (!createTable(info)) {
         return false;
     }
-    StatementInsert insert = StatementInsert().insertIntoTable(info.name).values(
-    StatementSelect().select(Column::all()).from(TableOrSubquery(info.name).schema(kOriginSchema)));
+    StringView protectedTableName = StringView::formatted("'%s'", info.name.data());
+    StatementInsert insert
+    = StatementInsert()
+      .insertIntoTable(protectedTableName)
+      .values(StatementSelect()
+              .select(Column::all())
+              .from(TableOrSubquery(protectedTableName).schema(kOriginSchema)));
     if (!getHandle()->execute(insert)) {
         return false;
     }
@@ -212,9 +220,11 @@ bool VacuumHandleOperator::copyNormalTable(const TableInfo &info)
     }
     InnerHandle *handle = getHandle();
     WCTAssert(handle->isOpened());
-    auto selectMaxRowid = StatementSelect()
-                          .select(Column::rowid().max())
-                          .from(TableOrSubquery(info.name).schema(kOriginSchema));
+    StringView protectedTableName = StringView::formatted("'%s'", info.name.data());
+    auto selectMaxRowid
+    = StatementSelect()
+      .select(Column::rowid().max())
+      .from(TableOrSubquery(protectedTableName).schema(kOriginSchema));
     if (!handle->prepare(selectMaxRowid)) {
         return false;
     }
@@ -227,7 +237,24 @@ bool VacuumHandleOperator::copyNormalTable(const TableInfo &info)
         return increaseProgress(m_tableWeight);
     }
     int64_t maxRowid = handle->getInteger();
-    int64_t lastInsertRowid = 0;
+    handle->finalize();
+
+    auto selectMinRowid
+    = StatementSelect()
+      .select(Column::rowid().min())
+      .from(TableOrSubquery(protectedTableName).schema(kOriginSchema));
+    if (!handle->prepare(selectMinRowid)) {
+        return false;
+    }
+    if (!handle->step()) {
+        handle->finalize();
+        return false;
+    }
+    if (handle->done()) {
+        handle->finalize();
+        return increaseProgress(m_tableWeight);
+    }
+    int64_t minRowid = handle->getInteger();
     handle->finalize();
 
     auto optionalMetas = handle->getTableMeta(Schema(), info.name);
@@ -240,35 +267,34 @@ bool VacuumHandleOperator::copyNormalTable(const TableInfo &info)
         columns.push_back(Column(meta.name));
     }
 
-    auto insert = StatementInsert().insertIntoTable(info.name).columns(columns).values(
-    StatementSelect()
-    .select(columns)
-    .from(TableOrSubquery(info.name).schema(kOriginSchema))
-    .order(Column::rowid().asOrder(Order::ASC))
-    .limit(VacuumBatchCount)
-    .offset(BindParameter()));
+    auto insert = StatementInsert()
+                  .insertIntoTable(protectedTableName)
+                  .columns(columns)
+                  .values(StatementSelect()
+                          .select(columns)
+                          .from(TableOrSubquery(protectedTableName).schema(kOriginSchema))
+                          .where(Column::rowid() >= BindParameter())
+                          .order(Column::rowid().asOrder(Order::ASC))
+                          .limit(VacuumBatchCount));
     if (!handle->prepare(insert)) {
         return false;
     }
-    int offset = 0;
+    int64_t curMinRowid = minRowid;
     do {
         handle->reset();
-        handle->bindInteger(offset);
+        handle->bindInteger(curMinRowid);
         if (!handle->step()) {
             handle->finalize();
             return false;
         }
-        offset += VacuumBatchCount;
-        if (maxRowid > 0) {
-            double incre = (double) (handle->getLastInsertedRowID() - lastInsertRowid)
-                           / maxRowid * m_tableWeight;
-            WCTAssert(incre >= 0);
-            if (!increaseProgress(incre)) {
-                handle->finalize();
-                return false;
-            }
-            lastInsertRowid = handle->getLastInsertedRowID();
+        double incre = (double) (handle->getLastInsertedRowID() - curMinRowid + 1)
+                       / (maxRowid - minRowid + 1) * m_tableWeight;
+        WCTAssert(incre >= 0);
+        if (!increaseProgress(incre)) {
+            handle->finalize();
+            return false;
         }
+        curMinRowid = handle->getLastInsertedRowID() + 1;
     } while (handle->getChanges() > 0);
     handle->finalize();
     return true;

@@ -2,7 +2,7 @@
 //  main.m
 //  DiagExample
 //
-//  Created by lk_ios2023002 on 2023/12/19.
+//  Created by diag on 2023/12/19.
 //
 
 #import <UIKit/UIKit.h>

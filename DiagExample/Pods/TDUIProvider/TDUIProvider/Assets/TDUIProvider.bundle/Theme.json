@@ -4,7 +4,7 @@
         "isHD" : 0,
         "statusBarStyle" : 0,
         "isNeutral": 0,
-        "neutralTopdonReplaceValue": "",
+        "neutralDiagReplaceValue": "",
         "isLogoutPopToRoot": 1,
         "titleColor" : "#333333",
         "subTitleColor" : "#999999",
@@ -22,7 +22,8 @@
         "confirmBtnBackgroundColor" : "#F22222",
         "confirmBtnDisableBackgroundColor" : "",
         "confirmBtnDisableTextColor" : "",
-        "textFieldPlaceholder": "#999999"
+        "textFieldPlaceholder": "#999999",
+        "cardBackground": "#F8F8F8"
     },
     
     "alert" : {

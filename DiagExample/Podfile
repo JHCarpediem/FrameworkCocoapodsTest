@@ -2,8 +2,7 @@
 # platform :ios, '9.0'
 
 source 'https://github.com/CocoaPods/Specs.git'
-source 'https://github.com/TopdonTechnology/Specs.git'
-source 'http://172.16.50.23:8081/topdon-app/ios/specs.git'
+
 
 target 'DiagExample' do
   # Comment the next line if you don't want to use dynamic frameworks
@@ -20,11 +19,11 @@ target 'DiagExample' do
   pod 'SocketRocket', '~> 0.6.0'
   pod 'YBImageBrowser','3.0.9'
   pod 'JHCampoCharts', '4.00.000'
-  pod 'TDBasis', '5.00.022'
+  pod 'TDBasis', '5.00.054'
   pod 'SnapKit'
-  pod 'TDUIProvider'
+  pod 'TDUIProvider', '2.10.022'
 
-pod 'TopdonDiagnosis', :path => '../'
+pod 'Diagnosis', :path => '../'
   # Pods for DiagExample
 
 end

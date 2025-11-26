@@ -17,6 +17,58 @@ import UIKit
     }
 }
 
+
+public extension Array {
+    /// 将数组元素按照指定键分组为字典
+    /// - Parameter keyForValue: 生成分组键的闭包
+    /// - Returns: 分组后的字典 [Key: [Element]]
+    func groupedToDictionary<Key: Hashable>(by keyForValue: (Element) -> Key) -> [Key: [Element]] {
+        return Dictionary(grouping: self, by: keyForValue)
+    }
+    
+    /// 将数组元素按照指定键分组为二维数组（保持首次出现的键的顺序）
+    /// - Parameter keyForValue: 生成分组键的闭包
+    /// - Returns: 分组后的二维数组 [[Element]]
+    func grouped<Key: Hashable>(by keyForValue: (Element) -> Key) -> [[Element]] {
+        let groupedDict = Dictionary(grouping: self, by: keyForValue)
+        
+        // 保持原始分组顺序（按元素首次出现的顺序）
+        var orderedKeys: [AnyHashable] = []
+        var uniqueKeys: Set<AnyHashable> = []
+        
+        for element in self {
+            let key = keyForValue(element)
+            if !uniqueKeys.contains(key) {
+                orderedKeys.append(key)
+                uniqueKeys.insert(key)
+            }
+        }
+        
+        return orderedKeys.compactMap { key in
+            groupedDict.first(where: {
+                if !($0.key is (any Hashable)) {
+                    return false
+                }
+                return $0.key as AnyHashable == key
+            })?.value
+        }
+    }
+    
+    /// 将数组元素按照指定键分组为二维数组（带排序选项）
+    /// - Parameters:
+    ///   - keyForValue: 生成分组键的闭包
+    ///   - sortGroups: 对分组进行排序的闭包（可选）
+    /// - Returns: 分组后的二维数组 [[Element]]
+    func grouped<Key: Hashable>(
+        by keyForValue: (Element) -> Key,
+        sortedBy sortGroups: (Key, Key) -> Bool
+    ) -> [[Element]] {
+        let groupedDict = Dictionary(grouping: self, by: keyForValue)
+        let sortedKeys = groupedDict.keys.sorted(by: sortGroups)
+        return sortedKeys.compactMap { groupedDict[$0] }
+    }
+}
+
 public extension Array {
     
     func jsonString(prettify: Bool = false) -> String? {
