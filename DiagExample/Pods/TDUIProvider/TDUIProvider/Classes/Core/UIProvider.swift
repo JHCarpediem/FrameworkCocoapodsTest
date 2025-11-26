@@ -23,9 +23,9 @@ public struct UIProvider {
         UIConfig.intValue(keyPath: "global.isNeutral") == 1
     }
     
-    /// 中性 App Topdon 替换文本
+    /// 中性 App diag 替换文本
     public static var neutralReplaceValue: String {
-        return UIConfig.string(for: "global.neutralTopdonReplaceValue", defaultValue: "")
+        return UIConfig.string(for: "global.neutralDiagReplaceValue", defaultValue: "")
     }
     
     /// 是否是平板

@@ -2,7 +2,7 @@
 //  TDPublicEnum.swift
 //  TDBasis
 //
-//  Created by Fench on 2025/8/14.
+//  Created by Diag on 2025/8/14.
 //
 
 import Foundation
@@ -10,9 +10,9 @@ import Foundation
 //MARK: 产品型号对应id关系
 @objc
 public enum TDProductType: Int {
-    case TopScan = 1255
-    case TopScanPro = 1514
-    case TopScanMoto = 1577
+    case DiagScan = 1255
+    case DiagScanPro = 1514
+    case DiagScanMoto = 1577
     case TopVCI = 1609
     case SmallCarPro = 1724
     case SmallCarProMoto = 1767
@@ -30,24 +30,24 @@ public enum TDProductType: Int {
     case BTMobilePro = 150
     case TB6000Pro = 1083
     case BT20 = 833
-    case CarPal = 1764
-    case CarPalGuru = 1852
-    case ArtiDiag800BT2 = 1847
-    case ArtiDiagMoto = 1948
-    case ArtiDiag600Pro = 1993
+    case CarDiag = 1764
+    case CarDiagGuru = 1852
+    case CarArti800BT2 = 1847
+    case CarArtiMoto = 1948
+    case CarArti600Pro = 1993
     case TC001 = 950
     case TC002 = 951
     case TS004 = 1733
     case TC002CDuo = 2062
-    case ArtiDiag600Elite = 2013
+    case CarArti600Elite = 2013
     case UltraDiagMoto = 2038
-    case DeepScan = 2071
-    case TOPDONONE = 2118
+    case DeepDiag = 2071
+    case DIAGONE = 2118
     case TDarts = 1206
     case BTMobilePros = 149
     case DS200 = 2153
     case DS100 = 2152
-    case ArtiDiag500BMS = 2119
+    case CarArti500BMS = 2119
     case DS900 = 2158
     case RLinkLite = 1456
     case RLinkPro = 1487
@@ -59,33 +59,33 @@ public enum TDProductType: Int {
         switch self {
         case .TC007:
             return 1801
-        case .CarPal:
+        case .CarDiag:
             return 1773
-        case .CarPalGuru:
+        case .CarDiagGuru:
             return 1806
-        case .ArtiDiag800BT2:
+        case .CarArti800BT2:
             return 1805
-        case .ArtiDiagMoto:
+        case .CarArtiMoto:
             return 1809
-        case .ArtiDiag600Pro:
+        case .CarArti600Pro:
             return 1820
         case .TS004:
             return 1695
         case .TC002CDuo:
             return 1838
-        case .ArtiDiag600Elite:
+        case .CarArti600Elite:
             return 1821
         case .UltraDiagMoto:
             return 1836
-        case .DeepScan:
+        case .DeepDiag:
             return 1837
-        case .TOPDONONE:
+        case .DIAGONE:
             return 1846
         case .DS200:
             return 1851
         case .DS100:
             return 1852
-        case .ArtiDiag500BMS:
+        case .CarArti500BMS:
             return 1853
         case .RlinkX7:
             return 1776

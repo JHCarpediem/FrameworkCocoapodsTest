@@ -2,7 +2,7 @@
 //  TDPopupView.swift
 //  TDUIProvider
 //
-//  Created by Fench on 2025/4/23.
+//  Created by Diag on 2025/4/23.
 //
 
 import Foundation
@@ -367,7 +367,7 @@ class TDPopupQueue: NSObject {
             }
         } else if element.data.responds(to: #selector(TDPopupView.dismissWithAnimation(_:))) {
             element.data.dismissWithAnimation? {
-                TDLogDebug("-dismissPopupViewWithAnimation: Triggered by a higher priority popover")
+
                 // 唤醒调度器检查队列
                 DispatchQueue.main.async {
                     TDPopupScheduler.shared.registerFirstPopupViewResponder()
@@ -489,12 +489,12 @@ class TDPopupQueue: NSObject {
     private func insert(_ element: PopupElement, at index: Int) {
         let safeIndex: Int = {
             if index < 0 {
-                TDLogDebug("⚠️ 插入索引值异常: \(index) 已自动修正为0")
+
                 return 0
             }
             if index > list.count {
                 let clampedIndex = list.count
-                TDLogDebug("⚠️ 插入越界: \(index)/\(list.count) 已修正为末尾")
+
                 return clampedIndex
             }
             return index

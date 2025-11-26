@@ -1,4 +1,22 @@
 PODS:
+  - Diagnosis (2.09.119):
+    - Firebase/AnalyticsWithoutAdIdSupport
+    - Firebase/Crashlytics
+    - FMDB (= 2.7.5)
+    - IQKeyboardManager
+    - JHCampoCharts (= 4.00.000)
+    - lottie-ios (= 4.4.1)
+    - Masonry (= 1.1.0)
+    - SnapKit
+    - SocketRocket (= 0.6.0)
+    - SSZipArchive (= 2.4.3)
+    - TDBasis
+    - TDUIProvider
+    - Texture (= 3.1.0)
+    - TZImagePickerController
+    - YBImageBrowser (= 3.0.9)
+    - YYModel (= 1.0.4)
+    - YYText (= 1.0.7)
   - Firebase/AnalyticsWithoutAdIdSupport (10.22.0):
     - Firebase/CoreOnly
     - FirebaseAnalytics/WithoutAdIdSupport (~> 10.22.0)
@@ -246,34 +264,16 @@ PODS:
     - Texture/Core
   - Texture/Video (3.1.0):
     - Texture/Core
-  - TopdonDiagnosis (2.09.119):
-    - Firebase/AnalyticsWithoutAdIdSupport
-    - Firebase/Crashlytics
-    - FMDB (= 2.7.5)
-    - IQKeyboardManager
-    - JHCampoCharts (= 4.00.000)
-    - lottie-ios (= 4.4.1)
-    - Masonry (= 1.1.0)
-    - SnapKit
-    - SocketRocket (= 0.6.0)
-    - SSZipArchive (= 2.4.3)
-    - TDBasis
-    - TDUIProvider
-    - Texture (= 3.1.0)
-    - TZImagePickerController
-    - YBImageBrowser (= 3.0.9)
-    - YYModel (= 1.0.4)
-    - YYText (= 1.0.7)
   - TopdonLog (1.60.011):
     - KSCrash (= 1.17.6)
     - SSZipArchive (= 2.4.3)
     - SwiftyBeaver (= 1.9.5)
     - TDWCDB
-  - TZImagePickerController (3.8.6):
-    - TZImagePickerController/Basic (= 3.8.6)
-    - TZImagePickerController/Location (= 3.8.6)
-  - TZImagePickerController/Basic (3.8.6)
-  - TZImagePickerController/Location (3.8.6)
+  - TZImagePickerController (3.8.9):
+    - TZImagePickerController/Basic (= 3.8.9)
+    - TZImagePickerController/Location (= 3.8.9)
+  - TZImagePickerController/Basic (3.8.9)
+  - TZImagePickerController/Location (3.8.9)
   - WCDB.swift (2.1.14):
     - WCDBOptimizedSQLCipher (= 1.4.7)
   - WCDBOptimizedSQLCipher (1.4.7)
@@ -289,6 +289,7 @@ PODS:
   - YYText (1.0.7)
 
 DEPENDENCIES:
+  - Diagnosis (from `../`)
   - Firebase/AnalyticsWithoutAdIdSupport (= 10.22.0)
   - Firebase/Crashlytics (= 10.22.0)
   - FMDB (= 2.7.5)
@@ -300,7 +301,6 @@ DEPENDENCIES:
   - TDBasis (= 5.00.054)
   - TDUIProvider (= 2.10.022)
   - Texture (= 3.1.0)
-  - TopdonDiagnosis (from `../`)
   - YBImageBrowser (= 3.0.9)
   - YYModel (= 1.0.4)
   - YYText (= 1.0.7)
@@ -352,10 +352,11 @@ SPEC REPOS:
     - YYText
 
 EXTERNAL SOURCES:
-  TopdonDiagnosis:
+  Diagnosis:
     :path: "../"
 
 SPEC CHECKSUMS:
+  Diagnosis: aee9ffe8b110e264c3a17fba32e819a0303c3f55
   Firebase: 797fd7297b7e1be954432743a0b3f90038e45a71
   FirebaseAnalytics: 8d0ff929c63b7f72260f332b86ccf569776b75d3
   FirebaseCore: 0326ec9b05fbed8f8716cddbf0e36894a13837f7
@@ -390,9 +391,8 @@ SPEC CHECKSUMS:
   TDUIProvider: 71bca2b2b43224dea28f51e653ab42283be541b5
   TDWCDB: 78229253c9fee043b66f2cd97a3baeeb6285fa26
   Texture: 2e8ab2519452515f7f5a520f5a8f7e0a413abfa3
-  TopdonDiagnosis: 7320fc0dc8d975c14c4deb5b5b3ba53628c3d12f
   TopdonLog: 7cc51d574dc26bd4679c723be96529cb91a019dd
-  TZImagePickerController: a013c186415f6044914bb0d0dd960a884cff46ec
+  TZImagePickerController: 456f470b5dea97b37226ec7a694994a8663340b2
   WCDB.swift: 0b09667a7c162989c0b0055d59d78d790deccec0
   WCDBOptimizedSQLCipher: 9bceac087eff9625b151838d3a30364f53f71ad9
   YBImageBrowser: 7ecc8bf33ffa5f3b94c397c29b4f3638dd37f527
@@ -400,6 +400,6 @@ SPEC CHECKSUMS:
   YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
   YYText: 5c461d709e24d55a182d1441c41dc639a18a4849
 
-PODFILE CHECKSUM: 97c51f548d3ac87170705bec799a60f593a1ef47
+PODFILE CHECKSUM: f3d602859fe88084c35c37186bdeb8972fe3e6c3
 
 COCOAPODS: 1.15.2

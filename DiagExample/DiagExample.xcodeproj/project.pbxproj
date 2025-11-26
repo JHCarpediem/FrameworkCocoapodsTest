@@ -17,13 +17,13 @@
 		86C46C482B32811C00A66F35 /* libc++.1.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C46C472B32811C00A66F35 /* libc++.1.tbd */; };
 		86C46C4A2B32812500A66F35 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C46C492B32812500A66F35 /* libc++.tbd */; };
 		86C46C4C2B32812B00A66F35 /* libc++abi.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 86C46C4B2B32812B00A66F35 /* libc++abi.tbd */; };
-		D666D85A2ED5901400908A87 /* TopGuru.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D666D8592ED5901400908A87 /* TopGuru.bundle */; };
-		D6AA4FA72D2F79ED00B2D1CC /* nanolog.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA02D2F79ED00B2D1CC /* nanolog.xcframework */; };
-		D6AA4FA82D2F79ED00B2D1CC /* passthru.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA12D2F79ED00B2D1CC /* passthru.xcframework */; };
-		D6AA4FA92D2F79ED00B2D1CC /* Std.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA22D2F79ED00B2D1CC /* Std.xcframework */; };
-		D6AA4FAA2D2F79ED00B2D1CC /* stdcomm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA32D2F79ED00B2D1CC /* stdcomm.xcframework */; };
-		D6AA4FAB2D2F79ED00B2D1CC /* stdshow.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA42D2F79ED00B2D1CC /* stdshow.xcframework */; };
-		D6AA4FAC2D2F79ED00B2D1CC /* vcibattery.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6AA4FA52D2F79ED00B2D1CC /* vcibattery.xcframework */; };
+		D666D85A2ED5901400908A87 /* Diag.bundle in Resources */ = {isa = PBXBuildFile; fileRef = D666D8592ED5901400908A87 /* Diag.bundle */; };
+		D666DC3B2ED6D5A200908A87 /* diagthru.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC3A2ED6D5A200908A87 /* diagthru.xcframework */; };
+		D666DC3C2ED6D5A200908A87 /* diagshow.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC392ED6D5A200908A87 /* diagshow.xcframework */; };
+		D666DC3D2ED6D5A200908A87 /* battery.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC352ED6D5A200908A87 /* battery.xcframework */; };
+		D666DC3E2ED6D5A200908A87 /* diag.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC362ED6D5A200908A87 /* diag.xcframework */; };
+		D666DC3F2ED6D5A200908A87 /* diagcomm.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC372ED6D5A200908A87 /* diagcomm.xcframework */; };
+		D666DC402ED6D5A200908A87 /* diaglog.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = D666DC382ED6D5A200908A87 /* diaglog.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,13 +43,13 @@
 		86C46C492B32812500A66F35 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		86C46C4B2B32812B00A66F35 /* libc++abi.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++abi.tbd"; path = "usr/lib/libc++abi.tbd"; sourceTree = SDKROOT; };
 		9416309C39EAD56F65AE605B /* Pods-DiagExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-DiagExample.release.xcconfig"; path = "Target Support Files/Pods-DiagExample/Pods-DiagExample.release.xcconfig"; sourceTree = "<group>"; };
-		D666D8592ED5901400908A87 /* TopGuru.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = TopGuru.bundle; sourceTree = "<group>"; };
-		D6AA4FA02D2F79ED00B2D1CC /* nanolog.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanolog.xcframework; sourceTree = "<group>"; };
-		D6AA4FA12D2F79ED00B2D1CC /* passthru.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = passthru.xcframework; sourceTree = "<group>"; };
-		D6AA4FA22D2F79ED00B2D1CC /* Std.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Std.xcframework; sourceTree = "<group>"; };
-		D6AA4FA32D2F79ED00B2D1CC /* stdcomm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = stdcomm.xcframework; sourceTree = "<group>"; };
-		D6AA4FA42D2F79ED00B2D1CC /* stdshow.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = stdshow.xcframework; sourceTree = "<group>"; };
-		D6AA4FA52D2F79ED00B2D1CC /* vcibattery.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = vcibattery.xcframework; sourceTree = "<group>"; };
+		D666D8592ED5901400908A87 /* Diag.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Diag.bundle; sourceTree = "<group>"; };
+		D666DC352ED6D5A200908A87 /* battery.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = battery.xcframework; sourceTree = "<group>"; };
+		D666DC362ED6D5A200908A87 /* diag.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = diag.xcframework; sourceTree = "<group>"; };
+		D666DC372ED6D5A200908A87 /* diagcomm.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = diagcomm.xcframework; sourceTree = "<group>"; };
+		D666DC382ED6D5A200908A87 /* diaglog.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = diaglog.xcframework; sourceTree = "<group>"; };
+		D666DC392ED6D5A200908A87 /* diagshow.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = diagshow.xcframework; sourceTree = "<group>"; };
+		D666DC3A2ED6D5A200908A87 /* diagthru.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = diagthru.xcframework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,14 +58,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				86C46C4C2B32812B00A66F35 /* libc++abi.tbd in Frameworks */,
-				D6AA4FAA2D2F79ED00B2D1CC /* stdcomm.xcframework in Frameworks */,
-				D6AA4FA82D2F79ED00B2D1CC /* passthru.xcframework in Frameworks */,
-				D6AA4FA72D2F79ED00B2D1CC /* nanolog.xcframework in Frameworks */,
+				D666DC3B2ED6D5A200908A87 /* diagthru.xcframework in Frameworks */,
+				D666DC3C2ED6D5A200908A87 /* diagshow.xcframework in Frameworks */,
+				D666DC3D2ED6D5A200908A87 /* battery.xcframework in Frameworks */,
+				D666DC3E2ED6D5A200908A87 /* diag.xcframework in Frameworks */,
+				D666DC3F2ED6D5A200908A87 /* diagcomm.xcframework in Frameworks */,
+				D666DC402ED6D5A200908A87 /* diaglog.xcframework in Frameworks */,
 				86C46C4A2B32812500A66F35 /* libc++.tbd in Frameworks */,
 				86C46C482B32811C00A66F35 /* libc++.1.tbd in Frameworks */,
-				D6AA4FAB2D2F79ED00B2D1CC /* stdshow.xcframework in Frameworks */,
-				D6AA4FA92D2F79ED00B2D1CC /* Std.xcframework in Frameworks */,
-				D6AA4FAC2D2F79ED00B2D1CC /* vcibattery.xcframework in Frameworks */,
 				04342151AEAAC3C309C28BC4 /* Pods_DiagExample.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -107,7 +107,7 @@
 				86C46C1E2B31A5DF00A66F35 /* AppDelegate.m */,
 				86C46C232B31A5DF00A66F35 /* ViewController.h */,
 				86C46C242B31A5DF00A66F35 /* ViewController.m */,
-				D666D8592ED5901400908A87 /* TopGuru.bundle */,
+				D666D8592ED5901400908A87 /* Diag.bundle */,
 				86C46C262B31A5DF00A66F35 /* Main.storyboard */,
 				86C46C292B31A5E000A66F35 /* Assets.xcassets */,
 				86C46C2B2B31A5E000A66F35 /* LaunchScreen.storyboard */,
@@ -120,7 +120,7 @@
 		B1017A4D0E8E4DD4EC3E23FE /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D6AA4FA62D2F79ED00B2D1CC /* platform */,
+				D6AA4FA62D2F79ED00B2D1CC /* plat */,
 				86C46C4B2B32812B00A66F35 /* libc++abi.tbd */,
 				86C46C492B32812500A66F35 /* libc++.tbd */,
 				86C46C472B32811C00A66F35 /* libc++.1.tbd */,
@@ -129,17 +129,17 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		D6AA4FA62D2F79ED00B2D1CC /* platform */ = {
+		D6AA4FA62D2F79ED00B2D1CC /* plat */ = {
 			isa = PBXGroup;
 			children = (
-				D6AA4FA02D2F79ED00B2D1CC /* nanolog.xcframework */,
-				D6AA4FA12D2F79ED00B2D1CC /* passthru.xcframework */,
-				D6AA4FA22D2F79ED00B2D1CC /* Std.xcframework */,
-				D6AA4FA32D2F79ED00B2D1CC /* stdcomm.xcframework */,
-				D6AA4FA42D2F79ED00B2D1CC /* stdshow.xcframework */,
-				D6AA4FA52D2F79ED00B2D1CC /* vcibattery.xcframework */,
+				D666DC352ED6D5A200908A87 /* battery.xcframework */,
+				D666DC362ED6D5A200908A87 /* diag.xcframework */,
+				D666DC372ED6D5A200908A87 /* diagcomm.xcframework */,
+				D666DC382ED6D5A200908A87 /* diaglog.xcframework */,
+				D666DC392ED6D5A200908A87 /* diagshow.xcframework */,
+				D666DC3A2ED6D5A200908A87 /* diagthru.xcframework */,
 			);
-			path = platform;
+			path = plat;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -202,7 +202,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D666D85A2ED5901400908A87 /* TopGuru.bundle in Resources */,
+				D666D85A2ED5901400908A87 /* Diag.bundle in Resources */,
 				86C46C2D2B31A5E000A66F35 /* LaunchScreen.storyboard in Resources */,
 				86C46C2A2B31A5E000A66F35 /* Assets.xcassets in Resources */,
 				86C46C282B31A5DF00A66F35 /* Main.storyboard in Resources */,

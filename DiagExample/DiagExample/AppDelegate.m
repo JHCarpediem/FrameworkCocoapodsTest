@@ -2,12 +2,12 @@
 //  AppDelegate.m
 //  DiagExample
 //
-//  Created by lk_ios2023002 on 2023/12/19.
+//  Created by diag on 2023/12/19.
 //
 
 #import "AppDelegate.h"
 #import "ViewController.h"
-@import TopdonDiagnosis;
+@import Diagnosis;
 @import TDUIProvider;
 @interface AppDelegate ()
 
@@ -22,7 +22,7 @@
     UINavigationController *nav = [[UINavigationController alloc] initWithRootViewController:vc];
     self.window.rootViewController = nav;
     [self.window makeKeyAndVisible];
-    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"TopGuru" ofType:@"bundle"];
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:@"Diag" ofType:@"bundle"];
     NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
     [TDDUIConfig setupConfigWith:@"Theme_Diag.json" in:bundle imagePath:@"DiagImages"];
     return YES;

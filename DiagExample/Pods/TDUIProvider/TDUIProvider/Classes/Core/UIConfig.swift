@@ -2,7 +2,7 @@
 //  UIConfig.swift
 //  TDUIProvider
 //
-//  Created by Fench on 2025/1/6.
+//  Created by Diag on 2025/1/6.
 //
 
 import Foundation
@@ -66,7 +66,7 @@ extension UIConfig {
                 let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
                 let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
                 let themeDict = json as? NSDictionary else {
-                TDLogError("加载配置警告: App 未配置主题 json '\(jsonName)' at: \(path)")
+
                 return nil
             }
             _themedDict = themeDict
@@ -104,7 +104,7 @@ extension UIConfig {
             let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
             let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
             let jsonDict = json as? NSDictionary else {
-            TDLogError("加载配置警告: App 未配置主题 json '\(jsonName)' at: \(path)")
+
             return nil
         }
         _jsonDict = jsonDict
@@ -122,7 +122,7 @@ extension UIConfig {
             let data = try? Data(contentsOf: URL(fileURLWithPath: path)),
             let json = try? JSONSerialization.jsonObject(with: data, options: .fragmentsAllowed),
             let jsonDict = json as? NSDictionary else {
-            TDLogError("加载配置警告: 无法读取 LMS 内置的配置文件 Theme.json at: \(path)")
+ 
             return nil
         }
         _internalJson = jsonDict
@@ -148,7 +148,7 @@ extension UIConfig {
             return value
         }
         
-        TDLogError("加载配置错误，未知的 keyPath: \(keyPath)")
+
         return nil
     }
 }
@@ -158,7 +158,7 @@ extension UIConfig {
     /// 从配置中读取颜色
     public static func color(with keyPath: String, middlewareKey: String? = nil) -> ThemeColorPicker? {
         guard let rgba = readValue(for: keyPath, middlewareKey: middlewareKey) as? String, let color = try? UIColor(rgba_throws: rgba) else {
-            TDLogError("配置错误 - 无法读取颜色配置: \(keyPath)")
+
             return nil
         }
         return ThemeColorPicker(v: { color })

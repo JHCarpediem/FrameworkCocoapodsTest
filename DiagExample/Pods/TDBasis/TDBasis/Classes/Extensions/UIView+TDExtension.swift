@@ -2,7 +2,7 @@
 //  UIView+TDExtension.swift
 //  Pods-TDBasis
 //
-//  Created by fench on 2023/7/10.
+//  Created by Diag on 2023/7/10.
 //
 
 import UIKit
@@ -98,9 +98,9 @@ import UIKit
         if let scrollView = self as? UIScrollView {
             size = scrollView.contentSize
         }
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, 0)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, 0)
         defer {
             UIGraphicsEndImageContext()
         }

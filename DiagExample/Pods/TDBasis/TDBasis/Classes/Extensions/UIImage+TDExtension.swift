@@ -2,7 +2,7 @@
 //  UIImage+TDExtension.swift
 //  Pods-TDBasis
 //
-//  Created by fench on 2023/7/10.
+//  Created by Diag on 2023/7/10.
 //
 
 import UIKit
@@ -28,9 +28,9 @@ public enum GradientStyle: Int {
 public extension TDBasisWrap where Base: UIImage {
     /// 通过颜色创建一张纯色的图片
     static func color(_ color: UIColor, size: CGSize) -> UIImage {
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, 1)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, 1)
 
         defer {
             UIGraphicsEndImageContext()
@@ -189,16 +189,16 @@ public extension TDBasisWrap where Base: UIImage {
         if size.width == 0 || size.height == 0 { return nil }
         
         let cgColors = colors.map { $0.cgColor }
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) }
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, true, UIScreen.main.scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) }
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, true, UIScreen.main.scale)
         guard let contenxt = UIGraphicsGetCurrentContext() else {
             return nil
         }
         
         if let baseColor = baseColor {
             contenxt.setFillColor(baseColor.cgColor)
-            contenxt.fill(CGRect(origin: .zero, size: topdon_new_size))
+            contenxt.fill(CGRect(origin: .zero, size: vci_new_size))
         }
         
         contenxt.saveGState()
@@ -232,9 +232,9 @@ public extension TDBasisWrap where Base: UIImage {
         if size.width == 0 || size.height == 0 { return nil }
 
         let cgColors = colors.map { $0.cgColor }
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, true, UIScreen.main.scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, true, UIScreen.main.scale)
         guard let contenxt = UIGraphicsGetCurrentContext() else {
             return nil
         }
@@ -263,9 +263,9 @@ public extension TDBasisWrap where Base: UIImage {
     /// - Returns: 新图片
     @objc public func td_image(byResize toSize: CGSize) -> UIImage {
         if toSize.width <= 0 || toSize.height <= 0 { return self }
-        var topdon_new_size = toSize
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, scale)
+        var vci_new_size = toSize
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, scale)
         self.draw(in: CGRect(origin: .zero, size: toSize))
         let img = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -276,9 +276,9 @@ public extension TDBasisWrap where Base: UIImage {
     /// - Parameter color: tintColor
     /// - Returns: 新的图片
     @objc public func td_image(byTintColor color: UIColor) -> UIImage {
-        var topdon_new_size = self.size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, self.scale)
+        var vci_new_size = self.size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, self.scale)
         let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
         color.set()
         UIRectFill(rect)
@@ -326,8 +326,8 @@ public extension TDBasisWrap where Base: UIImage {
     @objc public func td_scaled(toHeight: CGFloat, opaque: Bool = false) -> UIImage? {
         let scale = toHeight / size.height
         let newWidth = size.width * scale
-        let topdon_new_size = CGSize(width: max(0.1, newWidth), height: max(0.1, toHeight))
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, opaque, self.scale)
+        let vci_new_size = CGSize(width: max(0.1, newWidth), height: max(0.1, toHeight))
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, opaque, self.scale)
         draw(in: CGRect(x: 0, y: 0, width: newWidth, height: toHeight))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -343,8 +343,8 @@ public extension TDBasisWrap where Base: UIImage {
     @objc public func td_scaled(toWidth: CGFloat, opaque: Bool = false) -> UIImage? {
         let scale = toWidth / size.width
         let newHeight = size.height * scale
-        let topdon_new_size = CGSize(width: max(0.1, toWidth), height: max(0.1, newHeight))
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, opaque, self.scale)
+        let vci_new_size = CGSize(width: max(0.1, toWidth), height: max(0.1, newHeight))
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, opaque, self.scale)
         draw(in: CGRect(x: 0, y: 0, width: toWidth, height: newHeight))
         let newImage = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
@@ -370,9 +370,9 @@ public extension TDBasisWrap where Base: UIImage {
                                      width: destRect.width.rounded(),
                                      height: destRect.height.rounded())
 
-        var topdon_new_size = roundedDestRect.size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, UIScreen.main.scale)
+        var vci_new_size = roundedDestRect.size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, UIScreen.main.scale)
         guard let contextRef = UIGraphicsGetCurrentContext() else { return nil }
 
         contextRef.translateBy(x: roundedDestRect.width / 2, y: roundedDestRect.height / 2)
@@ -403,9 +403,9 @@ public extension TDBasisWrap where Base: UIImage {
                                      width: destRect.width.rounded(),
                                      height: destRect.height.rounded())
 
-        var topdon_new_size = roundedDestRect.size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, UIScreen.main.scale)
+        var vci_new_size = roundedDestRect.size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, UIScreen.main.scale)
         guard let contextRef = UIGraphicsGetCurrentContext() else { return nil }
 
         contextRef.translateBy(x: roundedDestRect.width / 2, y: roundedDestRect.height / 2)
@@ -438,9 +438,9 @@ public extension TDBasisWrap where Base: UIImage {
         }
         #endif
 
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, scale)
         color.setFill()
         guard let context = UIGraphicsGetCurrentContext() else { return self }
 
@@ -479,9 +479,9 @@ public extension TDBasisWrap where Base: UIImage {
         }
         #endif
 
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, scale)
         defer {
             UIGraphicsEndImageContext()
         }
@@ -511,9 +511,9 @@ public extension TDBasisWrap where Base: UIImage {
         }
         #endif
 
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, scale)
         defer { UIGraphicsEndImageContext() }
 
         backgroundColor.setFill()
@@ -537,9 +537,9 @@ public extension TDBasisWrap where Base: UIImage {
             cornerRadius = maxRadius
         }
 
-        var topdon_new_size = size
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, false, scale)
+        var vci_new_size = size
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, false, scale)
 
         let rect = CGRect(origin: .zero, size: size)
         UIBezierPath(roundedRect: rect, cornerRadius: cornerRadius).addClip()
@@ -580,9 +580,9 @@ public extension TDBasisWrap where Base: UIImage {
         scaledImageRect.origin.y = (newSize.height - size.height * aspectRatio) / 2.0
         
         //绘制并获取最终图片
-        var topdon_new_size = newSize
-        if topdon_new_size.width <= 0 || topdon_new_size.height <= 0{ topdon_new_size=CGSizeMake(0.1,0.1) } 
-        UIGraphicsBeginImageContextWithOptions(topdon_new_size, opaque, scale)
+        var vci_new_size = newSize
+        if vci_new_size.width <= 0 || vci_new_size.height <= 0{ vci_new_size=CGSizeMake(0.1,0.1) } 
+        UIGraphicsBeginImageContextWithOptions(vci_new_size, opaque, scale)
         draw(in: scaledImageRect)
         
         let scaledImage = UIGraphicsGetImageFromCurrentImageContext()

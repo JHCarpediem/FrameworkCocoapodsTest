@@ -1,5 +1,5 @@
 //
-//  UserDefaults+Topdon.swift
+//  UserDefaults+diag.swift
 //  TDBasis
 //
 //  Created by Fench on 2025/8/13.
@@ -10,7 +10,7 @@
 /// 快速构建 存储到偏好设置的值, 存储到 App 沙盒
 /// 使用 方式：
 /// ```
-/// @TDUserDefaults(key: "com.topdon.LMS.islogin", defaultValue: false)
+/// @TDUserDefaults(key: "com.diag.LMS.islogin", defaultValue: false)
 /// var isLogin: Bool
 ///
 /// ```
@@ -47,7 +47,7 @@ public struct TDUserDefaults<T: Codable> {
 /// 快速构建 存储到偏好设置的值, 如果 App 设置了 Group 开启了 keyChain sharing 将会保存到钥匙串 同一个组织可以一起访问该值，如果没有设置则会使用沙盒偏好设置
 /// 使用 方式：
 /// ```
-/// @TDKeyChainUserDefaults(key: "com.topdon.LMS.islogin", defaultValue: false)
+/// @TDKeyChainUserDefaults(key: "com.diag.LMS.islogin", defaultValue: false)
 /// var isLogin: Bool
 ///
 /// ```
@@ -66,15 +66,15 @@ public struct TDKeyChainUserDefaults<T: Codable> {
     
     public var wrappedValue: T {
         get {
-            UserDefaults.topdon.value(forKey: key) as? T ?? defaultValue
+            UserDefaults.diag.value(forKey: key) as? T ?? defaultValue
         }
         set {
             if case Optional<Any>.none = newValue as Any {
-                UserDefaults.topdon.set(newValue, forKey: key)
+                UserDefaults.diag.set(newValue, forKey: key)
             } else {
-                UserDefaults.topdon.removeObject(forKey: key)
+                UserDefaults.diag.removeObject(forKey: key)
             }
-            UserDefaults.topdon.synchronize()
+            UserDefaults.diag.synchronize()
         }
     }
     

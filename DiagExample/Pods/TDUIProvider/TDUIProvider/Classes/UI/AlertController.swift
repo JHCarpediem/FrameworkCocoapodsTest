@@ -2,7 +2,7 @@
 //  TDAlertController.swift
 //  TDBasis
 //
-//  Created by Fench on 2024/8/26.
+//  Created by Diag on 2024/8/26.
 //
 
 import UIKit
@@ -131,7 +131,7 @@ extension LMSAlertController {
             let message = messageLabel.text ?? ""
             
             if title == alertTitle && message == alertMessage {
-                TDLogDebug("当前调度列表中已存在相同弹框 - \"\(title)\" - \"\(message)\" 不再重复添加")
+
                 self._untriggerBehavior = .discard
                 return
             }
@@ -292,7 +292,7 @@ open class LMSAlertController: UIView {
             let message = messageLabel.text ?? ""
             
             if title == alertTitle && message == alertMessage {
-                TDLogDebug("当前调度列表中已存在相同弹框 - \"\(title)\" - \"\(message)\" 不再重复添加")
+
                 return
             }
         }

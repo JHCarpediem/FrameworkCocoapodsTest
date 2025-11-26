@@ -2,7 +2,7 @@
 //  UIBaseViewController.swift
 //  TDUIProvider
 //
-//  Created by Fench on 2025/1/9.
+//  Created by Diag on 2025/1/9.
 //
 
 import UIKit
@@ -90,7 +90,7 @@ open class UIBaseViewController: UIViewController {
     }
     
     deinit {
-        TDLogCustom("控制器被释放了 -- \(self)", customLevel: "【UIProvider】")
+
     }
     
     public override var preferredStatusBarStyle: UIStatusBarStyle {

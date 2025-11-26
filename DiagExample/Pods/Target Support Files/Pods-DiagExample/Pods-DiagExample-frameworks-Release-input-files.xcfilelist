@@ -1,4 +1,5 @@
 ${PODS_ROOT}/Target Support Files/Pods-DiagExample/Pods-DiagExample-frameworks.sh
+${PODS_ROOT}/../../Diagnosis/Framework/CarsFramework.framework
 ${BUILT_PRODUCTS_DIR}/FMDB/FMDB.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseCore/FirebaseCore.framework
 ${BUILT_PRODUCTS_DIR}/FirebaseCoreExtension/FirebaseCoreExtension.framework
@@ -28,8 +29,6 @@ ${BUILT_PRODUCTS_DIR}/TDTheme/TDTheme.framework
 ${BUILT_PRODUCTS_DIR}/TDWCDB/TDWCDB.framework
 ${BUILT_PRODUCTS_DIR}/TZImagePickerController/TZImagePickerController.framework
 ${BUILT_PRODUCTS_DIR}/Texture/AsyncDisplayKit.framework
-${PODS_ROOT}/../../TopDonDiag/Framework/CarsFramework.framework
-${BUILT_PRODUCTS_DIR}/TopdonLog/TopdonLog.framework
 ${BUILT_PRODUCTS_DIR}/WCDB.swift/WCDBSwift.framework
 ${BUILT_PRODUCTS_DIR}/WCDBOptimizedSQLCipher/sqlcipher.framework
 ${BUILT_PRODUCTS_DIR}/YBImageBrowser/YBImageBrowser.framework

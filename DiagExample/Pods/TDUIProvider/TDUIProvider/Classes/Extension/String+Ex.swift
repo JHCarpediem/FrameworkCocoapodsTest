@@ -18,12 +18,12 @@ public extension String {
 
 extension TDBasisWrap where Base == String {
     public var localized: String {
-        func replaceTopdon(_ text: String) -> String {
+        func replacediag(_ text: String) -> String {
             var result = text
             guard UIProvider.isNeutral else { return result }
             
-            // 使用正则表达式匹配所有 "topdon" (不论大小写)
-            let pattern = "(?i)topdon" // (?i) 表示不区分大小写
+            // 使用正则表达式匹配所有 "diag" (不论大小写)
+            let pattern = "(?i)diag" // (?i) 表示不区分大小写
             if let regex = try? NSRegularExpression(pattern: pattern, options: []) {
                 result = regex.stringByReplacingMatches(in: text, options: [], range: NSRange(text.startIndex..., in: text), withTemplate: "")
             }
@@ -39,7 +39,7 @@ extension TDBasisWrap where Base == String {
             guard let enDefaultStr = enDefaultStr, enDefaultStr.count > 0 else {
                 return key
             }
-            return replaceTopdon(enDefaultStr)
+            return replacediag(enDefaultStr)
         }
         
         let key = base
@@ -52,7 +52,7 @@ extension TDBasisWrap where Base == String {
             return defaultValue(key: key)
         }
         
-        return replaceTopdon(localStr)
+        return replacediag(localStr)
     }
 }
 

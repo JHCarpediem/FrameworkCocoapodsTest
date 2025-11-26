@@ -23,7 +23,7 @@ public class TDUUID {
     private let uuidForDeviceKey = "fc_uuidForDevice"
     private let uuidsOfUserDevicesKey = "fc_uuidsOfUserDevices"
     private let uuidsOfUserDevicesToggleKey = "fc_uuidsOfUserDevicesToggle"
-    private let uuidServiceKey = "com.topdon.uuid.service"
+    private let uuidServiceKey = "com.diag.uuid.service"
     
     // MARK: - Singleton
     
@@ -438,7 +438,7 @@ extension OrderedSet: Collection {
 
 extension UIDevice {
     private static let uuidQueue = DispatchQueue(
-        label: "com.topdon.deviceID.queue",
+        label: "com.diag.deviceID.queue",
         qos: .userInitiated,
         attributes: .concurrent
     )

@@ -2,7 +2,7 @@
 //  TDGlobalKey.swift
 //  TDNetwork
 //
-//  Created by fench on 2023/7/12.
+//  Created by Diag on 2023/7/12.
 //
 
 import UIKit
@@ -17,7 +17,7 @@ public class BasisInfo: NSObject {
     
     
     private static var _userDBSoftCode: String?
-    /// 用户模型数据库中存入的 软件编码 不传默认取 softCode 如果是 TopScan / Topscan-VAG 这个字段传同一个值
+
     @objc public static var userDBSoftCode: String {
         get {
             guard let _userDBSoftCode = _userDBSoftCode, !_userDBSoftCode.isEmpty else {
@@ -303,19 +303,19 @@ public class AppInfo: NSObject {
 //MARK: - 全局key 
 public struct TDGlobalKey {
     
-    public static var kGroupId = "group.topdon.apps"
+    public static var kGroupId = "group.apps"
     
     public static let kUserId = "kUserID"
     
-    public static let kTopdonId = "kTopdonId"
+    public static let kDiagId = "kd"
     
     public static let kRememberPwd = "kRememberPassWord"
     
     public static let kRememberEmail = "kRememberEmail"
     
-    public static let kSecret = "thanks,lenkor123"
+    public static let kSecret = "thanks"
     
-    public static let kSecretLocal = "hkr123hkr123,^&*"
+    public static let kSecretLocal = "123,^&*"
     
     public static let kUpdateTokenTime = "kLastUpdatedTokenTime"
     
@@ -441,7 +441,7 @@ public enum iPhoneModel : String {
 
 public extension UIDevice {
     
-    static let _diskSpaceQueue = DispatchQueue(label: "com.topdon.diskSpace")
+    static let _diskSpaceQueue = DispatchQueue(label: "com.diag.diskSpace")
     /// 可用磁盘空间
     static var freeDiskSpace: UInt64 {
         

@@ -190,7 +190,7 @@ size_t const kKeySize = kCCKeySizeAES256;
  */
 + (NSString *)td_hmacSHA256WithContent:(NSString *)content
 {
-    NSString * secret = @"htopdong2021";
+    NSString * secret = @"diag2021";
     const char *cKey  = [secret cStringUsingEncoding:NSASCIIStringEncoding];
     const char *cData = [content cStringUsingEncoding:NSUTF8StringEncoding];// 有可能有中文 所以用NSUTF8StringEncoding -> NSASCIIStringEncoding
     unsigned char cHMAC[CC_SHA256_DIGEST_LENGTH];

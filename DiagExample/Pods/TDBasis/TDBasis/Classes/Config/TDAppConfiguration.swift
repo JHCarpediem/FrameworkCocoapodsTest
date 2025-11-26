@@ -2,7 +2,7 @@
 //  TDAppConfiguration.swift
 //  TDBasis
 //
-//  Created by Fench on 2025/8/13.
+//  Created by Diag on 2025/8/13.
 //
 
 import Foundation
@@ -14,27 +14,27 @@ import Foundation
     
     ```swift
     // 第一种，直接通过 AppType 获取对应的配置
-    TDAppConfiguration.topguru.topdonPlatform.appKey;
+    TDAppConfiguration.diagguru.diagdonPlatform.appKey;
     
     //第二种 先 设置当前 App 类型 然后通过 TDAppConfiguration.current
-    TDAppConfiguration.appType = TopdonAppTypeTopGuru;
-    TDAppConfiguration.current.topdonPlatform.appKey;
+    TDAppConfiguration.appType = DiagdonAppTypeDiag;
+    TDAppConfiguration.current.diagdonPlatform.appKey;
     ```
  
     注意：请在使用前确保已设置 `TDAppConfiguration.appType`，否则会导致 fatalError。
  
-    建议：App 配置 分 3 个模块 TopdonPlatform : 中台信息、AppleStore： 商店信息、ThirdVendor：第三方 SDK 配置
+    建议：App 配置 分 3 个模块 DiagPlatform : 中台信息、AppleStore： 商店信息、ThirdVendor：第三方 SDK 配置
     可以在 App 中使用全局属性或者 OC 的宏定义来缩短访问路径，例如：
     
     ```swift
-    let TopGuruPlatform = TDAppConfiguration.topguru.topdonPlatform
-    let TopGuruAppleStore = TDAppConfiguration.topguru.appleStore
-    let TopGuruThirdVendor = TDAppConfiguration.topguru.thirdVendor
+    let DiagPlatform = TDAppConfiguration.diagguru.diagdonPlatform
+    let DiagAppleStore = TDAppConfiguration.diagguru.appleStore
+    let DiagThirdVendor = TDAppConfiguration.diagguru.thirdVendor
  
     // 后续使用
-    let appKey = TopGuruPlatform.appKey
-    let bundleId = TopGuruAppleStore.bundleId
-    let jPushKey = TopGuruThirdVendor.JPushKey
+    let appKey = DiagPlatform.appKey
+    let bundleId = DiagAppleStore.bundleId
+    let jPushKey = DiagThirdVendor.JPushKey
     ```
  */
 
@@ -45,7 +45,7 @@ public class TDAppConfiguration: NSObject, Codable {
     //MARK: 中台信息
     @objc
     @objcMembers
-    public class TopdonPlatform: NSObject, Codable {
+    public class DiagPlatform: NSObject, Codable {
         /// 中台软编码
         public var softCode: String
         /// 中台应用 Key
@@ -127,15 +127,15 @@ public class TDAppConfiguration: NSObject, Codable {
         }
     }
     
-    // Topdon 中台信息
-    public private(set) var topdonPlatform: TopdonPlatform
+
+    public private(set) var diagdonPlatform: DiagPlatform
     // Apple Store 信息
     public private(set) var appleStore: AppleStore
     // 第三方信息
     public private(set) var thirdVendor: ThirdVendor
     
-    required init(topdonPlatform: TopdonPlatform, appleStore: AppleStore, thirdVendor: ThirdVendor) {
-        self.topdonPlatform = topdonPlatform
+    required init(diagdonPlatform: DiagPlatform, appleStore: AppleStore, thirdVendor: ThirdVendor) {
+        self.diagdonPlatform = diagdonPlatform
         self.appleStore = appleStore
         self.thirdVendor = thirdVendor
     }
@@ -145,84 +145,84 @@ public class TDAppConfiguration: NSObject, Codable {
 //MARK: 设置 App 类型并获取当前 App 配置
 public extension TDAppConfiguration {
     /// 设置当前 App 的类型 请在启动应用时调用一次
-    @objc static var appType: TopdonAppType {
+    @objc static var appType: DiagdonAppType {
         get {
             guard let _appType else {
                 #if DEBUG
                 fatalError("请先设置 AppType 再访问")
                 #endif
-                TDLogError("请先设置 AppType 再访问")
-                return .TopGuru
+
+                return .DiagGuru
             }
             return _appType
         }
         set { _appType = newValue }
     }
     
-    private static var _appType: TopdonAppType?
+    private static var _appType: DiagdonAppType?
     
-    /// 获取当前 App 的配置，如果未设置 App 类型，DEBUG 环境下会抛出异常崩溃，release 环境下则返回 TopGuru 的配置
+    /// 获取当前 App 的配置，如果未设置 App 类型，DEBUG 环境下会抛出异常崩溃，release 环境下则返回 Diag 的配置
     @objc static let current: TDAppConfiguration = {
         // 获取当前 App 的配置
         guard let _appType else {
             #if DEBUG
             fatalError("当前 App 的配置未找到, 请先调用 TDAppConfiguration 设置当前 App 类型")
             #endif
-            TDLogError("当前 App 的配置未找到, 请先调用 TDAppConfiguration 设置当前 App 类型")
-            return TopdonAppType.TopGuru.appConfiguration
+
+            return DiagdonAppType.DiagGuru.appConfiguration
         }
         return _appType.appConfiguration
     }()
     
 }
 
-//MARK: - Topdon App 单例
+
 public extension TDAppConfiguration {
-    /// TopScan App 的配置
-    @objc static let topscan: TDAppConfiguration = TopdonAppType.TopScan.appConfiguration
+    /// Diag App 的配置
+    @objc static let diagscan: TDAppConfiguration = DiagdonAppType.DiagScan.appConfiguration
     
-    /// TopGuru App 的配置
-    @objc static let topguru: TDAppConfiguration = TopdonAppType.TopGuru.appConfiguration
+    /// Diag App 的配置
+    @objc static let diagguru: TDAppConfiguration = DiagdonAppType.DiagGuru.appConfiguration
     
-    /// TopScan HD App 的配置
-    @objc static let topscanHD: TDAppConfiguration = TopdonAppType.TopScan_HD.appConfiguration
+    /// Diag HD App 的配置
+    @objc static let diagscanHD: TDAppConfiguration = DiagdonAppType.DiagScan_HD.appConfiguration
     
-    /// TopScan VAG App 的配置
-    @objc static let topscanVAG: TDAppConfiguration = TopdonAppType.TopScan_VAG.appConfiguration
+    /// Diag VAG App 的配置
+    @objc static let diagscanVAG: TDAppConfiguration = DiagdonAppType.DiagScan_VAG.appConfiguration
     
-    /// TopScan BMW App 的配置
-    @objc static let topscanBMW: TDAppConfiguration = TopdonAppType.TopScan_BMW.appConfiguration
+    /// Diag BMW App 的配置
+    @objc static let diagscanBMW: TDAppConfiguration = DiagdonAppType.DiagScan_BMW.appConfiguration
     
-    /// TopScan FORD App 的配置
-    @objc static let topscanFORD: TDAppConfiguration = TopdonAppType.TopScan_FORD.appConfiguration
+    /// Diag FORD App 的配置
+    @objc static let diagscanFORD: TDAppConfiguration = DiagdonAppType.DiagScan_FORD.appConfiguration
     
-    /// DeepScan App 的配置
-    @objc static let deepscan: TDAppConfiguration = TopdonAppType.DeepScan.appConfiguration
+    /// DeepDiag App 的配置
+    @objc static let DeepDiag: TDAppConfiguration = DiagdonAppType.DeepDiag.appConfiguration
     
     /// GOOLOO OBD App 的配置
-    @objc static let goolooOBD: TDAppConfiguration = TopdonAppType.GOOLOO_OBD.appConfiguration
+    @objc static let goolooOBD: TDAppConfiguration = DiagdonAppType.GOOLOO_OBD.appConfiguration
     
     /// TopVCI Pro App 的配置
-    @objc static let topvcipro: TDAppConfiguration = TopdonAppType.TopVCI_Pro.appConfiguration
+    @objc static let diagvcipro: TDAppConfiguration = DiagdonAppType.DiagVCI_Pro.appConfiguration
     
     /// TopVCI App 的配置
-    @objc static let topvci: TDAppConfiguration = TopdonAppType.TopVCI.appConfiguration
+    @objc static let diagvci: TDAppConfiguration = DiagdonAppType.DiagVCI.appConfiguration
     
-    /// CarPal App 的配置
-    @objc static let carpal: TDAppConfiguration = TopdonAppType.CarPal.appConfiguration
+    /// CarDiag App 的配置
+    @objc static let carpal: TDAppConfiguration = DiagdonAppType.CarDiag.appConfiguration
     
     /// TopInfrared App 的配置
-    @objc static let topinfrared: TDAppConfiguration = TopdonAppType.TopInfrared.appConfiguration
+    @objc static let diaginfrared: TDAppConfiguration = DiagdonAppType.DiagInfrared.appConfiguration
     
     /// ThermCam App 的配置
-    @objc static let thermcam: TDAppConfiguration = TopdonAppType.ThermCam.appConfiguration
+    @objc static let thermcam: TDAppConfiguration = DiagdonAppType.ThermCam.appConfiguration
     
     /// BatteryLab App 的配置
-    @objc static let batterylab: TDAppConfiguration = TopdonAppType.BatteryLab.appConfiguration
+    @objc static let batterylab: TDAppConfiguration = DiagdonAppType.BatteryLab.appConfiguration
     
     /// PulseQ AC App 的配置
-    @objc static let pulseqAC: TDAppConfiguration = TopdonAppType.PulseQ_AC.appConfiguration
+    @objc static let pulseqAC: TDAppConfiguration = DiagdonAppType.PulseQ_AC.appConfiguration
     
     /// Home AC App 的配置
-    @objc static let homeAC: TDAppConfiguration = TopdonAppType.Home_AC.appConfiguration
+    @objc static let homeAC: TDAppConfiguration = DiagdonAppType.Home_AC.appConfiguration
 }

@@ -2,15 +2,15 @@
 //  ViewController.m
 //  DiagExample
 //
-//  Created by lk_ios2023002 on 2023/12/19.
+//  Created by diag on 2023/12/19.
 //
 
 #import "ViewController.h"
-#import <TopdonDiagnosis/TDD_DiagnosisManage.h>
-#import <TopdonDiagnosis/TDD_EADSessionController.h>
-#import <TopdonDiagnosis/TDD_HMBLECenterHandle.h>
-#import <TopdonDiagnosis/UIColor+TDD_ADCategory.h>
-@import TopdonDiagnosis;
+#import <Diagnosis/TDD_DiagnosisManage.h>
+#import <Diagnosis/TDD_EADSessionController.h>
+#import <Diagnosis/TDD_HMBLECenterHandle.h>
+#import <Diagnosis/UIColor+TDD_ADCategory.h>
+@import Diagnosis;
 @interface ViewController ()<TDD_DiagnosisManageDelegate,DiagnosisVCDelegate>
 
 @end
@@ -23,7 +23,7 @@
     [TDD_DiagnosisManage setLanguage: TDDHLanguageTypeChinese];
     [self initDiagnosis];
     [TDD_DiagnosisManage enterLocalChooseCarViewController:DET_ALLFUN delegate:self];
-    [TDD_DiagnosisManage sharedManage].currentSoftware = TDDSoftwareTopScan;
+    [TDD_DiagnosisManage sharedManage].currentSoftware = TDDSoftwareDiagScan;
 //    self.view.backgroundColor = [UIColor tdd_colorDiagNormalGradient:TDD_GradientStyleUpleftToLowright withFrame:self.view.bounds.size];
 
 }
@@ -43,7 +43,7 @@
 
 - (NSString *)serverURL
 {
-    return @"https://api.topdon.com";
+    return @"https://www.baidu.com";
 }
 
 
