@@ -786,6 +786,7 @@ NSString *EADSessionDataReceivedNotification = @"EADSessionDataReceivedNotificat
 
 #pragma mark Lazy
 - (NSString *)SN {
+    return @"110238C4F13562";
     //DEBUG下 并且开启后门使用选中 sn
     NSString *sn = _SN?:@"";
     if ([TDD_DiagnosisManage sharedManage].appScenarios == AS_INTERNAL_USE && [TDD_DiagnosisTools isUseSelectSNToRequest]) {

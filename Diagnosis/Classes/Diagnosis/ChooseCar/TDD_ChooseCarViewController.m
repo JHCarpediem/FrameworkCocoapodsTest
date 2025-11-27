@@ -11,6 +11,7 @@
 #import "TDD_ArtiMenuCellView.h"
 #import "TDD_CarModel.h"
 #import "TDD_DiagnosisTools.h"
+#import "TDDataFlowViewController.h"
 #endif
 
 #import "TDD_RightbuttonView.h"
@@ -18,7 +19,7 @@
 @import TDUIProvider;
 @interface TDD_ChooseCarViewController ()<UICollectionViewDelegate, UICollectionViewDataSource, TDD_HTipBtnViewDelegate,DiagnosisVCDelegate>
 @property (nonatomic, strong) UICollectionView *collectionView;
-@property (nonatomic, strong) NSArray * dataArr;
+@property (nonatomic, strong) NSMutableArray * dataArr;
 @property (nonatomic, strong) TDD_RightbuttonView *rightView;
 @property (nonatomic, strong) TDD_CarModel * carModel;
 @property (nonatomic, assign) CGFloat scale;
@@ -58,12 +59,12 @@
 
 - (void)getData
 {
-    self.dataArr = [TDD_DiagnosisTools searchAllDirectory];
     
-    self.dataArr = [self.dataArr sortedArrayUsingComparator:^NSComparisonResult(TDD_CarModel * obj1, TDD_CarModel * obj2) {
+    NSArray *dataArr = [[TDD_DiagnosisTools searchAllDirectory] sortedArrayUsingComparator:^NSComparisonResult(TDD_CarModel * obj1, TDD_CarModel * obj2) {
         return [obj1.strVehicle compare:obj2.strVehicle]; // 升序
     }];
     
+    self.dataArr = [NSMutableArray arrayWithArray:dataArr];
     [self.collectionView reloadData];
 }
 
@@ -81,7 +82,6 @@
     UIButton * topBtn = ({
         UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
         btn.titleLabel.font = [[UIFont systemFontOfSize:20] tdd_adaptHD];
-//        [btn addTarget:self action:@selector(btnClick) forControlEvents:UIControlEventTouchUpInside];
         [btn setTitle:@"全部" forState:UIControlStateNormal];
         [btn setTitleColor:RgbColor(40, 102, 177, 1) forState:UIControlStateNormal];
         btn;
@@ -127,6 +127,29 @@
     }];
     
     [collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cellid"];
+    
+    
+    
+    UIButton * liveDataBtn = ({
+        UIButton * btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn.titleLabel.font = [[UIFont systemFontOfSize:20] tdd_adaptHD];
+        [btn setTitle:@"数据流" forState:UIControlStateNormal];
+        [btn setTitleColor:RgbColor(40, 102, 177, 1) forState:UIControlStateNormal];
+        [btn addTarget:self action:@selector(toLiveData) forControlEvents:UIControlEventTouchUpInside];
+        btn;
+    });
+    [self.view addSubview:liveDataBtn];
+    
+    [liveDataBtn mas_makeConstraints:^(MASConstraintMaker *make) {
+        make.left.equalTo(self.view);
+        make.bottom.equalTo(self.view).offset(-44);
+        make.height.mas_equalTo(40 * _scale);
+        make.width.mas_equalTo(120 * _scale);
+    }];
+}
+
+- (void)toLiveData {
+    [self.navigationController pushViewController:[TDDataFlowViewController new] animated:YES];
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section{

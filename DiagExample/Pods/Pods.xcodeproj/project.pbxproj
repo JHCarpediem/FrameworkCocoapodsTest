@@ -3381,6 +3381,56 @@
 		D61DB40A66D93B0AB2D94AE2A127A9E2 /* SDImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 13E313B29E037A4D73BE749E47A2DF53 /* SDImageCache.m */; };
 		D6348ABC56016D11AB0D4EF4E1855AE7 /* FIRCLSUnwind_x86.c in Sources */ = {isa = PBXBuildFile; fileRef = 348B61F4234581AD8B244AE16D5842D8 /* FIRCLSUnwind_x86.c */; };
 		D63911A7E1B7D8C30F874EA527241719 /* ShapeItemLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D938DA8EE15E779ACC05A81099D96EB1 /* ShapeItemLayer.swift */; };
+		D666DE502ED82F1000908A87 /* CBOBD2DTC.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE242ED82F1000908A87 /* CBOBD2DTC.m */; };
+		D666DE512ED82F1000908A87 /* CBBTLEReadCharacteristicStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE422ED82F1000908A87 /* CBBTLEReadCharacteristicStream.m */; };
+		D666DE522ED82F1000908A87 /* CBOBD2O2Sensor.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE2A2ED82F1000908A87 /* CBOBD2O2Sensor.m */; };
+		D666DE532ED82F1000908A87 /* CBSupportAutomotive.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE342ED82F1000908A87 /* CBSupportAutomotive.m */; };
+		D666DE542ED82F1000908A87 /* CBOBD2Mode6TestResult.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE262ED82F1000908A87 /* CBOBD2Mode6TestResult.m */; };
+		D666DE552ED82F1000908A87 /* CBOBD2Protocol.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE372ED82F1000908A87 /* CBOBD2Protocol.m */; };
+		D666DE562ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE3D2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.m */; };
+		D666DE572ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE392ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.m */; };
+		D666DE582ED82F1000908A87 /* CBOBD2MonitorResult.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE282ED82F1000908A87 /* CBOBD2MonitorResult.m */; };
+		D666DE592ED82F1000908A87 /* CBOBD2Command.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE2F2ED82F1000908A87 /* CBOBD2Command.m */; };
+		D666DE5A2ED82F1000908A87 /* CBBTLESerialTransporter.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE442ED82F1000908A87 /* CBBTLESerialTransporter.m */; };
+		D666DE5B2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE3F2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.m */; };
+		D666DE5C2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE2C2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.m */; };
+		D666DE5D2ED82F1000908A87 /* CBOBD2AdapterELM327.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE1F2ED82F1000908A87 /* CBOBD2AdapterELM327.m */; };
+		D666DE5E2ED82F1000908A87 /* CBOBD2PID.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE312ED82F1000908A87 /* CBOBD2PID.m */; };
+		D666DE5F2ED82F1000908A87 /* CBOBD2Adapter.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE1B2ED82F1000908A87 /* CBOBD2Adapter.m */; };
+		D666DE602ED82F1000908A87 /* CBOBD2AdapterCaptureFile.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE1D2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.m */; };
+		D666DE612ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE3B2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.m */; };
+		D666DE622ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE462ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.m */; };
+		D666DE632ED82F1000908A87 /* CBOBD2CaptureFile.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE222ED82F1000908A87 /* CBOBD2CaptureFile.m */; };
+		D666DE642ED82F1000908A87 /* CBVIN.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE492ED82F1000908A87 /* CBVIN.m */; };
+		D666DE652ED82F1000908A87 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = D666DE4E2ED82F1000908A87 /* Localizable.strings */; };
+		D666DE662ED82F1000908A87 /* CBOBD2Command.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE2E2ED82F1000908A87 /* CBOBD2Command.h */; };
+		D666DE672ED82F1000908A87 /* CBOBD2AdapterELM327.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE1E2ED82F1000908A87 /* CBOBD2AdapterELM327.h */; };
+		D666DE682ED82F1000908A87 /* CBOBD2DTC.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE232ED82F1000908A87 /* CBOBD2DTC.h */; };
+		D666DE692ED82F1000908A87 /* CBOBD2CaptureFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE212ED82F1000908A87 /* CBOBD2CaptureFile.h */; };
+		D666DE6A2ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE452ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.h */; };
+		D666DE6B2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE1C2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.h */; };
+		D666DE6C2ED82F1000908A87 /* CBOBD2PID.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE302ED82F1000908A87 /* CBOBD2PID.h */; };
+		D666DE6D2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE3A2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.h */; };
+		D666DE6E2ED82F1000908A87 /* CBOBD2Adapter.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE1A2ED82F1000908A87 /* CBOBD2Adapter.h */; };
+		D666DE6F2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE3C2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.h */; };
+		D666DE702ED82F1000908A87 /* CBBTLEReadCharacteristicStream.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE412ED82F1000908A87 /* CBBTLEReadCharacteristicStream.h */; };
+		D666DE712ED82F1000908A87 /* CBOBD2Mode6TestResult.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE252ED82F1000908A87 /* CBOBD2Mode6TestResult.h */; };
+		D666DE722ED82F1000908A87 /* CBBTLESerialTransporter.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE432ED82F1000908A87 /* CBBTLESerialTransporter.h */; };
+		D666DE732ED82F1000908A87 /* CBOBD2O2Sensor.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE292ED82F1000908A87 /* CBOBD2O2Sensor.h */; };
+		D666DE742ED82F1000908A87 /* CBSupportAutomotive.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE332ED82F1000908A87 /* CBSupportAutomotive.h */; };
+		D666DE752ED82F1000908A87 /* CBOBD2MonitorResult.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE272ED82F1000908A87 /* CBOBD2MonitorResult.h */; };
+		D666DE762ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE2B2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.h */; };
+		D666DE772ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE382ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.h */; };
+		D666DE782ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE3E2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.h */; };
+		D666DE792ED82F1000908A87 /* CBOBD2Protocol.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE362ED82F1000908A87 /* CBOBD2Protocol.h */; };
+		D666DE7A2ED82F1000908A87 /* CBVIN.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE482ED82F1000908A87 /* CBVIN.h */; };
+		D666DE832ED84BF400908A87 /* TDDataFlowViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE7F2ED84BF400908A87 /* TDDataFlowViewController.m */; };
+		D666DE842ED84BF400908A87 /* TDLiveDataPlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE812ED84BF400908A87 /* TDLiveDataPlayViewController.m */; };
+		D666DE852ED84BF400908A87 /* TDDataFlowCell.m in Sources */ = {isa = PBXBuildFile; fileRef = D666DE7C2ED84BF400908A87 /* TDDataFlowCell.m */; };
+		D666DE862ED84BF400908A87 /* TDLiveDataPlayViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE802ED84BF400908A87 /* TDLiveDataPlayViewController.h */; };
+		D666DE872ED84BF400908A87 /* TDDataFlowCell.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE7B2ED84BF400908A87 /* TDDataFlowCell.h */; };
+		D666DE882ED84BF400908A87 /* TDDataFlowModel.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE7D2ED84BF400908A87 /* TDDataFlowModel.h */; };
+		D666DE892ED84BF400908A87 /* TDDataFlowViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = D666DE7E2ED84BF400908A87 /* TDDataFlowViewController.h */; };
 		D66DBC117881BEFFCD14E037D468582C /* OrderingTerm.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F7CFBFE871176E2BEB5F79ABF9047107 /* OrderingTerm.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D67A8CF1F49F8A6BDFC601CB0AAC4C82 /* FIRCLSUserDefaults.h in Headers */ = {isa = PBXBuildFile; fileRef = 3E8882CCD3876274A6EEF8A23FC4C73A /* FIRCLSUserDefaults.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		D689C7C38A1F7AB135DB9412490FFF94 /* SDWebImageOperation.h in Headers */ = {isa = PBXBuildFile; fileRef = 9AD0713615F1B3432F3BE2F0BF02F898 /* SDWebImageOperation.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -8383,6 +8433,58 @@
 		D64B7637EB312C7B1277AFB071404AC5 /* ASTabBarController.mm */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.objcpp; name = ASTabBarController.mm; path = Source/ASTabBarController.mm; sourceTree = "<group>"; };
 		D64C6051F1AEFDADFAEFC01E29D95004 /* FactoryRetriever.hpp */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.cpp.h; name = FactoryRetriever.hpp; path = src/common/repair/factory/FactoryRetriever.hpp; sourceTree = "<group>"; };
 		D6565F322C2B19B4DAD26CB587EF689E /* MJRefreshAutoNormalFooter.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = MJRefreshAutoNormalFooter.h; path = MJRefresh/Custom/Footer/Auto/MJRefreshAutoNormalFooter.h; sourceTree = "<group>"; };
+		D666DE1A2ED82F1000908A87 /* CBOBD2Adapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2Adapter.h; sourceTree = "<group>"; };
+		D666DE1B2ED82F1000908A87 /* CBOBD2Adapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2Adapter.m; sourceTree = "<group>"; };
+		D666DE1C2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2AdapterCaptureFile.h; sourceTree = "<group>"; };
+		D666DE1D2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2AdapterCaptureFile.m; sourceTree = "<group>"; };
+		D666DE1E2ED82F1000908A87 /* CBOBD2AdapterELM327.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2AdapterELM327.h; sourceTree = "<group>"; };
+		D666DE1F2ED82F1000908A87 /* CBOBD2AdapterELM327.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2AdapterELM327.m; sourceTree = "<group>"; };
+		D666DE212ED82F1000908A87 /* CBOBD2CaptureFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2CaptureFile.h; sourceTree = "<group>"; };
+		D666DE222ED82F1000908A87 /* CBOBD2CaptureFile.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2CaptureFile.m; sourceTree = "<group>"; };
+		D666DE232ED82F1000908A87 /* CBOBD2DTC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2DTC.h; sourceTree = "<group>"; };
+		D666DE242ED82F1000908A87 /* CBOBD2DTC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2DTC.m; sourceTree = "<group>"; };
+		D666DE252ED82F1000908A87 /* CBOBD2Mode6TestResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2Mode6TestResult.h; sourceTree = "<group>"; };
+		D666DE262ED82F1000908A87 /* CBOBD2Mode6TestResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2Mode6TestResult.m; sourceTree = "<group>"; };
+		D666DE272ED82F1000908A87 /* CBOBD2MonitorResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2MonitorResult.h; sourceTree = "<group>"; };
+		D666DE282ED82F1000908A87 /* CBOBD2MonitorResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2MonitorResult.m; sourceTree = "<group>"; };
+		D666DE292ED82F1000908A87 /* CBOBD2O2Sensor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2O2Sensor.h; sourceTree = "<group>"; };
+		D666DE2A2ED82F1000908A87 /* CBOBD2O2Sensor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2O2Sensor.m; sourceTree = "<group>"; };
+		D666DE2B2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2PerformanceTrackingResult.h; sourceTree = "<group>"; };
+		D666DE2C2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2PerformanceTrackingResult.m; sourceTree = "<group>"; };
+		D666DE2E2ED82F1000908A87 /* CBOBD2Command.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2Command.h; sourceTree = "<group>"; };
+		D666DE2F2ED82F1000908A87 /* CBOBD2Command.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2Command.m; sourceTree = "<group>"; };
+		D666DE302ED82F1000908A87 /* CBOBD2PID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2PID.h; sourceTree = "<group>"; };
+		D666DE312ED82F1000908A87 /* CBOBD2PID.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2PID.m; sourceTree = "<group>"; };
+		D666DE332ED82F1000908A87 /* CBSupportAutomotive.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBSupportAutomotive.h; sourceTree = "<group>"; };
+		D666DE342ED82F1000908A87 /* CBSupportAutomotive.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBSupportAutomotive.m; sourceTree = "<group>"; };
+		D666DE362ED82F1000908A87 /* CBOBD2Protocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2Protocol.h; sourceTree = "<group>"; };
+		D666DE372ED82F1000908A87 /* CBOBD2Protocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2Protocol.m; sourceTree = "<group>"; };
+		D666DE382ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2ProtocolISO9141_2.h; sourceTree = "<group>"; };
+		D666DE392ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2ProtocolISO9141_2.m; sourceTree = "<group>"; };
+		D666DE3A2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2ProtocolISO14230_4.h; sourceTree = "<group>"; };
+		D666DE3B2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2ProtocolISO14230_4.m; sourceTree = "<group>"; };
+		D666DE3C2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2ProtocolISO15765_4.h; sourceTree = "<group>"; };
+		D666DE3D2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2ProtocolISO15765_4.m; sourceTree = "<group>"; };
+		D666DE3E2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBOBD2ProtocolSAEJ1850.h; sourceTree = "<group>"; };
+		D666DE3F2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBOBD2ProtocolSAEJ1850.m; sourceTree = "<group>"; };
+		D666DE412ED82F1000908A87 /* CBBTLEReadCharacteristicStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBBTLEReadCharacteristicStream.h; sourceTree = "<group>"; };
+		D666DE422ED82F1000908A87 /* CBBTLEReadCharacteristicStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBBTLEReadCharacteristicStream.m; sourceTree = "<group>"; };
+		D666DE432ED82F1000908A87 /* CBBTLESerialTransporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBBTLESerialTransporter.h; sourceTree = "<group>"; };
+		D666DE442ED82F1000908A87 /* CBBTLESerialTransporter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBBTLESerialTransporter.m; sourceTree = "<group>"; };
+		D666DE452ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBBTLEWriteCharacteristicStream.h; sourceTree = "<group>"; };
+		D666DE462ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBBTLEWriteCharacteristicStream.m; sourceTree = "<group>"; };
+		D666DE482ED82F1000908A87 /* CBVIN.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CBVIN.h; sourceTree = "<group>"; };
+		D666DE492ED82F1000908A87 /* CBVIN.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CBVIN.m; sourceTree = "<group>"; };
+		D666DE4B2ED82F1000908A87 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = ../Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D666DE4C2ED82F1000908A87 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = ../de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D666DE4D2ED82F1000908A87 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = ../fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		D666DE7B2ED84BF400908A87 /* TDDataFlowCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TDDataFlowCell.h; sourceTree = "<group>"; };
+		D666DE7C2ED84BF400908A87 /* TDDataFlowCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TDDataFlowCell.m; sourceTree = "<group>"; };
+		D666DE7D2ED84BF400908A87 /* TDDataFlowModel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TDDataFlowModel.h; sourceTree = "<group>"; };
+		D666DE7E2ED84BF400908A87 /* TDDataFlowViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TDDataFlowViewController.h; sourceTree = "<group>"; };
+		D666DE7F2ED84BF400908A87 /* TDDataFlowViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TDDataFlowViewController.m; sourceTree = "<group>"; };
+		D666DE802ED84BF400908A87 /* TDLiveDataPlayViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TDLiveDataPlayViewController.h; sourceTree = "<group>"; };
+		D666DE812ED84BF400908A87 /* TDLiveDataPlayViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TDLiveDataPlayViewController.m; sourceTree = "<group>"; };
 		D66937E909BE1F65B9DD47E711E4EF12 /* TransformerHorizontalBarChart.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransformerHorizontalBarChart.swift; path = Source/Charts/Utils/TransformerHorizontalBarChart.swift; sourceTree = "<group>"; };
 		D6A1B3BB492F48B8AE117E9666ACE263 /* Promise+All.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Promise+All.swift"; path = "Sources/Promises/Promise+All.swift"; sourceTree = "<group>"; };
 		D6C2AEA23C0C970B2A1B894322C32DBE /* UIConfig.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = UIConfig.swift; path = TDUIProvider/Classes/Core/UIConfig.swift; sourceTree = "<group>"; };
@@ -9647,6 +9749,7 @@
 		02BC05AFE4F63E2E9177779653ACFDD4 /* Tools */ = {
 			isa = PBXGroup;
 			children = (
+				82834D4412B3F16A72F595A62A873BFD /* HBLE */,
 				007A4D228AE6A0C27AADE58667544583 /* TDD_ADASManage.h */,
 				3540B80F3BE0B7DAB7F02F5E9AD02250 /* TDD_ADASManage.m */,
 				1D9A4F914AE3315C87D1E1A48A223F63 /* TDD_AlertTools.h */,
@@ -12132,6 +12235,7 @@
 				8D35D67EEE399FF5CF18A62396C9BD8B /* TDDLocalized.swift */,
 				4D27EC93DE94B3BC447E6769863795ED /* TDDUIConfig.swift */,
 				6C3A5248E45383653CF80EC2DBDBD78C /* TDDUIProvider.swift */,
+				D666DE822ED84BF400908A87 /* DataFlow */,
 				E3610372EAEA0FBF78BC49001183B314 /* Category */,
 				1BC019D284C32BAA0A36A5E7ED3C3D96 /* DBModel */,
 				8B3DA182A4472826F19D849A88845D5E /* HLanguage */,
@@ -12188,7 +12292,8 @@
 				C295ED353E11F54697996B15A8BC0375 /* TDD_HMBLECenterHandle.h */,
 				CFE246DEA0BA60AAF2045A1587C1D114 /* TDD_HMBLECenterHandle.m */,
 			);
-			path = HBLE;
+			name = HBLE;
+			path = ../../BLE/HBLE;
 			sourceTree = "<group>";
 		};
 		834E2A173E1A75948FF0F0897BFDF247 /* Support Files */ = {
@@ -12598,8 +12703,8 @@
 		953BFCFAA4CF7D8A8C74A9F479A7CA90 /* BLE */ = {
 			isa = PBXGroup;
 			children = (
+				D666DE4F2ED82F1000908A87 /* CBBLE */,
 				508A037AE90B7EEC4FBC7C2471F7B703 /* EABLE */,
-				82834D4412B3F16A72F595A62A873BFD /* HBLE */,
 			);
 			name = BLE;
 			path = Diagnosis/Classes/BLE;
@@ -12817,11 +12922,11 @@
 				FD0DA75F5641D45C4BF341A257F23AAC /* Diagnosis-Bridging-Header.h */,
 				953BFCFAA4CF7D8A8C74A9F479A7CA90 /* BLE */,
 				281A64F12136663721C34B5452821B94 /* Diagnosis */,
+				E26750C92CF43C05DEDF285026BC0024 /* UI */,
+				8246254850297C42485DDF487004EAAE /* Tools */,
 				DB6B573831E795686FFF7B2BD6BD01BD /* Frameworks */,
 				96AEE5FA0CA8A0D66DD7715BA46B0DA8 /* Pod */,
 				0D7ACA582A1D9384CD13659CB6A3BD4F /* Support Files */,
-				8246254850297C42485DDF487004EAAE /* Tools */,
-				E26750C92CF43C05DEDF285026BC0024 /* UI */,
 			);
 			name = Diagnosis;
 			path = ../..;
@@ -15122,6 +15227,126 @@
 			name = UIPackage;
 			sourceTree = "<group>";
 		};
+		D666DE202ED82F1000908A87 /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE1A2ED82F1000908A87 /* CBOBD2Adapter.h */,
+				D666DE1B2ED82F1000908A87 /* CBOBD2Adapter.m */,
+				D666DE1C2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.h */,
+				D666DE1D2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.m */,
+				D666DE1E2ED82F1000908A87 /* CBOBD2AdapterELM327.h */,
+				D666DE1F2ED82F1000908A87 /* CBOBD2AdapterELM327.m */,
+			);
+			path = Adapters;
+			sourceTree = "<group>";
+		};
+		D666DE2D2ED82F1000908A87 /* Auxilliary */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE212ED82F1000908A87 /* CBOBD2CaptureFile.h */,
+				D666DE222ED82F1000908A87 /* CBOBD2CaptureFile.m */,
+				D666DE232ED82F1000908A87 /* CBOBD2DTC.h */,
+				D666DE242ED82F1000908A87 /* CBOBD2DTC.m */,
+				D666DE252ED82F1000908A87 /* CBOBD2Mode6TestResult.h */,
+				D666DE262ED82F1000908A87 /* CBOBD2Mode6TestResult.m */,
+				D666DE272ED82F1000908A87 /* CBOBD2MonitorResult.h */,
+				D666DE282ED82F1000908A87 /* CBOBD2MonitorResult.m */,
+				D666DE292ED82F1000908A87 /* CBOBD2O2Sensor.h */,
+				D666DE2A2ED82F1000908A87 /* CBOBD2O2Sensor.m */,
+				D666DE2B2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.h */,
+				D666DE2C2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.m */,
+			);
+			path = Auxilliary;
+			sourceTree = "<group>";
+		};
+		D666DE322ED82F1000908A87 /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE4E2ED82F1000908A87 /* Localizable.strings */,
+				D666DE2E2ED82F1000908A87 /* CBOBD2Command.h */,
+				D666DE2F2ED82F1000908A87 /* CBOBD2Command.m */,
+				D666DE302ED82F1000908A87 /* CBOBD2PID.h */,
+				D666DE312ED82F1000908A87 /* CBOBD2PID.m */,
+			);
+			path = Commands;
+			sourceTree = "<group>";
+		};
+		D666DE352ED82F1000908A87 /* Global */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE332ED82F1000908A87 /* CBSupportAutomotive.h */,
+				D666DE342ED82F1000908A87 /* CBSupportAutomotive.m */,
+			);
+			path = Global;
+			sourceTree = "<group>";
+		};
+		D666DE402ED82F1000908A87 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE362ED82F1000908A87 /* CBOBD2Protocol.h */,
+				D666DE372ED82F1000908A87 /* CBOBD2Protocol.m */,
+				D666DE382ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.h */,
+				D666DE392ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.m */,
+				D666DE3A2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.h */,
+				D666DE3B2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.m */,
+				D666DE3C2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.h */,
+				D666DE3D2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.m */,
+				D666DE3E2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.h */,
+				D666DE3F2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.m */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		D666DE472ED82F1000908A87 /* Serial Transporter */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE412ED82F1000908A87 /* CBBTLEReadCharacteristicStream.h */,
+				D666DE422ED82F1000908A87 /* CBBTLEReadCharacteristicStream.m */,
+				D666DE432ED82F1000908A87 /* CBBTLESerialTransporter.h */,
+				D666DE442ED82F1000908A87 /* CBBTLESerialTransporter.m */,
+				D666DE452ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.h */,
+				D666DE462ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.m */,
+			);
+			path = "Serial Transporter";
+			sourceTree = "<group>";
+		};
+		D666DE4A2ED82F1000908A87 /* VIN Decoding */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE482ED82F1000908A87 /* CBVIN.h */,
+				D666DE492ED82F1000908A87 /* CBVIN.m */,
+			);
+			path = "VIN Decoding";
+			sourceTree = "<group>";
+		};
+		D666DE4F2ED82F1000908A87 /* CBBLE */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE202ED82F1000908A87 /* Adapters */,
+				D666DE2D2ED82F1000908A87 /* Auxilliary */,
+				D666DE322ED82F1000908A87 /* Commands */,
+				D666DE352ED82F1000908A87 /* Global */,
+				D666DE402ED82F1000908A87 /* Protocols */,
+				D666DE472ED82F1000908A87 /* Serial Transporter */,
+				D666DE4A2ED82F1000908A87 /* VIN Decoding */,
+			);
+			path = CBBLE;
+			sourceTree = "<group>";
+		};
+		D666DE822ED84BF400908A87 /* DataFlow */ = {
+			isa = PBXGroup;
+			children = (
+				D666DE7B2ED84BF400908A87 /* TDDataFlowCell.h */,
+				D666DE7C2ED84BF400908A87 /* TDDataFlowCell.m */,
+				D666DE7D2ED84BF400908A87 /* TDDataFlowModel.h */,
+				D666DE7E2ED84BF400908A87 /* TDDataFlowViewController.h */,
+				D666DE7F2ED84BF400908A87 /* TDDataFlowViewController.m */,
+				D666DE802ED84BF400908A87 /* TDLiveDataPlayViewController.h */,
+				D666DE812ED84BF400908A87 /* TDLiveDataPlayViewController.m */,
+			);
+			path = DataFlow;
+			sourceTree = "<group>";
+		};
 		D77705A68624BE3C6CBF378AD99FF976 /* Network */ = {
 			isa = PBXGroup;
 			children = (
@@ -16283,6 +16508,27 @@
 				23985737AA71D9EA9B9027F80DF7EB0F /* TDD_ArtiFreqWaveModel.h in Headers */,
 				1CA2BFBC8F5CECCEEA1320A4DD708DB5 /* TDD_ArtiFreqWaveView.h in Headers */,
 				739C68BD9EB631B7135B720C523C0B1D /* TDD_ArtiFuelLevelModel.h in Headers */,
+				D666DE662ED82F1000908A87 /* CBOBD2Command.h in Headers */,
+				D666DE672ED82F1000908A87 /* CBOBD2AdapterELM327.h in Headers */,
+				D666DE682ED82F1000908A87 /* CBOBD2DTC.h in Headers */,
+				D666DE692ED82F1000908A87 /* CBOBD2CaptureFile.h in Headers */,
+				D666DE6A2ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.h in Headers */,
+				D666DE6B2ED82F1000908A87 /* CBOBD2AdapterCaptureFile.h in Headers */,
+				D666DE6C2ED82F1000908A87 /* CBOBD2PID.h in Headers */,
+				D666DE6D2ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.h in Headers */,
+				D666DE6E2ED82F1000908A87 /* CBOBD2Adapter.h in Headers */,
+				D666DE6F2ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.h in Headers */,
+				D666DE702ED82F1000908A87 /* CBBTLEReadCharacteristicStream.h in Headers */,
+				D666DE712ED82F1000908A87 /* CBOBD2Mode6TestResult.h in Headers */,
+				D666DE722ED82F1000908A87 /* CBBTLESerialTransporter.h in Headers */,
+				D666DE732ED82F1000908A87 /* CBOBD2O2Sensor.h in Headers */,
+				D666DE742ED82F1000908A87 /* CBSupportAutomotive.h in Headers */,
+				D666DE752ED82F1000908A87 /* CBOBD2MonitorResult.h in Headers */,
+				D666DE762ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.h in Headers */,
+				D666DE772ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.h in Headers */,
+				D666DE782ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.h in Headers */,
+				D666DE792ED82F1000908A87 /* CBOBD2Protocol.h in Headers */,
+				D666DE7A2ED82F1000908A87 /* CBVIN.h in Headers */,
 				F75015F369531BA259583143F58360F2 /* TDD_ArtiFuelLevelView.h in Headers */,
 				49907E4A54F5C5045C12D08D0B237FDA /* TDD_ArtiGatewayRightsView.h in Headers */,
 				294F0A1DCB48808DF3BAF596E165DBCA /* TDD_ArtiGlobalModel.h in Headers */,
@@ -16323,6 +16569,10 @@
 				C486DA3B696D77BEDBF121FE1C658FCC /* TDD_ArtiMenuCellView.h in Headers */,
 				076F863B93C9F5ACADC651805BFF4768 /* TDD_ArtiMenuModel.h in Headers */,
 				210F53862EE62F15707C69699058B76F /* TDD_ArtiMenuView.h in Headers */,
+				D666DE862ED84BF400908A87 /* TDLiveDataPlayViewController.h in Headers */,
+				D666DE872ED84BF400908A87 /* TDDataFlowCell.h in Headers */,
+				D666DE882ED84BF400908A87 /* TDDataFlowModel.h in Headers */,
+				D666DE892ED84BF400908A87 /* TDDataFlowViewController.h in Headers */,
 				BD9BA54474E58EF6668DBC0221270A10 /* TDD_ArtiMiniMsgBoxModel.h in Headers */,
 				67024F7E9B7D6F3499DC32C10E771BA7 /* TDD_ArtiMiniMsgBoxView.h in Headers */,
 				41440F042A649AED509DCC476BF1A7AA /* TDD_ArtiModelBase.h in Headers */,
@@ -18902,6 +19152,8 @@
 			knownRegions = (
 				Base,
 				en,
+				de,
+				fr,
 			);
 			mainGroup = CF1408CF629C7361332E53B88F7BD30C;
 			productRefGroup = 7F5F32B5EFDC270B294D5828D483AA44 /* Products */;
@@ -19331,6 +19583,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D666DE652ED82F1000908A87 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -20480,6 +20733,9 @@
 				FDF278C1904F32CD1D41945A80CD3AEC /* TDD_ArtiObdReviewModel.mm in Sources */,
 				B385CABFFD29BE52FA2342CD8303B062 /* TDD_ArtiPictureCellView.m in Sources */,
 				2E0770744200F12B8F0FF11ED58AF431 /* TDD_ArtiPictureHeadCell.m in Sources */,
+				D666DE832ED84BF400908A87 /* TDDataFlowViewController.m in Sources */,
+				D666DE842ED84BF400908A87 /* TDLiveDataPlayViewController.m in Sources */,
+				D666DE852ED84BF400908A87 /* TDDataFlowCell.m in Sources */,
 				FBFE9CDACBEDD97BEBDE63A54172989A /* TDD_ArtiPictureModel.mm in Sources */,
 				99B20BC3A60263425C323C8763550496 /* TDD_ArtiPictureView.m in Sources */,
 				477E5F48976984500641583C56FE98C5 /* TDD_ArtiPopupCellView.m in Sources */,
@@ -20554,6 +20810,27 @@
 				171C5D15EF6F5C29BDF16EF9DCBD5218 /* TDD_DeviceTools.m in Sources */,
 				5E41D7B73F1144F223D33418EC5AFC8B /* TDD_DiagBridge.m in Sources */,
 				FC5A9D2290754D5F642B113F3F1AF289 /* TDD_DiagNaviBtnGuildView.m in Sources */,
+				D666DE502ED82F1000908A87 /* CBOBD2DTC.m in Sources */,
+				D666DE512ED82F1000908A87 /* CBBTLEReadCharacteristicStream.m in Sources */,
+				D666DE522ED82F1000908A87 /* CBOBD2O2Sensor.m in Sources */,
+				D666DE532ED82F1000908A87 /* CBSupportAutomotive.m in Sources */,
+				D666DE542ED82F1000908A87 /* CBOBD2Mode6TestResult.m in Sources */,
+				D666DE552ED82F1000908A87 /* CBOBD2Protocol.m in Sources */,
+				D666DE562ED82F1000908A87 /* CBOBD2ProtocolISO15765_4.m in Sources */,
+				D666DE572ED82F1000908A87 /* CBOBD2ProtocolISO9141_2.m in Sources */,
+				D666DE582ED82F1000908A87 /* CBOBD2MonitorResult.m in Sources */,
+				D666DE592ED82F1000908A87 /* CBOBD2Command.m in Sources */,
+				D666DE5A2ED82F1000908A87 /* CBBTLESerialTransporter.m in Sources */,
+				D666DE5B2ED82F1000908A87 /* CBOBD2ProtocolSAEJ1850.m in Sources */,
+				D666DE5C2ED82F1000908A87 /* CBOBD2PerformanceTrackingResult.m in Sources */,
+				D666DE5D2ED82F1000908A87 /* CBOBD2AdapterELM327.m in Sources */,
+				D666DE5E2ED82F1000908A87 /* CBOBD2PID.m in Sources */,
+				D666DE5F2ED82F1000908A87 /* CBOBD2Adapter.m in Sources */,
+				D666DE602ED82F1000908A87 /* CBOBD2AdapterCaptureFile.m in Sources */,
+				D666DE612ED82F1000908A87 /* CBOBD2ProtocolISO14230_4.m in Sources */,
+				D666DE622ED82F1000908A87 /* CBBTLEWriteCharacteristicStream.m in Sources */,
+				D666DE632ED82F1000908A87 /* CBOBD2CaptureFile.m in Sources */,
+				D666DE642ED82F1000908A87 /* CBVIN.m in Sources */,
 				1DCD849E848035CB46DD86970BB53CCE /* TDD_DiagnosisManage.mm in Sources */,
 				BD875C46568FA8FB280A48BC4319F02E /* TDD_DiagnosisTools.mm in Sources */,
 				EB60A776528C55B8888CE268DDD9E746 /* TDD_DiagnosisViewController.m in Sources */,
@@ -22800,6 +23077,19 @@
 			targetProxy = 40F47CD8341591CB212CFBD468381771 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D666DE4E2ED82F1000908A87 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D666DE4B2ED82F1000908A87 /* Base */,
+				D666DE4C2ED82F1000908A87 /* de */,
+				D666DE4D2ED82F1000908A87 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		00E11A55D43A91E01F28B5BE7F322706 /* Debug */ = {

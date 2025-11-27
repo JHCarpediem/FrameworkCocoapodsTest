@@ -854,6 +854,7 @@
 
 /// 获取选中VCI sn
 + (NSString *)selectedVCISerialNum {
+    return @"110238C4F13562";
     NSString *str = @"";
     if ([[TDD_DiagnosisManage sharedManage].manageDelegate respondsToSelector:@selector(selectedVCISerialNum)]) {
         str = [[TDD_DiagnosisManage sharedManage].manageDelegate selectedVCISerialNum];

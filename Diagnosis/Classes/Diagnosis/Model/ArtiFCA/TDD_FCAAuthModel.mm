@@ -296,6 +296,7 @@
 }
 
 /// 登陆认证
+///110238C4F13562
 /// 测试： sn = @"11034213F10085"; accountStr = @"tchenautoauth"; passwordStr = @"Tchen@autoauth123";
 /// 欧洲：RyanZhang1/1z2h1ang#K1
 + (void)requestFcaLoginWithType:(eSpecialShowType)type complete:(void(^)(BOOL isSuccess,NSInteger code))complete {
